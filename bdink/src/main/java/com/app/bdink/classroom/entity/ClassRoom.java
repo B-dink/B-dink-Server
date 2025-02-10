@@ -2,6 +2,7 @@ package com.app.bdink.classroom.entity;
 
 import com.app.bdink.classroom.domain.ChapterSummary;
 import com.app.bdink.classroom.domain.PriceDetail;
+import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ClassRoom {
+public class ClassRoom extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

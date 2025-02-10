@@ -1,6 +1,7 @@
 package com.app.bdink.classroom.controller;
 
-import com.app.bdink.classroom.controller.dto.ClassRoomDto;
+import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,10 @@ public class ClassRoomController {
 
     @GetMapping
     ResponseEntity<?> getClassRoomInfo(@RequestParam Long id){
-        ClassRoom classRoom = classRoomService.getClassRoom(id);
-        return ResponseEntity.ok(classRoom);
+        ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
+        return ResponseEntity.ok(classRoomDto);
     }
+
+
 
 }

@@ -1,9 +1,10 @@
 package com.app.bdink.classroom.service;
 
-import com.app.bdink.classroom.controller.dto.ClassRoomDto;
+import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,19 +17,22 @@ public class ClassRoomService {
 
     private final ClassRoomRepository classRoomRepository;
 
+    public ClassRoom findById(Long id){
+        return classRoomRepository.findById(id).orElseThrow(
+                ()-> new IllegalStateException("해당 클래스를 찾지 못했습니다.")
+        );
+    }
+
     @Transactional(readOnly = true)
-    public ClassRoom getClassRoom(final Long id){
-        Optional<ClassRoom> classRoom = classRoomRepository.findById(id);
-        if (classRoom.isEmpty()){
-            throw new IllegalStateException("해당 클래스 룸이 존재하지 않습니다.");
-        }
-        return classRoom.get();
+    public ClassRoomResponse getClassRoomInfo(final Long id) {
+        ClassRoom classRoom = findById(id);
+        return ClassRoomResponse.from(classRoom);
     }
 
     @Transactional
-    public String createClassRoom(final ClassRoomDto classRoomDto){
+    public String createClassRoom(final ClassRoomDto classRoomDto) {
         Long id = classRoomRepository.save(
-                classRoomDto.toEntity())
+                        classRoomDto.toEntity())
                 .getId();
         return String.valueOf(id);
     }

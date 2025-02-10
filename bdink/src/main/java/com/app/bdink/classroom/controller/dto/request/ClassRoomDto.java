@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.controller.dto;
+package com.app.bdink.classroom.controller.dto.request;
 
 import com.app.bdink.classroom.entity.ClassRoom;
 
