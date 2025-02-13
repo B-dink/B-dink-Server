@@ -32,8 +32,21 @@ public class ClassRoomService {
     @Transactional
     public String createClassRoom(final ClassRoomDto classRoomDto) {
         Long id = classRoomRepository.save(
-                        classRoomDto.toEntity())
+                    classRoomDto.toEntity()
+                )
                 .getId();
         return String.valueOf(id);
+    }
+
+    @Transactional
+    public ClassRoomResponse updateClassRoomInfo(final Long id, final ClassRoomDto classRoomDto){
+        ClassRoom classRoom = findById(id);
+        classRoom.modifyClassRoom(classRoomDto);
+        return new ClassRoomResponse(
+                classRoom.getId(),
+                classRoom.getTitle(),
+                classRoom.getIntroduction(),
+                classRoom.getPriceDetail()
+        );
     }
 }

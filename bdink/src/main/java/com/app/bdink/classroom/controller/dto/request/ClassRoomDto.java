@@ -4,6 +4,7 @@ import com.app.bdink.classroom.entity.ClassRoom;
 
 public record ClassRoomDto(
         String title,
+
         String introduction,
 
         PriceDto priceDto

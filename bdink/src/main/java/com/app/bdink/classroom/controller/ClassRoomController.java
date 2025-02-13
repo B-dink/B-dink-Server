@@ -2,7 +2,6 @@ package com.app.bdink.classroom.controller;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
-import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ public class ClassRoomController {
     @PostMapping
     ResponseEntity<?> createClassRoom(@RequestBody ClassRoomDto classRoomDto){
         String id = classRoomService.createClassRoom(classRoomDto);
-        System.out.println("test커밋");
         return ResponseEntity.created(
                 URI.create(id))
                 .build();
@@ -30,6 +28,12 @@ public class ClassRoomController {
     ResponseEntity<?> getClassRoomInfo(@RequestParam Long id){
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
         return ResponseEntity.ok(classRoomDto);
+    }
+
+    @PutMapping
+    ResponseEntity<?> updateClassRoomInfo(@RequestParam Long id, @RequestBody ClassRoomDto classRoomDto){
+        ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(id, classRoomDto);
+        return ResponseEntity.ok(classResponse);
     }
 
 
