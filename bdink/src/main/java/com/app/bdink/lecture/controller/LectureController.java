@@ -17,7 +17,7 @@ public class LectureController {
     private final LectureService lectureService;
 
     @PostMapping
-    public ResponseEntity<?> createLecuture(@RequestParam Long memberId, @RequestParam Long classRoomId,
+    public ResponseEntity<?> createLecture(@RequestParam Long memberId, @RequestParam Long classRoomId,
                                             @RequestBody LectureDto lectureDto) {
 
         String id = lectureService.createLecture(memberId, classRoomId, lectureDto);
