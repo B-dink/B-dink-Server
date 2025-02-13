@@ -49,4 +49,10 @@ public class ClassRoomService {
                 classRoom.getPriceDetail()
         );
     }
+
+    @Transactional
+    public void deleteClassRoom(long id){
+        ClassRoom classRoom = findById(id);
+        classRoomRepository.delete(classRoom);
+    }
 }

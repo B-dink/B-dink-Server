@@ -36,6 +36,12 @@ public class ClassRoomController {
         return ResponseEntity.ok(classResponse);
     }
 
+    @DeleteMapping
+    ResponseEntity<?> deleteClassRoom(@RequestParam Long id){
+        classRoomService.deleteClassRoom(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 }
