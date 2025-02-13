@@ -20,6 +20,7 @@ public class ClassRoomController {
     @PostMapping
     ResponseEntity<?> createClassRoom(@RequestBody ClassRoomDto classRoomDto){
         String id = classRoomService.createClassRoom(classRoomDto);
+        System.out.println("test커밋");
         return ResponseEntity.created(
                 URI.create(id))
                 .build();
