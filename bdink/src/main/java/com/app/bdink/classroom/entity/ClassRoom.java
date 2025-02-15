@@ -1,14 +1,19 @@
 package com.app.bdink.classroom.entity;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.domain.ChapterSummary;
 import com.app.bdink.classroom.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.lecture.entity.Chapter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,28 +29,32 @@ public class ClassRoom extends BaseTimeEntity {
 
     private String introduction;
 
-    @Embedded
-    private PriceDetail priceDetail;
+    @OneToMany(mappedBy = "classRoom", cascade = CascadeType.REMOVE)
+    private List<Chapter> chapters = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Instructor instructor;
 
     @Embedded
-    private ChapterSummary chapterSummary;
+    private PriceDetail priceDetail;
 
 
     @Builder
     public ClassRoom(final String title, final String introduction,
-                     final PriceDetail priceDetail, final ChapterSummary chapterSummary) {
+                     final Instructor instructor,
+                     final PriceDetail priceDetail) {
 
         this.title = title;
+        this.instructor = instructor;
         this.introduction = introduction;
         this.priceDetail = priceDetail;
-        this.chapterSummary = chapterSummary;
     }
 
     public void modifyClassRoom(final ClassRoomDto classRoomDto){
         this.title = updateTitle(classRoomDto.title());
         this.introduction = updateIntroduction(classRoomDto.introduction());
         this.priceDetail = updatePriceDetail(classRoomDto.priceDto().toPriceDetail());
-        //TODO: chapter 로직 추가
     }
 
     public String updateTitle(final String title) {
@@ -70,5 +79,16 @@ public class ClassRoom extends BaseTimeEntity {
         }
         this.priceDetail = priceDetail;
         return priceDetail;
+    }
+
+    public boolean isOwner(final Instructor instructor){
+        return this.instructor.equals(instructor);
+    }
+
+    public void addChapter(final Chapter chapter){
+        if (chapter == null){
+            throw new IllegalStateException("chapter가 존재하지않습니다.");
+        }
+        this.chapters.add(chapter);
     }
 }

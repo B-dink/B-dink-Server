@@ -3,6 +3,7 @@ package com.app.bdink.classroom.service;
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,14 @@ public class ClassRoomService {
     }
 
     @Transactional
-    public String createClassRoom(final ClassRoomDto classRoomDto) {
-        Long id = classRoomRepository.save(
-                    classRoomDto.toEntity()
-                )
-                .getId();
+    public String createClassRoom(final Instructor instructor, final ClassRoomDto classRoomDto) {
+        ClassRoom classRoom = ClassRoom.builder()
+                .title(classRoomDto.title())
+                .introduction(classRoomDto.introduction())
+                .instructor(instructor)
+                .priceDetail(classRoomDto.priceDto().toPriceDetail())
+                .build();
+        Long id = classRoomRepository.save(classRoom).getId();
         return String.valueOf(id);
     }
 

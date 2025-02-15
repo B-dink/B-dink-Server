@@ -1,5 +1,6 @@
 package com.app.bdink.member.entity;
 
+import com.app.bdink.classroom.entity.Instructor;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,5 +21,8 @@ public class Member {
 
     @Column(name =  "gender")
     private boolean gender;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    private Instructor instructor;
 
 }

@@ -23,6 +23,7 @@ public class PriceDetailTest {
         //when
         int expected = priceDetail.getDiscountPrice();
 
+        //then
         Assertions.assertEquals(expected, result);
     }
 }
