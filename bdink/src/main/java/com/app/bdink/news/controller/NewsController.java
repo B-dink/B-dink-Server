@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/news")
+@RequestMapping("/api/v1/news")
 public class NewsController {
 
     private final NewsService newsService;
@@ -34,14 +35,14 @@ public class NewsController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateNews(@RequestBody NewsReqDto newsReqDto) {
-        newsService.updateNews(newsReqDto.toEntity().getId(), newsReqDto);
+    public ResponseEntity<?> updateNews(@RequestParam Long id, @RequestBody NewsReqDto newsReqDto) {
+        newsService.updateNews(id, newsReqDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteNews(@RequestBody NewsReqDto newsReqDto) {
-        newsService.deleteNews(newsReqDto.toEntity().getId());
+    public ResponseEntity<?> deleteNews(@RequestParam Long id) {
+        newsService.deleteNews(id);
         return ResponseEntity.ok().build();
     }
 }

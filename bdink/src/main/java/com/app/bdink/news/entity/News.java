@@ -42,11 +42,11 @@ public class News extends BaseTimeEntity {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public void update(NewsReqDto newsReqDto) {
-        this.title = updateTitle(newsReqDto.title());
-        this.content = updateContent(newsReqDto.content());
-        this.url = updateUrl(newsReqDto.url());
-        this.thumbnailUrl = updateThumbnailUrl(newsReqDto.thumbnailUrl());
+    public void update(String title, String content, String url, String thumbnailUrl) {
+        this.title = updateTitle(title);
+        this.content = updateContent(content);
+        this.url = updateUrl(url);
+        this.thumbnailUrl = updateThumbnailUrl(thumbnailUrl);
     }
 
     public String updateTitle(String title) {
