@@ -2,13 +2,13 @@ package com.app.bdink.member.entity;
 
 import com.app.bdink.classroom.entity.Instructor;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Member {
 
     @Id
@@ -18,6 +18,7 @@ public class Member {
 
     @Column(name = "name")
     private String name;
+
     //TODO: 나중에 "M", "F" 이런식으로 바꿔주기
     @Column(name =  "gender")
     private boolean gender;
@@ -25,4 +26,13 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
 
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "pictureUrl")
+    private String pictureUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
 }
