@@ -1,6 +1,10 @@
 package com.app.bdink.lecture.controller;
 
+import com.app.bdink.classroom.domain.Career;
+import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.lecture.controller.dto.InstructorDto;
+import com.app.bdink.lecture.controller.dto.request.UpdateInstructorDto;
+import com.app.bdink.lecture.controller.dto.response.InstructorInfoDto;
 import com.app.bdink.lecture.service.InstructorService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
@@ -31,5 +35,30 @@ public class InstructorController {
         return ResponseEntity.created(
                 URI.create(instructorId))
                 .build();
+    }
+
+    @GetMapping
+    @Operation(method = "GET", description = "강사 정보를 조회합니다.")
+    public ResponseEntity<?> getInstructorInfo(@RequestParam Long memberId){
+
+        Member member = memberService.findById(memberId);
+        InstructorInfoDto instructorInfo = instructorService.getInfo(member);
+        return ResponseEntity.ok(instructorInfo);
+    }
+
+    @PutMapping
+    @Operation(method = "PUT", description = "강사 정보를 수정합니다.")
+    public ResponseEntity<?> modifyInstructorInfo(@RequestParam Long memberId, @RequestBody UpdateInstructorDto instructorDto){
+        Member member = memberService.findById(memberId);
+        InstructorInfoDto infoDto = instructorService.modifyInstructorInfo(member, instructorDto);
+        return ResponseEntity.ok(infoDto);
+    }
+
+    @DeleteMapping
+    @Operation(method = "DELETE", description = "강사 정보를 삭제합니다. soft delete를 진행합니다. 강사정보를 제거하더라도 자신이 등록한 강의를 보유하고 싶을 수도 있기 때문에")
+    public ResponseEntity<?> deleteInstructor(@RequestParam Long memberId){
+        Member member = memberService.findById(memberId);
+        instructorService.deleteInstructor(member);
+        return ResponseEntity.noContent().build();
     }
 }

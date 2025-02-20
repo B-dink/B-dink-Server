@@ -18,7 +18,7 @@ public class Member {
 
     @Column(name = "name")
     private String name;
-
+    //TODO: 나중에 "M", "F" 이런식으로 바꿔주기
     @Column(name =  "gender")
     private boolean gender;
 
