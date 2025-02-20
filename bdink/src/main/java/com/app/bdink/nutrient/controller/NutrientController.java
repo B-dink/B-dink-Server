@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/nutrients")
-@Tag(name = "nutrients API", description = "영양과 관련된 API들입니다. 영양은 관리자만 생성할 수 있습니다.")
+@Tag(name = "Nutrients API", description = "영양과 관련된 API들입니다. 영양은 관리자만 생성할 수 있습니다.")
 public class NutrientController {
 
     private final NutrientService nutrientService;
