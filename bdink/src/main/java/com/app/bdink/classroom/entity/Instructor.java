@@ -32,4 +32,12 @@ public class Instructor extends BaseTimeEntity {
         this.member = member;
         this.career = career;
     }
+
+    public void modify(final Career career){
+        this.career = career;
+    }
+
+    public void softDelete(){
+        this.career = null;
+    }
 }

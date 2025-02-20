@@ -5,6 +5,8 @@ import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.lecture.service.ChapterService;
 import com.app.bdink.lecture.service.InstructorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chapter")
+@Tag(name = "챕터 API", description = "챕터와 관련된 API들입니다. 챕터는 챕터마다 강좌에 대한 데이터를 총합해 가지고 있습니다. 클래스룸을 만들어야 생성할 수 있습니다.")
 public class ChapterController {
 
     private final ChapterService chapterService;
@@ -21,6 +24,7 @@ public class ChapterController {
     private final InstructorService instructorService;
 
     @PostMapping
+    @Operation(method = "POST", description = "챕터를 생성합니다.")
     public ResponseEntity<?> createChapter(@RequestParam Long instructorId, @RequestParam Long classRoomId,
                                            @RequestParam String title) {
         Instructor instructor = instructorService.findById(instructorId);
