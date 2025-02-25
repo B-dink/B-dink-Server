@@ -1,10 +1,12 @@
 package com.app.bdink.classroom.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @NoArgsConstructor
+@Getter
 public class PriceDetail {
 
     private int originPrice;
@@ -16,7 +18,7 @@ public class PriceDetail {
     public PriceDetail(int originPrice, float discountRate) {
         this.originPrice = originPrice;
         this.discountRate = discountRate;
-        this.discountPrice = (int) (originPrice * discountRate);
+        this.discountPrice = (int) (originPrice * (1- discountRate));
     }
 
 }
