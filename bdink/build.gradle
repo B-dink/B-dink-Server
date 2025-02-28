@@ -47,6 +47,14 @@ dependencies {
 
 	//Webflux
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//coolsms
+	implementation 'net.nurigo:sdk:4.3.2'
+
+	//s3
+	implementation 'software.amazon.awssdk:bom:2.21.0'
+	implementation 'software.amazon.awssdk:s3:2.21.0'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.9'
 }
 
 tasks.named('test') {
