@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SmsController {
 
-    private final DefaultMessageService messageService;
+    private DefaultMessageService messageService;
 
     @Value("${coolsms.API_KEY}")
     private String API_KEY;
@@ -32,7 +32,8 @@ public class SmsController {
     @Value("${coolsms.PHONE}")
     private String BDINK_PHONE;
 
-    public SmsController() {
+    @PostConstruct
+    public void init() {
         this.messageService = NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, "https://api.coolsms.co.kr");
     }
 
