@@ -9,8 +9,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,6 +40,9 @@ public class SecurityConfig {
                         .requestMatchers("/callback/**").permitAll() // 이 경로에 대해서는 모든 사용자가 접근할 수 있도록 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/member")
+                        ).permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증이 필요하도록 설정
                 ) // 인증 및 권한 부여 규칙 설정
                 .cors(cors -> cors.configurationSource(configurationSource()))
@@ -64,5 +69,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
 
         return source;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

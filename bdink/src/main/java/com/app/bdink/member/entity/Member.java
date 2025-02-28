@@ -25,8 +25,6 @@ public class Member {
     //TODO: 나중에 "M", "F" 이런식으로 바꿔주기
     @Column(name =  "gender")
     private boolean gender;
-    
-   
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
@@ -40,4 +38,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Builder
+    public Member(String email, String password, String auth) {
+        this.email = email;
+        this.password = password;
+    }
 }
