@@ -18,10 +18,15 @@ public class Member {
 
     @Column(name = "name")
     private String name;
+    
+    @Column(name = "password")
+    private String password;
 
     //TODO: 나중에 "M", "F" 이런식으로 바꿔주기
     @Column(name =  "gender")
     private boolean gender;
+    
+   
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
