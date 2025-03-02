@@ -41,7 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
                         .requestMatchers(
-                                new AntPathRequestMatcher("/member")
+                                new AntPathRequestMatcher("/join"),
+                                new AntPathRequestMatcher("/login")
                         ).permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증이 필요하도록 설정
                 ) // 인증 및 권한 부여 규칙 설정

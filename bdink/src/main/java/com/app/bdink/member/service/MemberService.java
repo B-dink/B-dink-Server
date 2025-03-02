@@ -7,14 +7,12 @@ import com.app.bdink.member.controller.dto.response.MemberLoginResponseDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.exception.InvalidMemberException;
-import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -40,6 +38,7 @@ public class MemberService {
         });
 
         Member member = Member.builder()
+                .name(memberSaveRequestDto.name())
                 .email(memberSaveRequestDto.email())
                 .password(passwordEncoder.encode(memberSaveRequestDto.password()))
                 .role(Role.ROLE_USER)
@@ -50,7 +49,7 @@ public class MemberService {
 
     // 로그인
     public MemberLoginResponseDto login(MemberRequestDto memberRequestDto) {
-        Member member = memberRepository.findByEmail(memberRequestDto.email()).orElseThrow(NotFoundMemberException::new);
+        Member member = findById(memberRequestDto.id());
         Token token = tokenProvider.createToken(member);
 
         if (!passwordEncoder.matches(memberRequestDto.password(), member.getPassword()))

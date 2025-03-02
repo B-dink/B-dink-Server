@@ -5,12 +5,10 @@ import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginResponseDto;
 import com.app.bdink.member.service.MemberService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/member")
 public class MemberController {
     private final MemberService memberService;
 
@@ -18,14 +16,14 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @PostMapping()
+    @PostMapping("/join")
     public RspTemplate<String> join(@RequestBody @Valid MemberRequestDto memberRequestDto) {
         memberService.join(memberRequestDto);
 
         return new RspTemplate<>(HttpStatus.CREATED, "회원가입");
     }
 
-    @GetMapping()
+    @PostMapping("/login")
     public RspTemplate<MemberLoginResponseDto> login(@RequestBody @Valid MemberRequestDto memberRequestDto) {
         MemberLoginResponseDto memberLoginResponseDto = memberService.login(memberRequestDto);
 
