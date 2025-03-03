@@ -32,15 +32,21 @@ public class Lecture extends BaseTimeEntity {
     @JoinColumn(name = "chapter_id")
     private Chapter chapter;
 
+    @Column(name = "title")
     private String title;
 
+    @Column(name = "time")
     private LocalTime time;
 
+    @Column(name = "media_link")
+    private String mediaLink;
+
     @Builder
-    public Lecture(ClassRoom classRoom, Chapter chapter, String title, LocalTime time) {
+    public Lecture(ClassRoom classRoom, Chapter chapter, String title, LocalTime time, String mediaLink) {
         this.classRoom = classRoom;
         this.chapter = chapter;
         this.title = title;
         this.time = time;
+        this.mediaLink = mediaLink;
     }
 }

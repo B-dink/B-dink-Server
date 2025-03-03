@@ -62,7 +62,7 @@ public class ClassRoomController {
         ClassRoom classRoom = classRoomService.findById(id);
 
         if (!classRoom.isEmptyThumbnail()){
-            s3Service.deleteImage(classRoom.getThumbnail());
+            s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         }
 
         ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoom, thumbnailKey, classRoomDto);
@@ -73,7 +73,7 @@ public class ClassRoomController {
     @Operation(method = "DELETE", description = "클래스룸을 삭제합니다. 이는 hard delete로 구성되어있으며 클래스룸을 삭제하면 안에 있는 챕터, 강좌들이 함께 삭제됩니다.")
     ResponseEntity<?> deleteClassRoom(@RequestParam Long id){
         ClassRoom classRoom = classRoomService.findById(id);
-        s3Service.deleteImage(classRoom.getThumbnail());
+        s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         classRoomService.deleteClassRoom(classRoom);
 
         return ResponseEntity.noContent().build();

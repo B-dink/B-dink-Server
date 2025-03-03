@@ -47,7 +47,27 @@ public class S3Service {
         return key;
     }
 
-    public void deleteImage(String key) {
+    public String uploadMedia(String directoryPath, MultipartFile media) {
+        final String key = directoryPath + generateMediaFileName();
+        final S3Client s3Client = s3Config.getS3Client();
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(media.getContentType())
+                .contentDisposition("inline")
+                .build();
+
+        try{
+            RequestBody requestBody = RequestBody.fromBytes(media.getBytes());
+            s3Client.putObject(request, requestBody);
+        }catch (IOException e){
+            log.info("이미지 저장 중 에러발생.");
+        }
+        return key;
+    }
+
+    public void deleteImageAndMedia(String key) {
         final S3Client s3Client = s3Config.getS3Client();
         s3Client.deleteObject((DeleteObjectRequest.Builder builder) ->
                 builder.bucket(bucketName)
@@ -59,6 +79,14 @@ public class S3Service {
 
     private String generateImageFileName() {
         return UUID.randomUUID().toString() + ".jpg";
+    }
+
+    private String generateMediaFileName() {
+        return UUID.randomUUID().toString() + ".m3u8";
+    }
+
+    public String generateOriginalLink(String imageKey){
+        return "https://"+bucketName+".s3."+ s3Config.getRegion()+".amazonaws.com/"+imageKey;
     }
 
 }

@@ -2,6 +2,7 @@ package com.app.bdink.lecture.controller;
 
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
@@ -15,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import retrofit2.http.Multipart;
 
 import java.net.URI;
 
@@ -27,18 +30,26 @@ public class LectureController {
     private final LectureService lectureService;
     private final ClassRoomService classRoomService;
     private final ChapterService chapterService;
+    private final S3Service s3Service;
 
     //TODO: 강사인지 확인하는 로직이 필요하다.
     @PostMapping
     @Operation(method = "POST", description = "강의를 생성합니다. 강의를 생성하면 해당 강의에 대한 시간정보, 강의 수가 해당 챕터에 업데이트 되는 로직입니다.")
     public ResponseEntity<?> createLecture(@RequestParam Long classRoomId,
-                                            @RequestParam Long chapterId,
-                                            @RequestBody LectureDto lectureDto) {
+                                           @RequestParam Long chapterId,
+                                           @RequestPart(value = "lectureDto") LectureDto lectureDto,
+                                           @RequestPart(value = "media") MultipartFile file) {
 
         ClassRoom classRoom = classRoomService.findById(classRoomId);
         Chapter chapter = chapterService.findById(chapterId);
+        String uploadUrlKey = null;
 
-        String id = lectureService.createLecture(classRoom, chapter, lectureDto);
+        if (!file.isEmpty()){
+            uploadUrlKey = s3Service.uploadMedia("media/", file); //TODO: 이미지인지 동영상인지 구분 + s3에서 validation하도록 구현
+        }
+
+        String uploadUrl = s3Service.generateOriginalLink(uploadUrlKey);
+        String id = lectureService.createLecture(classRoom, chapter, lectureDto, uploadUrl);
         return ResponseEntity.created(URI.create(id)).build();
     }
 
