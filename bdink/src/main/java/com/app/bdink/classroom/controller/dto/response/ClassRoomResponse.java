@@ -7,6 +7,7 @@ public record ClassRoomResponse(
         Long id,
         String title,
         String introduction,
+        String thumbnail,
 
         PriceDetail priceDetail
 ) {
@@ -15,6 +16,7 @@ public record ClassRoomResponse(
                 classRoom.getId(),
                 classRoom.getTitle(),
                 classRoom.getIntroduction(),
+                classRoom.getThumbnail(),
                 classRoom.getPriceDetail()
         );
     }

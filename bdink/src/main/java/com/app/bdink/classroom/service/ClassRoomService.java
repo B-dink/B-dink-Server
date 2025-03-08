@@ -31,11 +31,16 @@ public class ClassRoomService {
     }
 
     @Transactional
-    public String createClassRoom(final Instructor instructor, final ClassRoomDto classRoomDto) {
+    public String createClassRoom(final Instructor instructor,
+                                  final String thumbnailKey,
+                                  final String mediaKey,
+                                  final ClassRoomDto classRoomDto) {
+
         ClassRoom classRoom = ClassRoom.builder()
                 .title(classRoomDto.title())
                 .introduction(classRoomDto.introduction())
                 .instructor(instructor)
+                .thumbnail(thumbnailKey)
                 .priceDetail(classRoomDto.priceDto().toPriceDetail())
                 .build();
         Long id = classRoomRepository.save(classRoom).getId();
@@ -43,20 +48,28 @@ public class ClassRoomService {
     }
 
     @Transactional
-    public ClassRoomResponse updateClassRoomInfo(final Long id, final ClassRoomDto classRoomDto){
-        ClassRoom classRoom = findById(id);
-        classRoom.modifyClassRoom(classRoomDto);
+    public ClassRoomResponse updateClassRoomInfo(final ClassRoom classRoom,
+                                                 final String thumbnailKey,
+                                                 final String videoKey,
+                                                 final ClassRoomDto classRoomDto){
+        classRoom.modifyClassRoom(classRoomDto, thumbnailKey, videoKey);
         return new ClassRoomResponse(
                 classRoom.getId(),
                 classRoom.getTitle(),
                 classRoom.getIntroduction(),
+                thumbnailKey,
                 classRoom.getPriceDetail()
         );
     }
 
     @Transactional
-    public void deleteClassRoom(long id){
+    public void updateClassRoomCdn(Long id, String assetId){
         ClassRoom classRoom = findById(id);
+        classRoom.updateCDNLink(assetId);
+    }
+
+    @Transactional
+    public void deleteClassRoom(final ClassRoom classRoom){
         classRoomRepository.delete(classRoom);
     }
 }

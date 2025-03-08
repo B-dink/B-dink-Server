@@ -33,7 +33,8 @@ public class LectureService {
 
     //chapter에 강좌 추가
     @Transactional
-    public String createLecture(final ClassRoom classRoom, final Chapter chapter, final LectureDto lectureDto){
+    public String createLecture(final ClassRoom classRoom, final Chapter chapter,
+                                final LectureDto lectureDto, final String uploadUrl){
 
         Lecture lecture = lectureRepository.save(
                 Lecture.builder()
@@ -41,6 +42,7 @@ public class LectureService {
                         .chapter(chapter) //강좌를 만들때 챕터는 무조건 있어야한다.
                         .title(lectureDto.title())
                         .time(lectureDto.convertToLocalTime())
+                        .mediaLink(uploadUrl)
                         .build());
 
         chapter.increaseLectureCount();

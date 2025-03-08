@@ -6,11 +6,14 @@ import java.time.LocalTime;
 
 public record LectureInfo(
         String title,
+
+        String mediaLink,
         String lectureTime
 ) {
     public static LectureInfo from(final Lecture lecture){
         return new LectureInfo(
                 lecture.getTitle(),
+                lecture.getMediaLink(),
                 makeTimeString(lecture.getTime())
         );
     }
