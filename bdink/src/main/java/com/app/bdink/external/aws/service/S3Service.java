@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -20,15 +21,26 @@ public class S3Service {
 
     private final String bucketName;
     private final S3Config s3Config;
+    private final String cdnName;
 
-    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName, S3Config s3Config) {
+    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName,
+                     S3Config s3Config,
+                     @Value("${aws-property.cdn-name}") final String cdnName) {
         this.bucketName = bucketName;
         this.s3Config = s3Config;
+        this.cdnName = cdnName;
     }
 
 
-    public String uploadImage(String directoryPath, MultipartFile image) {
-        final String key = directoryPath + generateImageFileName();
+    public String uploadImageOrMedia(String directoryPath, MultipartFile image) {
+        String key = null;
+        // TODO: 나중에 enum으로 분기.
+        if (Objects.equals(directoryPath, "image/")){
+            key = directoryPath + generateImageFileName();
+        } else if (Objects.equals(directoryPath, "media/")) {
+            key = directoryPath + generateMediaFileName();
+        }
+
         final S3Client s3Client = s3Config.getS3Client();
 
         PutObjectRequest request = PutObjectRequest.builder()
@@ -81,8 +93,12 @@ public class S3Service {
         return UUID.randomUUID().toString() + ".jpg";
     }
 
+    private String generateCdnMediaKey(String key){
+        return cdnName+key;
+    }
+
     private String generateMediaFileName() {
-        return UUID.randomUUID().toString() + ".m3u8";
+        return UUID.randomUUID().toString() + ".mp4";
     }
 
     public String generateOriginalLink(String imageKey){

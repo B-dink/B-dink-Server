@@ -31,6 +31,8 @@ public class ClassRoom extends BaseTimeEntity {
 
     private String thumbnail;
 
+    private String introLink;
+
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.REMOVE)
     private List<Chapter> chapters = new ArrayList<>();
 
@@ -44,21 +46,23 @@ public class ClassRoom extends BaseTimeEntity {
 
     @Builder
     public ClassRoom(final String title, final String introduction,
-                     final String thumbnail, final Instructor instructor,
-                     final PriceDetail priceDetail) {
+                     final String thumbnail, final String introLink,
+                     final Instructor instructor, final PriceDetail priceDetail) {
 
         this.title = title;
         this.thumbnail = thumbnail;
         this.instructor = instructor;
         this.introduction = introduction;
         this.priceDetail = priceDetail;
+        this.introLink = introLink;
     }
 
-    public void modifyClassRoom(final ClassRoomDto classRoomDto, String thumbnailKey){
+    public void modifyClassRoom(final ClassRoomDto classRoomDto, final String thumbnailKey, final String videoKey){
         this.title = updateTitle(classRoomDto.title());
         this.introduction = updateIntroduction(classRoomDto.introduction());
         this.priceDetail = updatePriceDetail(classRoomDto.priceDto().toPriceDetail());
         this.thumbnail = thumbnailKey; //TODO: 이미지 관련해서 어떤 예외가 생길 수 있는지?
+        this.introLink = videoKey;
     }
 
     public String updateTitle(final String title) {
@@ -94,6 +98,10 @@ public class ClassRoom extends BaseTimeEntity {
             throw new IllegalStateException("chapter가 존재하지않습니다.");
         }
         this.chapters.add(chapter);
+    }
+
+    public void updateCDNLink(String cdnLink){
+        this.introLink = cdnLink;
     }
 
     public boolean isEmptyThumbnail(){
