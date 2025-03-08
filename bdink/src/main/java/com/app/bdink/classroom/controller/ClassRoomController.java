@@ -5,6 +5,7 @@ import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.lecture.service.InstructorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,18 +29,24 @@ public class ClassRoomController {
     private final ClassRoomService classRoomService;
     private final InstructorService instructorService;
     private final S3Service s3Service;
+    private final MediaService mediaService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
     ResponseEntity<?> createClassRoom(@RequestParam Long instructorId,
                                       @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+                                      @RequestPart(value = "intro-video") MultipartFile video,
                                       @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto){
 
         Instructor instructor = instructorService.findById(instructorId);
 
-        String thumbnailKey = s3Service.uploadImage("image/", thumbnail);
+        String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
+        String mediaKey = s3Service.uploadImageOrMedia("media/", video);
 
-        String id = classRoomService.createClassRoom(instructor, thumbnailKey, classRoomDto);
+
+
+        String id = classRoomService.createClassRoom(instructor, thumbnailKey, mediaKey, classRoomDto);
+        mediaService.createMedia(Long.parseLong(id),mediaKey);
         return ResponseEntity.created(
                 URI.create(id))
                 .build();
@@ -56,16 +63,18 @@ public class ClassRoomController {
     @Operation(method = "PUT", description = "클래스룸 정보를 수정합니다.")
     ResponseEntity<?> updateClassRoomInfo(@RequestParam Long id,
                                           @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto,
-                                          @RequestPart(value = "file") MultipartFile thumbnail){
+                                          @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+                                          @RequestPart(value = "intro-video") MultipartFile video){
 
-        String thumbnailKey = s3Service.uploadImage("image/", thumbnail);
+        String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
+        String videoKey = s3Service.uploadImageOrMedia("media/", video);
         ClassRoom classRoom = classRoomService.findById(id);
 
         if (!classRoom.isEmptyThumbnail()){
-            s3Service.deleteImage(classRoom.getThumbnail());
+            s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         }
 
-        ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoom, thumbnailKey, classRoomDto);
+        ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoom, thumbnailKey, videoKey, classRoomDto);
         return ResponseEntity.ok(classResponse);
     }
 
@@ -73,7 +82,7 @@ public class ClassRoomController {
     @Operation(method = "DELETE", description = "클래스룸을 삭제합니다. 이는 hard delete로 구성되어있으며 클래스룸을 삭제하면 안에 있는 챕터, 강좌들이 함께 삭제됩니다.")
     ResponseEntity<?> deleteClassRoom(@RequestParam Long id){
         ClassRoom classRoom = classRoomService.findById(id);
-        s3Service.deleteImage(classRoom.getThumbnail());
+        s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         classRoomService.deleteClassRoom(classRoom);
 
         return ResponseEntity.noContent().build();

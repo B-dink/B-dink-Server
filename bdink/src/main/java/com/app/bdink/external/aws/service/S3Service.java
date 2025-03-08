@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -20,15 +21,26 @@ public class S3Service {
 
     private final String bucketName;
     private final S3Config s3Config;
+    private final String cdnName;
 
-    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName, S3Config s3Config) {
+    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName,
+                     S3Config s3Config,
+                     @Value("${aws-property.cdn-name}") final String cdnName) {
         this.bucketName = bucketName;
         this.s3Config = s3Config;
+        this.cdnName = cdnName;
     }
 
 
-    public String uploadImage(String directoryPath, MultipartFile image) {
-        final String key = directoryPath + generateImageFileName();
+    public String uploadImageOrMedia(String directoryPath, MultipartFile image) {
+        String key = null;
+        // TODO: 나중에 enum으로 분기.
+        if (Objects.equals(directoryPath, "image/")){
+            key = directoryPath + generateImageFileName();
+        } else if (Objects.equals(directoryPath, "media/")) {
+            key = directoryPath + generateMediaFileName();
+        }
+
         final S3Client s3Client = s3Config.getS3Client();
 
         PutObjectRequest request = PutObjectRequest.builder()
@@ -47,7 +59,27 @@ public class S3Service {
         return key;
     }
 
-    public void deleteImage(String key) {
+    public String uploadMedia(String directoryPath, MultipartFile media) {
+        final String key = directoryPath + generateMediaFileName();
+        final S3Client s3Client = s3Config.getS3Client();
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(media.getContentType())
+                .contentDisposition("inline")
+                .build();
+
+        try{
+            RequestBody requestBody = RequestBody.fromBytes(media.getBytes());
+            s3Client.putObject(request, requestBody);
+        }catch (IOException e){
+            log.info("이미지 저장 중 에러발생.");
+        }
+        return key;
+    }
+
+    public void deleteImageAndMedia(String key) {
         final S3Client s3Client = s3Config.getS3Client();
         s3Client.deleteObject((DeleteObjectRequest.Builder builder) ->
                 builder.bucket(bucketName)
@@ -59,6 +91,18 @@ public class S3Service {
 
     private String generateImageFileName() {
         return UUID.randomUUID().toString() + ".jpg";
+    }
+
+    private String generateCdnMediaKey(String key){
+        return cdnName+key;
+    }
+
+    private String generateMediaFileName() {
+        return UUID.randomUUID().toString() + ".mp4";
+    }
+
+    public String generateOriginalLink(String imageKey){
+        return "https://"+bucketName+".s3."+ s3Config.getRegion()+".amazonaws.com/"+imageKey;
     }
 
 }

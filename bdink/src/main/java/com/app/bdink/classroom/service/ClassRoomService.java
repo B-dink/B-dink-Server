@@ -33,6 +33,7 @@ public class ClassRoomService {
     @Transactional
     public String createClassRoom(final Instructor instructor,
                                   final String thumbnailKey,
+                                  final String mediaKey,
                                   final ClassRoomDto classRoomDto) {
 
         ClassRoom classRoom = ClassRoom.builder()
@@ -49,8 +50,9 @@ public class ClassRoomService {
     @Transactional
     public ClassRoomResponse updateClassRoomInfo(final ClassRoom classRoom,
                                                  final String thumbnailKey,
+                                                 final String videoKey,
                                                  final ClassRoomDto classRoomDto){
-        classRoom.modifyClassRoom(classRoomDto, thumbnailKey);
+        classRoom.modifyClassRoom(classRoomDto, thumbnailKey, videoKey);
         return new ClassRoomResponse(
                 classRoom.getId(),
                 classRoom.getTitle(),
@@ -58,6 +60,12 @@ public class ClassRoomService {
                 thumbnailKey,
                 classRoom.getPriceDetail()
         );
+    }
+
+    @Transactional
+    public void updateClassRoomCdn(Long id, String assetId){
+        ClassRoom classRoom = findById(id);
+        classRoom.updateCDNLink(assetId);
     }
 
     @Transactional
