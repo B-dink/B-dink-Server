@@ -47,10 +47,9 @@ public class BookmarkController {
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "북마크를 삭제합니다.")
-    public ResponseEntity<?> deleteBookmark(@RequestParam Long memberId, @RequestParam Long classRoomId) {
+    public ResponseEntity<?> deleteBookmark(@RequestParam Long memberId, @RequestParam Long reviewId) {
         Member member = memberService.findById(memberId);
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        bookmarkService.deleteBookmark(member, classRoom);
+        bookmarkService.deleteBookmark(member, reviewId);
         return ResponseEntity.noContent().build();
     }
 }

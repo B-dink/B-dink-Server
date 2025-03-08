@@ -7,7 +7,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
-
-    void deleteByMemberAndClassRoom(Member member, ClassRoom classRoom);
     List<Bookmark> findByMember(Member member);
 }
