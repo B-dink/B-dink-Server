@@ -34,8 +34,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(final Member member, final ClassRoom classRoom){
-        bookmarkRepository.deleteByMemberAndClassRoom(member, classRoom);
+    public void deleteBookmark(final Member member, Long reviewId){
+        // TODO: 로그인한 멤버와 북마크를 만든 멤버가 같은지 확인
+        bookmarkRepository.deleteById(reviewId);
     }
 
 }
