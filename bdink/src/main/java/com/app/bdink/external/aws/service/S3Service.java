@@ -56,7 +56,12 @@ public class S3Service {
         }catch (IOException e){
             log.info("이미지 저장 중 에러발생.");
         }
-        return key;
+        if (Objects.equals(directoryPath, "image/")){
+            return key;
+        } else if (Objects.equals(directoryPath, "media/")) {
+            return generateCdnLink(key);
+        }
+        return null;
     }
 
     public String uploadMedia(String directoryPath, MultipartFile media) {
@@ -103,6 +108,11 @@ public class S3Service {
 
     public String generateOriginalLink(String imageKey){
         return "https://"+bucketName+".s3."+ s3Config.getRegion()+".amazonaws.com/"+imageKey;
+    }
+
+    public String generateCdnLink(String mediaKey){
+        String originalName = mediaKey.substring(6,mediaKey.length()-4);
+        return cdnName+originalName+"/HLS/"+originalName+"_360.m3u8";
     }
 
 }
