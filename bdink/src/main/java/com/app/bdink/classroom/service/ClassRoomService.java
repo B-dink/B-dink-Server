@@ -41,6 +41,7 @@ public class ClassRoomService {
                 .introduction(classRoomDto.introduction())
                 .instructor(instructor)
                 .thumbnail(thumbnailKey)
+                .introLink(mediaKey)
                 .priceDetail(classRoomDto.priceDto().toPriceDetail())
                 .build();
         Long id = classRoomRepository.save(classRoom).getId();

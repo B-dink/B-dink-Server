@@ -44,11 +44,9 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/join"),
                                 new AntPathRequestMatcher("/login")
                         ).permitAll()
-                        .requestMatchers("/api/v1/**").permitAll()
-                        .requestMatchers("/api/v1/receiver/**").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증이 필요하도록 설정
                 ) // 인증 및 권한 부여 규칙 설정
-                //.cors(cors -> cors.configurationSource(configurationSource()))
+                .cors(cors -> cors.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 // jwt 토큰 인증을 위한 jwtfilter 추가
@@ -57,22 +55,22 @@ public class SecurityConfig {
 
     // CORS 설정을 정의하는 메서드.
     // CORS는 다른 도메인에서 리소스를 요청할 때 이를 허용할 지 여부를 결정하는 매커니즘
-//    @Bean
-//    public CorsConfigurationSource configurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//
-//        configuration.setAllowedOriginPatterns(List.of("*")); // 모든 도메인에서의 요청 허용
-//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // HTTP 에 대한 요청 허용
-//        configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 요청 허용
-//        configuration.setExposedHeaders(List.of("Access-Control-Allow-Credentials", "Authorization", "Set-Cookie")); // 특정 응답 헤더를 클라이언트가 접근할 수 있도록 노출
-//        //configuration.setAllowCredentials(true); // 자격 증명(쿠기 등)을 포함한 요청 허용
-//        configuration.setMaxAge(3600L); // 브라우저가 사전 요청을 캐시할 시간 1시간으로 설정
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
-//
-//        return source;
-//    }
+    @Bean
+    public CorsConfigurationSource configurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOriginPatterns(List.of("*")); // 모든 도메인에서의 요청 허용
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // HTTP 에 대한 요청 허용
+        configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 요청 허용
+        configuration.setExposedHeaders(List.of("Access-Control-Allow-Credentials", "Authorization", "Set-Cookie")); // 특정 응답 헤더를 클라이언트가 접근할 수 있도록 노출
+        configuration.setAllowCredentials(true); // 자격 증명(쿠기 등)을 포함한 요청 허용
+        configuration.setMaxAge(3600L); // 브라우저가 사전 요청을 캐시할 시간 1시간으로 설정
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
+
+        return source;
+    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
