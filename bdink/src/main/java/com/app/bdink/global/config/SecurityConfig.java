@@ -44,7 +44,6 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/join"),
                                 new AntPathRequestMatcher("/login")
                         ).permitAll()
-                        .requestMatchers("/api/v1/receiver/**").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증이 필요하도록 설정
                 ) // 인증 및 권한 부여 규칙 설정
                 .cors(cors -> cors.configurationSource(configurationSource()))

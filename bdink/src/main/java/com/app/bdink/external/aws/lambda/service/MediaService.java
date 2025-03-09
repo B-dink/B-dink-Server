@@ -1,6 +1,5 @@
 package com.app.bdink.external.aws.lambda.service;
 
-import com.app.bdink.external.aws.lambda.controller.request.CdnLinkUrlDto;
 import com.app.bdink.external.aws.lambda.domain.Media;
 import com.app.bdink.external.aws.lambda.repository.MediaRepository;
 import lombok.RequiredArgsConstructor;
