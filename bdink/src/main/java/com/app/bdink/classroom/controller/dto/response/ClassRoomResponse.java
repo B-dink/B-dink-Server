@@ -9,6 +9,8 @@ public record ClassRoomResponse(
         String introduction,
         String thumbnail,
 
+        String introLink,
+
         PriceDetail priceDetail
 ) {
     public static ClassRoomResponse from(final ClassRoom classRoom){
@@ -17,6 +19,7 @@ public record ClassRoomResponse(
                 classRoom.getTitle(),
                 classRoom.getIntroduction(),
                 classRoom.getThumbnail(),
+                classRoom.getIntroLink(),
                 classRoom.getPriceDetail()
         );
     }
