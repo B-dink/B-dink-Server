@@ -9,9 +9,10 @@ import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.lecture.service.InstructorService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,8 +59,7 @@ public class ClassRoomController {
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
         return ResponseEntity.ok(classRoomDto);
     }
-
-    @PutMapping
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "클래스룸 정보를 수정합니다.")
     ResponseEntity<?> updateClassRoomInfo(@RequestParam Long id,
                                           @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto,

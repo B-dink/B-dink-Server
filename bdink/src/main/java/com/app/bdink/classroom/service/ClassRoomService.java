@@ -59,6 +59,7 @@ public class ClassRoomService {
                 classRoom.getTitle(),
                 classRoom.getIntroduction(),
                 thumbnailKey,
+                videoKey,
                 classRoom.getPriceDetail()
         );
     }
