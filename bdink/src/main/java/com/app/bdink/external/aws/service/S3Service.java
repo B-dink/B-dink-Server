@@ -23,12 +23,16 @@ public class S3Service {
     private final S3Config s3Config;
     private final String cdnName;
 
+    private final String cdnMedia;
+
     public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName,
                      S3Config s3Config,
-                     @Value("${aws-property.cdn-name}") final String cdnName) {
+                     @Value("${aws-property.cdn-name}") final String cdnName,
+                     @Value("${aws-property.cdn-media}") final String cdnMedia) {
         this.bucketName = bucketName;
         this.s3Config = s3Config;
         this.cdnName = cdnName;
+        this.cdnMedia = cdnMedia;
     }
 
 
@@ -57,7 +61,7 @@ public class S3Service {
             log.info("이미지 저장 중 에러발생.");
         }
         if (Objects.equals(directoryPath, "image/")){
-            return key;
+            return generateCdnImageKey(key);
         } else if (Objects.equals(directoryPath, "media/")) {
             return generateCdnLink(key);
         }
@@ -98,7 +102,7 @@ public class S3Service {
         return UUID.randomUUID().toString() + ".jpg";
     }
 
-    private String generateCdnMediaKey(String key){
+    private String generateCdnImageKey(String key){
         return cdnName+key;
     }
 
@@ -112,7 +116,7 @@ public class S3Service {
 
     public String generateCdnLink(String mediaKey){
         String originalName = mediaKey.substring(6,mediaKey.length()-4);
-        return cdnName+originalName+"/HLS/"+originalName+"_360.m3u8";
+        return cdnMedia+originalName+"/HLS/"+originalName+"_360.m3u8";
     }
 
 }
