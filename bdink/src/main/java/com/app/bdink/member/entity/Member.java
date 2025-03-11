@@ -32,6 +32,9 @@ public class Member {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "phoneNumber", nullable = false)
+    private String phoneNumber;
+
     @Column(name = "pictureUrl")
     private String pictureUrl;
 
@@ -43,5 +46,9 @@ public class Member {
     public Member(String email, String password, String auth) {
         this.email = email;
         this.password = password;
+    }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
