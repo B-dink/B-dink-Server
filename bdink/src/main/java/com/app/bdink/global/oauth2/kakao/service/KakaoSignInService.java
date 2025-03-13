@@ -1,9 +1,8 @@
 package com.app.bdink.global.oauth2.kakao.service;
 
+import com.app.bdink.global.oauth2.domain.LoginResult;
 import com.app.bdink.global.oauth2.kakao.dto.KakaoTokenResDto;
 import com.app.bdink.global.oauth2.kakao.info.KakaoUserInfo;
-import com.app.bdink.global.token.Token;
-import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.repository.MemberRepository;
@@ -21,7 +20,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class KakaoService {
+public class KakaoSignInService {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -30,7 +29,6 @@ public class KakaoService {
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com"; // 사용자 정보 서버
 
     private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
 
     // 인가 코드를 통해 액세스 토큰을 받아오는 메서드
     public String getAccessToken(String code) {
@@ -67,27 +65,31 @@ public class KakaoService {
     }
 
     @Transactional
-    public Token loginOrSignUp(String kakaoAccessToken) {
+    public LoginResult loginOrSignUp(String kakaoAccessToken) {
         KakaoUserInfo userInfo = getUserInfo(kakaoAccessToken);
         log.info(userInfo.toString());
-        Long id = userInfo.getId();
+        Long kakaoId = userInfo.getId();
 
-        Optional<Member> member = getById(id);
+        Optional<Member> member = getByKaKaoId(kakaoId);
 
         if (member.isEmpty()){
-            member = Optional.of(memberRepository.save(Member.builder()
+            member = Optional.of(memberRepository.save(
+                    Member.builder()
                     .name(userInfo.getKakaoAccount().getProfile().getNickName())
                     .email(userInfo.getKakaoAccount().getEmail())
+                    .phoneNumber("")
                     .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                     .role(Role.ROLE_USER)
                     .build()));
         }
 
-        return tokenProvider.createToken(member.get());
+        return new LoginResult(member.get());
+
+
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> getById(Long id){
-        return memberRepository.findById(id);
+    public Optional<Member> getByKaKaoId(Long kakaoId){
+        return memberRepository.findByKakaoId(kakaoId);
     }
 }

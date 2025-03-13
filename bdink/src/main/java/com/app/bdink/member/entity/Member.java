@@ -29,10 +29,14 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "phoneNumber", nullable = false)
+    private Long kakaoId;
+
+    private String appleId;
+
+    @Column(name = "phoneNumber")
     private String phoneNumber;
 
     @Column(name = "pictureUrl")
