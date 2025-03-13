@@ -2,19 +2,23 @@ package com.app.bdink.member.service;
 
 import com.app.bdink.global.token.Token;
 import com.app.bdink.global.token.TokenProvider;
+import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginResponseDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.exception.InvalidMemberException;
+import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -58,6 +62,14 @@ public class MemberService {
         }
 
         return MemberLoginResponseDto.of(member, token.getAccessToken());
+    }
+
+    @Transactional
+    public void updatePhoneNumber(Long id, MemberPhoneUpdateRequestDto memberPhoneUpdateRequestDto) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new NotFoundMemberException("회원 정보를 찾을 수 없습니다."));
+
+        member.updatePhoneNumber(memberPhoneUpdateRequestDto.phoneNumber());
     }
 
 }
