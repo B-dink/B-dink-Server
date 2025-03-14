@@ -1,5 +1,7 @@
 package com.app.bdink.global.token;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.domain.TokenDto;
 import com.app.bdink.member.entity.Member;
 import io.jsonwebtoken.*;
@@ -125,5 +127,21 @@ public class TokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    @Transactional
+    public TokenDto reIssueTokenByRefresh(Member member, String refreshToken) {
+        boolean isValid = validateToken(refreshToken);
+
+        if (!isValid){
+            throw new CustomException(Error.REFRESH_TOKEN_EXPIRED_EXCEPTION, Error.REFRESH_TOKEN_EXPIRED_EXCEPTION.getMessage());
+        }
+
+        // jwt 발급 (액세스 토큰, 리프레쉬 토큰)
+        TokenDto tokenDto = createToken(member);
+
+        member.updateRefreshToken(tokenDto.refreshToken());
+
+        return tokenDto;
     }
 }

@@ -28,8 +28,16 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
+    @Transactional(readOnly = true)
     public Member findById(Long id){
         return memberRepository.findById(id).orElseThrow(
+                ()-> new IllegalStateException("해당 멤버를 찾지 못했습니다.")
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByRefreshToken(String refreshToken){
+        return memberRepository.findByRefreshToken(refreshToken).orElseThrow(
                 ()-> new IllegalStateException("해당 멤버를 찾지 못했습니다.")
         );
     }
