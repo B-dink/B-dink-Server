@@ -8,6 +8,8 @@ import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.lecture.service.InstructorService;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -31,6 +33,7 @@ public class ClassRoomController {
     private final InstructorService instructorService;
     private final S3Service s3Service;
     private final MediaService mediaService;
+    private final MemberService memberService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
@@ -88,6 +91,10 @@ public class ClassRoomController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/all")
+    @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
+    public ResponseEntity<?> getAllClassRoom() {
+        return ResponseEntity.ok().body(classRoomService.getAllClassRoom());
+    }
 
 }
