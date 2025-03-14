@@ -46,6 +46,8 @@ public class Member {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    private String refreshToken;
+
     @Builder
     public Member(String email, String password, String auth) {
         this.email = email;
@@ -55,4 +57,6 @@ public class Member {
     public void updatePhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public void updateRefreshToken(String refreshToken){this.refreshToken = refreshToken;}
 }

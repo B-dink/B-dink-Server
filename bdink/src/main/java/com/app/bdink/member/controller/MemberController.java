@@ -5,12 +5,13 @@ import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginResponseDto;
 import com.app.bdink.member.service.MemberService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/member")
+@RequestMapping("/api/v1/member")
 public class MemberController {
     private final MemberService memberService;
 

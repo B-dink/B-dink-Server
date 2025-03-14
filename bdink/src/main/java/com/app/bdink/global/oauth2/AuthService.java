@@ -5,11 +5,13 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.apple.service.AppleSignInService;
 import com.app.bdink.global.oauth2.domain.LoginResult;
 import com.app.bdink.global.oauth2.domain.SocialType;
+import com.app.bdink.global.oauth2.domain.TokenDto;
 import com.app.bdink.global.oauth2.kakao.service.KakaoSignInService;
 import com.app.bdink.global.token.Token;
 import com.app.bdink.global.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,8 @@ public class AuthService {
     private final TokenProvider tokenProvider;
 
 
-    public Token signIn(String socialType, String socialAccessToken) {
+    @Transactional
+    public TokenDto signIn(String socialType, String socialAccessToken) {
         LoginResult result = null;
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
             result = appleSignInService.getAppleId(socialAccessToken);
@@ -34,7 +37,10 @@ public class AuthService {
             throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
         }
 
-        Token token = tokenProvider.createToken(result.member());
-        return token;
+        TokenDto tokenDto = tokenProvider.createToken(result.member());
+
+        return tokenDto;
     }
+
+
 }

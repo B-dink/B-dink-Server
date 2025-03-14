@@ -1,5 +1,6 @@
 package com.app.bdink.member.service;
 
+import com.app.bdink.global.oauth2.domain.TokenDto;
 import com.app.bdink.global.token.Token;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
@@ -54,14 +55,14 @@ public class MemberService {
     // 로그인
     public MemberLoginResponseDto login(MemberRequestDto memberRequestDto) {
         Member member = findById(memberRequestDto.id());
-        Token token = tokenProvider.createToken(member);
+        TokenDto token = tokenProvider.createToken(member);
 
         if (!passwordEncoder.matches(memberRequestDto.password(), member.getPassword()))
         {
             throw new InvalidMemberException("비밀번호가 일치하지 않습니다.");
         }
 
-        return MemberLoginResponseDto.of(member, token.getAccessToken());
+        return MemberLoginResponseDto.of(member, token.accessToken());
     }
 
     @Transactional

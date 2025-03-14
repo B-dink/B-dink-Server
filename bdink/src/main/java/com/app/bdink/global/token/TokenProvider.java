@@ -1,5 +1,6 @@
 package com.app.bdink.global.token;
 
+import com.app.bdink.global.oauth2.domain.TokenDto;
 import com.app.bdink.member.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
@@ -29,19 +31,26 @@ public class TokenProvider {
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
     private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
 
+    private final long refreshTokenValidityTime; // 리프레시 토큰의 유효 시간 정의
+
     @Autowired
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime) {
+                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
+                         @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);    // secretKey를 Base64 디코딩
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
+        this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
 
     // 정보와 시크릿 키, 시간을 넣어 압축해 토큰 생성
-    public Token createToken(Member member) {
+    @Transactional
+    public TokenDto createToken(Member member) {
         long nowTime = (new Date()).getTime();
 
         Date tokenExpiredTime = new Date(nowTime + accessTokenValidityTime); // 만료 시간 계산
+
+        Date refreshExpiredTime = new Date(nowTime + refreshTokenValidityTime); //refreshToken 만료시간 계산
 
         String accessToken = Jwts.builder()
                 .setSubject(member.getId().toString()) // 토큰의 주체로 사용자의 id를 설정
@@ -50,9 +59,16 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256) // 생성된 토큰에 서명
                 .compact(); // 토큰 생성
 
-        return Token.builder()
-                .accessToken(accessToken)
-                .build();
+        String refreshToken = Jwts.builder()
+                .setSubject(member.getId().toString()) // 토큰의 주체로 사용자의 id를 설정
+                .claim(AUTHORITIES_KEY, member.getRole().name()) // 사용자 권한 정보 저장
+                .setExpiration(refreshExpiredTime) // 토큰의 만료 시간 설정
+                .signWith(key, SignatureAlgorithm.HS256) // 생성된 토큰에 서명
+                .compact();
+
+        member.updateRefreshToken(refreshToken);
+
+        return TokenDto.of(accessToken, refreshToken);
     }
 
     // 토큰에서 인증 정보 추출

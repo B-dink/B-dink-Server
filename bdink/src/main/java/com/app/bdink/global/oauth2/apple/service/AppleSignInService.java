@@ -52,6 +52,7 @@ public class AppleSignInService {
                             .email("")
                             .phoneNumber("")
                             .pictureUrl("")
+                            .appleId(appleId)
                             .role(Role.ROLE_USER)
                             .build()));
         }

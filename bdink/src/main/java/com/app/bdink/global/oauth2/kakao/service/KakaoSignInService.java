@@ -78,6 +78,7 @@ public class KakaoSignInService {
                     .name(userInfo.getKakaoAccount().getProfile().getNickName())
                     .email(userInfo.getKakaoAccount().getEmail())
                     .phoneNumber("")
+                    .kakaoId(kakaoId)
                     .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                     .role(Role.ROLE_USER)
                     .build()));
