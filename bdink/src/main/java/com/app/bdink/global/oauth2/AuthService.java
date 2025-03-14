@@ -51,5 +51,11 @@ public class AuthService {
         return tokenProvider.reIssueTokenByRefresh(member, refreshToken.refreshToken());
     }
 
+    @Transactional
+    public void signOut(Long userId){
+        Member member = memberService.findById(userId);
+        member.updateRefreshToken(null);
+    }
+
 
 }
