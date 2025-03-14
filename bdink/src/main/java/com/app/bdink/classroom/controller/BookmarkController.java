@@ -3,7 +3,7 @@ package com.app.bdink.classroom.controller;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.BookmarkService;
 import com.app.bdink.classroom.service.ClassRoomService;
-import com.app.bdink.common.entity.MemberUtilService;
+import com.app.bdink.common.util.MemberUtilService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;

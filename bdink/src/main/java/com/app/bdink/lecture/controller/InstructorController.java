@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.controller;
 
-import com.app.bdink.common.entity.MemberUtilService;
+import com.app.bdink.common.util.MemberUtilService;
 import com.app.bdink.lecture.controller.dto.InstructorDto;
 import com.app.bdink.lecture.controller.dto.request.UpdateInstructorDto;
 import com.app.bdink.lecture.controller.dto.response.InstructorInfoDto;
