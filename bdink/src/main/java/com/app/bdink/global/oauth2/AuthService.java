@@ -9,11 +9,15 @@ import com.app.bdink.global.oauth2.domain.SocialType;
 import com.app.bdink.global.oauth2.domain.TokenDto;
 import com.app.bdink.global.oauth2.kakao.service.KakaoSignInService;
 import com.app.bdink.global.token.TokenProvider;
+import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +48,17 @@ public class AuthService {
 
         return tokenDto;
     }
+
+    @Transactional
+    public TokenDto signUpInternal(final Member member){
+        return tokenProvider.createToken(member);
+    }
+
+    @Transactional
+    public TokenDto signInInternal(final Member member){
+        return tokenProvider.createToken(member);
+    }
+
 
     @Transactional
     public TokenDto reIssueToken(RefreshToken refreshToken){
