@@ -4,12 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 
 public record MemberRequestDto(
         @NotBlank
-        Long id,
-        @NotBlank
-        String name,
-        @NotBlank
         String email,
         @NotBlank
-        String password
+        String password,
+        boolean passwordDoubleCheck,
+        @NotBlank
+        String name
+
 ) {
 }

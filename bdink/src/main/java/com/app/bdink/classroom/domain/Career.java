@@ -1,6 +1,9 @@
 package com.app.bdink.classroom.domain;
 
 public enum Career {
-    HEALTH_TRAINER,
-    NUTRITIONIST
+    PODCAST,
+    NUTRITION,
+    EXERCISE,
+    REHABILITATION
+
 }

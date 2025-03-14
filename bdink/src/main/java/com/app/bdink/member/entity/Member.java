@@ -29,8 +29,15 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
+
+    private Long kakaoId;
+
+    private String appleId;
+
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
 
     @Column(name = "pictureUrl")
     private String pictureUrl;
@@ -39,9 +46,21 @@ public class Member {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    private String refreshToken;
+
     @Builder
     public Member(String email, String password, String auth) {
         this.email = email;
+        this.password = password;
+    }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void updateRefreshToken(String refreshToken){this.refreshToken = refreshToken;}
+
+    public void updatePassword(String password) {
         this.password = password;
     }
 }
