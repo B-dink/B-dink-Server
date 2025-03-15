@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,4 +76,13 @@ public class ClassRoomService {
     public void deleteClassRoom(final ClassRoom classRoom){
         classRoomRepository.delete(classRoom);
     }
+
+    @Transactional(readOnly = true)
+    public List<ClassRoomResponse> getAllClassRoom() {
+        List<ClassRoom> classRooms = classRoomRepository.findAll();
+        return classRooms.stream()
+                .map(ClassRoomResponse::from)
+                .collect(Collectors.toList());
+    }
+
 }
