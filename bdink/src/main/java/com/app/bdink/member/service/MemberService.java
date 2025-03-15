@@ -2,8 +2,6 @@ package com.app.bdink.member.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.global.oauth2.domain.TokenDto;
-import com.app.bdink.global.token.Token;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
@@ -33,21 +31,21 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(
-                () -> new IllegalStateException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalStateException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByRefreshToken(String refreshToken) {
         return memberRepository.findByRefreshToken(refreshToken).orElseThrow(
-                () -> new IllegalStateException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
         );
     }
 

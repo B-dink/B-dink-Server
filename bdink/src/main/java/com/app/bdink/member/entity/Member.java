@@ -1,5 +1,6 @@
 package com.app.bdink.member.entity;
 
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.entity.Instructor;
 import jakarta.persistence.*;
 import lombok.*;
@@ -62,5 +63,12 @@ public class Member {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public Career getInterest(){
+        if (this.instructor != null){
+            return instructor.getCareer();
+        }
+        return Career.EXERCISE;
     }
 }
