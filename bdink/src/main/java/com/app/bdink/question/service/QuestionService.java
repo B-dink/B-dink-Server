@@ -40,6 +40,7 @@ public class QuestionService {
 
     @Transactional
     public void updateQuestion(Long questionId, QuestionRequest questionRequest) {
+        // TODO: 로그인 한 사용자와 질문 작성자가 같은지 확인
         Question question = getById(questionId);
 
         question.update(questionRequest.content());
@@ -47,6 +48,7 @@ public class QuestionService {
 
     @Transactional
     public void deleteQuestion(Long questionId) {
+        // TODO: 로그인 한 사용자와 질문 작성자가 같은지 확인
         Question question = getById(questionId);
 
         questionRepository.delete(question);
