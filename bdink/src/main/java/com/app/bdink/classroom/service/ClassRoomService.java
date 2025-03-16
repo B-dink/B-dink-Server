@@ -1,7 +1,10 @@
 package com.app.bdink.classroom.service;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.controller.dto.response.AllClassRoomResponse;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.domain.Career;
+import com.app.bdink.classroom.domain.ChapterSummary;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,9 +24,9 @@ public class ClassRoomService {
 
     private final ClassRoomRepository classRoomRepository;
 
-    public ClassRoom findById(Long id){
+    public ClassRoom findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
-                ()-> new IllegalStateException("해당 클래스를 찾지 못했습니다.")
+                () -> new IllegalStateException("해당 클래스를 찾지 못했습니다.")
         );
     }
 
@@ -54,7 +58,7 @@ public class ClassRoomService {
     public ClassRoomResponse updateClassRoomInfo(final ClassRoom classRoom,
                                                  final String thumbnailKey,
                                                  final String videoKey,
-                                                 final ClassRoomDto classRoomDto){
+                                                 final ClassRoomDto classRoomDto) {
         classRoom.modifyClassRoom(classRoomDto, thumbnailKey, videoKey);
         return new ClassRoomResponse(
                 classRoom.getId(),
@@ -67,22 +71,40 @@ public class ClassRoomService {
     }
 
     @Transactional
-    public void updateClassRoomCdn(Long id, String assetId){
+    public void updateClassRoomCdn(Long id, String assetId) {
         ClassRoom classRoom = findById(id);
         classRoom.updateCDNLink(assetId);
     }
 
     @Transactional
-    public void deleteClassRoom(final ClassRoom classRoom){
+    public void deleteClassRoom(final ClassRoom classRoom) {
         classRoomRepository.delete(classRoom);
     }
 
     @Transactional(readOnly = true)
-    public List<ClassRoomResponse> getAllClassRoom() {
+    public List<AllClassRoomResponse> getAllClassRoom() {
         List<ClassRoom> classRooms = classRoomRepository.findAll();
         return classRooms.stream()
-                .map(ClassRoomResponse::from)
+                .map(classRoom -> {
+                    ChapterSummary chapterSummary = getChapterSummary(classRoom.getId());
+                    return AllClassRoomResponse.from(classRoom, chapterSummary);
+                })
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<AllClassRoomResponse> getClassRoomByCareer(Career career) {
+        List<ClassRoom> classRooms = classRoomRepository.findAllByInstructorCareer(career);
+        return classRooms.stream()
+                .map(classRoom -> AllClassRoomResponse.from(classRoom, new ChapterSummary(0, 0, LocalTime.of(0, 0))))
+                .collect(Collectors.toList());
+    }
+
+    private ChapterSummary getChapterSummary(Long id) {
+        int totalLectureCount = classRoomRepository.countById(id);
+        int totalChapterCount = findById(id).getChapters().size();
+        LocalTime totalLectureTime = LocalTime.of(0, 0, 0);
+
+        return new ChapterSummary(totalChapterCount, totalLectureCount, totalLectureTime);
+    }
 }

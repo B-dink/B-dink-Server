@@ -2,6 +2,7 @@ package com.app.bdink.classroom.controller;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
@@ -95,6 +96,12 @@ public class ClassRoomController {
     @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
     public ResponseEntity<?> getAllClassRoom() {
         return ResponseEntity.ok().body(classRoomService.getAllClassRoom());
+    }
+
+    @GetMapping("/career")
+    @Operation(method = "GET", description = "특정 Career의 클래스룸을 조회합니다.")
+    public ResponseEntity<?> getClassRoomByCareer(@RequestParam Career career) {
+        return ResponseEntity.ok().body(classRoomService.getClassRoomByCareer(career));
     }
 
 }
