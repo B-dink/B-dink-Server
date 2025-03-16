@@ -8,6 +8,8 @@ import com.app.bdink.classroom.repository.ReviewRepository;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +36,9 @@ public class ReviewService {
         return String.valueOf(reviewRepository.save(review).getId());
     }
 
-    public List<ReviewResponse> getAllReview(final ClassRoom classRoom) {
-        List<Review> reviewList = reviewRepository.findByClassRoom(classRoom);
-        return reviewList.stream()
+    public List<ReviewResponse> getAllReview(final ClassRoom classRoom, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findAllByClassRoom(classRoom, pageable);
+        return reviews.stream()
             .map(ReviewResponse::from)
             .toList();
     }
