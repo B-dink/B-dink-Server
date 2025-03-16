@@ -1,25 +1,25 @@
 package com.app.bdink.lecture.controller;
 
-import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.service.ClassRoomService;
+
+import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.external.aws.service.S3Service;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
 import com.app.bdink.lecture.service.ChapterService;
 import com.app.bdink.lecture.service.LectureService;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.service.MemberService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import retrofit2.http.Multipart;
 
 import java.net.URI;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,20 +28,26 @@ import java.net.URI;
 public class LectureController {
 
     private final LectureService lectureService;
-    private final ClassRoomService classRoomService;
+    private final InstructorUtilService instructorUtilService;
     private final ChapterService chapterService;
     private final S3Service s3Service;
 
     //TODO: 강사인지 확인하는 로직이 필요하다.
     @PostMapping
     @Operation(method = "POST", description = "강의를 생성합니다. 강의를 생성하면 해당 강의에 대한 시간정보, 강의 수가 해당 챕터에 업데이트 되는 로직입니다.")
-    public ResponseEntity<?> createLecture(@RequestParam Long classRoomId,
+    public ResponseEntity<?> createLecture(
+                                           Principal principal,
+                                           @RequestParam Long classRoomId,
                                            @RequestParam Long chapterId,
                                            @RequestPart(value = "lectureDto") LectureDto lectureDto,
                                            @RequestPart(value = "media") MultipartFile file) {
 
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
+        if (!instructorUtilService.validateClassRoomOwner(principal, classRoomId)){
+            throw new CustomException(Error.NO_INSTRUCTOR, Error.NO_INSTRUCTOR.getMessage());
+        }
+
         Chapter chapter = chapterService.findById(chapterId);
+
         String uploadUrlKey = null;
 
         if (!file.isEmpty()){
@@ -49,8 +55,8 @@ public class LectureController {
         }
 
         String uploadUrl = s3Service.generateOriginalLink(uploadUrlKey);
-        String id = lectureService.createLecture(classRoom, chapter, lectureDto, uploadUrl);
-        return ResponseEntity.created(URI.create(id)).build();
+
+        return ResponseEntity.created(URI.create(lectureService.createLecture(chapter, lectureDto, uploadUrl))).build();
     }
 
     @GetMapping
@@ -64,7 +70,13 @@ public class LectureController {
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "강의를 삭제합니다. 현재 하드 delete로 구성되어있습니다.")
-    ResponseEntity<?> deleteLecture(@RequestParam Long id){
+    ResponseEntity<?> deleteLecture(Principal principal,
+                                    @RequestParam Long id){
+
+        if (!instructorUtilService.validateLectureOwner(principal, id)){
+            throw new CustomException(Error.NO_INSTRUCTOR, Error.NO_INSTRUCTOR.getMessage());
+        }
+
         lectureService.deleteLecture(id);
         return ResponseEntity.noContent().build();
     }

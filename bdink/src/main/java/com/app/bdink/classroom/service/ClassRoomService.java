@@ -121,7 +121,7 @@ public class ClassRoomService {
     public List<AllClassRoomResponse> getClassRoomByCareer(Career career) {
         List<ClassRoom> classRooms = classRoomRepository.findAllByInstructorCareer(career);
         return classRooms.stream()
-                .map(classRoom -> AllClassRoomResponse.from(classRoom, new ChapterSummary(0, 0, LocalTime.of(0, 0))))
+                .map(classRoom -> AllClassRoomResponse.from(classRoom, getChapterSummary(classRoom.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -144,7 +144,7 @@ public class ClassRoomService {
         ClassRoom classRoom = findById(id) ;
         int totalLectureCount = lectureService.countLectureByClassRoom(classRoom);
         int totalChapterCount = classRoom.getChapters().size();
-        LocalTime totalLectureTime = LocalTime.of(0, 0, 0);
+        int totalLectureTime = lectureService.getChapterLectureTime(classRoom);
 
         return new ChapterSummary(totalChapterCount, totalLectureCount, totalLectureTime);
     }

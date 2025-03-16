@@ -1,18 +1,13 @@
 package com.app.bdink.lecture.entity;
 
 import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.common.entity.BaseTimeEntity;
-import com.app.bdink.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -26,7 +21,7 @@ public class Lecture extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private ClassRoom classRoom;
+    private ClassRoom classRoom; //TODO: 얘 뭐지 흠.. 당장 문제는 안될거같긴한데
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id")

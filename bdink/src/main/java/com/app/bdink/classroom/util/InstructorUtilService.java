@@ -5,6 +5,7 @@ import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class InstructorUtilService {
     //TODO: 나중에 여기가 레포지터리로 변할듯.
     private final MemberService memberService;
     private final ClassRoomService classRoomService;
+    private final LectureService lectureService;
 
     @Transactional(readOnly = true)
     public Instructor getInstructor(Principal principal){
@@ -45,6 +47,20 @@ public class InstructorUtilService {
 
         return true;
     }
+
+    @Transactional(readOnly = true)
+    public boolean validateLectureOwner(Principal principal, Long lectureId){
+        Instructor instructor = getInstructor(principal);
+        ClassRoom classRoom = lectureService.findById(lectureId).getClassRoom();
+
+        if (instructor.getId().equals(classRoom.getInstructor().getId())){
+            return false;
+        }
+
+        return true;
+    }
+
+
 
 
 
