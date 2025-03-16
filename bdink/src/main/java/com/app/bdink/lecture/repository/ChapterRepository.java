@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     boolean existsByClassRoom(ClassRoom classRoom);
+    int countByClassRoom(ClassRoom classRoom);
 }

@@ -2,23 +2,23 @@ package com.app.bdink.classroom.service;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.AllClassRoomResponse;
+import com.app.bdink.classroom.controller.dto.response.ChapterResponse;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.controller.dto.response.ClassRoomSummeryDto;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.domain.ChapterSummary;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
+import com.app.bdink.lecture.repository.ChapterRepository;
+import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
-import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +28,8 @@ public class ClassRoomService {
     private final ClassRoomRepository classRoomRepository;
 
     private final LectureService lectureService;
+    private final ChapterRepository chapterRepository;
+    private final LectureRepository lectureRepository;
 
     public ClassRoom findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -38,7 +40,22 @@ public class ClassRoomService {
     @Transactional(readOnly = true)
     public ClassRoomResponse getClassRoomInfo(final Long id) {
         ClassRoom classRoom = findById(id);
-        return ClassRoomResponse.from(classRoom);
+
+        ClassRoomSummeryDto classRoomSummeryDto = ClassRoomSummeryDto.of(
+            chapterRepository.countByClassRoom(classRoom),
+            lectureRepository.countByClassRoom(classRoom),
+            lectureService.getTotalLectureTime(classRoom)
+        );
+
+        return ClassRoomResponse.of(classRoom, classRoomSummeryDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChapterResponse> getChapterInfo(Long id) {
+        ClassRoom classRoom = findById(id);
+        return classRoom.getChapters().stream()
+            .map(ChapterResponse::of)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -65,14 +82,14 @@ public class ClassRoomService {
                                                  final String videoKey,
                                                  final ClassRoomDto classRoomDto) {
         classRoom.modifyClassRoom(classRoomDto, thumbnailKey, videoKey);
-        return new ClassRoomResponse(
-                classRoom.getId(),
-                classRoom.getTitle(),
-                classRoom.getIntroduction(),
-                thumbnailKey,
-                videoKey,
-                classRoom.getPriceDetail()
-        );
+        return ClassRoomResponse.builder()
+            .id(classRoom.getId())
+            .title(classRoom.getTitle())
+            .introduction(classRoom.getIntroduction())
+            .thumbnail(classRoom.getThumbnail())
+            .introLink(classRoom.getIntroLink())
+            .priceDetail(classRoom.getPriceDetail())
+            .build();
     }
 
     @Transactional
