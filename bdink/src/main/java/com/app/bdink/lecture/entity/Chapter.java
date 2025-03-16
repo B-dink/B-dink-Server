@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,14 +38,6 @@ public class Chapter extends BaseTimeEntity {
         this.title = title;
         this.lectureCount = 0;
         this.number = 1;
-    }
-
-    public void increaseLectureCount() {
-        this.lectureCount++;
-    }
-
-    public void decreaseLectureCount(){
-        this.lectureCount--;
     }
 
     public void updateNumber(){

@@ -9,6 +9,8 @@ import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.security.Principal;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,9 +36,9 @@ public class ReviewController {
 
     @Operation(method = "POST", description = "리뷰를 등록합니다.")
     @PostMapping
-    public ResponseEntity<?> saveReview(@RequestParam Long memberId, @RequestParam Long classRoomId,
-        @RequestBody ReviewRequest reviewRequest) {
-        Member member = memberService.findById(memberId);
+    public ResponseEntity<?> saveReview(Principal principal, @RequestParam Long classRoomId,
+                                        @RequestBody ReviewRequest reviewRequest) {
+        Member member = memberService.findById(Long.parseLong(principal.getName()));
         ClassRoom classRoom = classRoomService.findById(classRoomId);
         String id = reviewService.saveReview(member, classRoom, reviewRequest);
         return ResponseEntity.created(
@@ -53,16 +55,17 @@ public class ReviewController {
 
     @Operation(method = "PUT", description = "리뷰를 수정합니다.")
     @PutMapping
-    public ResponseEntity<?> updateReview(@RequestParam Long reviewId, @RequestParam Long memberId, @RequestBody ReviewRequest reviewRequest) {
-        Member member = memberService.findById(memberId);
+    public ResponseEntity<?> updateReview(@RequestParam Long reviewId, Principal principal,
+                                          @RequestBody ReviewRequest reviewRequest) {
+        Member member = memberService.findById(Long.parseLong(principal.getName()));
         reviewService.updateReview(reviewId, member, reviewRequest);
         return ResponseEntity.ok().build();
     }
 
     @Operation(method = "DELETE", description = "리뷰를 삭제합니다.")
     @DeleteMapping
-    public ResponseEntity<?> deleteReview(@RequestParam Long reviewId, @RequestParam Long memberId) {
-        Member member = memberService.findById(memberId);
+    public ResponseEntity<?> deleteReview(@RequestParam Long reviewId, Principal principal) {
+        Member member = memberService.findById(Long.parseLong(principal.getName()));
         reviewService.deleteReview(reviewId, member);
         return ResponseEntity.noContent().build();
     }
