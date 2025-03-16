@@ -1,6 +1,6 @@
-package com.app.bdink.question.controller.dto.response;
+package com.app.bdink.qna.controller.dto.response;
 
-import com.app.bdink.question.entity.Question;
+import com.app.bdink.qna.entity.Question;
 
 public record QuestionResponse(
     String content

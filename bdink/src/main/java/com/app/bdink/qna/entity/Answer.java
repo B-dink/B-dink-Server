@@ -1,41 +1,42 @@
-package com.app.bdink.question.entity;
+package com.app.bdink.qna.entity;
 
-import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.common.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.ToOne;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Question extends BaseTimeEntity {
+public class Answer extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "content")
     private String content;
 
     @ManyToOne
-    private ClassRoom classRoom;
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     @Builder
-    public Question(String content, ClassRoom classRoom) {
+    public Answer(String content, Question question) {
         this.content = content;
-        this.classRoom = classRoom;
+        this.question = question;
     }
 
     public void update(String content) {
         this.content = content;
     }
+
 }

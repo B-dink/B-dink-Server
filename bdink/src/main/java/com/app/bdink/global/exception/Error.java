@@ -32,6 +32,7 @@ public enum Error {
      * 401 UNAUTHORIZED EXCEPTION
      */
     TOKEN_TIME_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    VERIFY_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 인증입니다. 재발송 해주세요."),
     REFRESH_TOKEN_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 리프레시 토큰입니다. 재로그인해주세요."),
     EXPIRED_APPLE_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 아이덴티티 토큰입니다."),
 
@@ -39,6 +40,7 @@ public enum Error {
      * 403 FORBIDDEN EXCEPTION
      */
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, "리소스에 대한 권한이 없습니다."),
+    NO_INSTRUCTOR(HttpStatus.FORBIDDEN, "강사정보가 없는 유저입니다."),
     INVALID_USER_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없는 유저입니다."),
 
     /**

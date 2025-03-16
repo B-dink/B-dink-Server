@@ -1,9 +1,9 @@
-package com.app.bdink.question.controller;
+package com.app.bdink.qna.controller;
 
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.ClassRoomService;
-import com.app.bdink.question.controller.dto.request.QuestionRequest;
-import com.app.bdink.question.service.QuestionService;
+import com.app.bdink.qna.controller.dto.request.QnARequest;
+import com.app.bdink.qna.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
@@ -29,9 +29,9 @@ public class QuestionController {
 
     @Operation(method = "POST", description = "질문을 생성합니다.")
     @PostMapping
-    public ResponseEntity<?> createQuestion(@RequestParam Long classRoomId, @RequestBody QuestionRequest questionRequest) {
+    public ResponseEntity<?> createQuestion(@RequestParam Long classRoomId, @RequestBody QnARequest qnARequest) {
         ClassRoom classRoom = classRoomService.findById(classRoomId);
-        String id = questionService.createQuestion(classRoom, questionRequest);
+        String id = questionService.createQuestion(classRoom, qnARequest);
         return ResponseEntity.created(
                 URI.create(id))
             .build();
@@ -44,16 +44,16 @@ public class QuestionController {
         return ResponseEntity.ok().body(questionService.getAllQuestions(classRoom));
     }
 
-    @Operation(method = "GET", description = "질문 상세를 조회합니다.")
+    @Operation(method = "GET", description = "질문과 답변을 조회합니다.")
     @GetMapping("/detail")
-    public ResponseEntity<?> getQuestionDetail(@RequestParam Long questionId) {
-        return ResponseEntity.ok().body(questionService.getQuestionDetail(questionId));
+    public ResponseEntity<?> getQuestionAnswer(@RequestParam Long questionId) {
+        return ResponseEntity.ok().body(questionService.getQuestionAnswer(questionId));
     }
 
     @Operation(method = "PUT", description = "질문을 수정합니다.")
     @PutMapping
-    public ResponseEntity<?> updateQuestion(@RequestParam Long questionId, @RequestBody QuestionRequest questionRequest) {
-        questionService.updateQuestion(questionId, questionRequest);
+    public ResponseEntity<?> updateQuestion(@RequestParam Long questionId, @RequestBody QnARequest qnARequest) {
+        questionService.updateQuestion(questionId, qnARequest);
         return ResponseEntity.ok().build();
     }
 
