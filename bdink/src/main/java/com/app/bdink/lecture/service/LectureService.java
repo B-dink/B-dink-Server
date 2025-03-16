@@ -6,7 +6,6 @@ import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
-import com.app.bdink.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class LectureService {
 
     //chapter에 강좌 추가
     @Transactional
-    public String createLecture(final ClassRoom classRoom, final Chapter chapter,
+    public String createLecture(final Chapter chapter,
                                 final LectureDto lectureDto, final String uploadUrl){
 
         Lecture lecture = lectureRepository.save(
@@ -38,7 +37,6 @@ public class LectureService {
                         .mediaLink(uploadUrl)
                         .build());
 
-        chapter.increaseLectureCount();
         chapter.addLectures(lecture);
 
         return String.valueOf(lecture.getId());
@@ -66,6 +64,12 @@ public class LectureService {
     }
 
     public int getTotalLectureTime(ClassRoom classRoom) {
+        return lectureRepository.findAllByClassRoom(classRoom).stream()
+                .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
+                .sum();
+    }
+
+    public int getChapterLectureTime(ClassRoom classRoom) {
         return lectureRepository.findAllByClassRoom(classRoom).stream()
                 .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
                 .sum();
