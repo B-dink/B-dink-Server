@@ -3,14 +3,13 @@ package com.app.bdink.classroom.controller;
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
-import com.app.bdink.lecture.service.InstructorService;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,49 +28,59 @@ import java.net.URI;
 public class ClassRoomController {
 
     private final ClassRoomService classRoomService;
-    private final InstructorService instructorService;
     private final S3Service s3Service;
     private final MediaService mediaService;
+    private final InstructorUtilService instructorUtilService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
-    ResponseEntity<?> createClassRoom(@RequestParam Long instructorId,
+    ResponseEntity<?> createClassRoom(Principal memberId,
                                       @RequestPart(value = "thumbnail") MultipartFile thumbnail,
                                       @RequestPart(value = "intro-video") MultipartFile video,
-                                      @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto){
-
-        Instructor instructor = instructorService.findById(instructorId);
+                                      @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
 
         String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
         String mediaKey = s3Service.uploadImageOrMedia("media/", video);
 
 
+        String id = classRoomService.createClassRoom(
+                instructorUtilService.getInstructor(memberId),
+                thumbnailKey,
+                mediaKey,
+                classRoomDto
+        );
 
-        String id = classRoomService.createClassRoom(instructor, thumbnailKey, mediaKey, classRoomDto);
-        mediaService.createMedia(Long.parseLong(id),mediaKey);
+        mediaService.createMedia(Long.parseLong(id), mediaKey);
         return ResponseEntity.created(
-                URI.create(id))
+                        URI.create(id))
                 .build();
     }
 
     @GetMapping
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
-    ResponseEntity<?> getClassRoomInfo(@RequestParam Long id){
+    ResponseEntity<?> getClassRoomInfo(@RequestParam Long id) {
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
         return ResponseEntity.ok(classRoomDto);
     }
+
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "클래스룸 정보를 수정합니다.")
-    ResponseEntity<?> updateClassRoomInfo(@RequestParam Long id,
-                                          @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto,
-                                          @RequestPart(value = "thumbnail") MultipartFile thumbnail,
-                                          @RequestPart(value = "intro-video") MultipartFile video){
+    ResponseEntity<?> updateClassRoomInfo(
+            Principal principal,
+            @RequestParam Long id,
+            @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto,
+            @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+            @RequestPart(value = "intro-video") MultipartFile video) {
+
+        if (instructorUtilService.validateClassRoomOwner(principal, id)){
+            throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
+        }
 
         String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
         String videoKey = s3Service.uploadImageOrMedia("media/", video);
         ClassRoom classRoom = classRoomService.findById(id);
 
-        if (!classRoom.isEmptyThumbnail()){
+        if (!classRoom.isEmptyThumbnail()) {
             s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         }
 
@@ -80,14 +90,20 @@ public class ClassRoomController {
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "클래스룸을 삭제합니다. 이는 hard delete로 구성되어있으며 클래스룸을 삭제하면 안에 있는 챕터, 강좌들이 함께 삭제됩니다.")
-    ResponseEntity<?> deleteClassRoom(@RequestParam Long id){
+    ResponseEntity<?> deleteClassRoom(
+            Principal principal,
+            @RequestParam Long id) {
+
+        if (instructorUtilService.validateClassRoomOwner(principal, id)){
+            throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
+        }
+
         ClassRoom classRoom = classRoomService.findById(id);
         s3Service.deleteImageAndMedia(classRoom.getThumbnail());
         classRoomService.deleteClassRoom(classRoom);
 
         return ResponseEntity.noContent().build();
     }
-
 
 
 }
