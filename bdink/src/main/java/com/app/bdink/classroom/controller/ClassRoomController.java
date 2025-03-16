@@ -2,11 +2,15 @@ package com.app.bdink.classroom.controller;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
+import com.app.bdink.lecture.service.InstructorService;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +34,7 @@ public class ClassRoomController {
     private final ClassRoomService classRoomService;
     private final S3Service s3Service;
     private final MediaService mediaService;
+    private final MemberService memberService;
     private final InstructorUtilService instructorUtilService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -105,5 +110,16 @@ public class ClassRoomController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/all")
+    @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
+    public ResponseEntity<?> getAllClassRoom() {
+        return ResponseEntity.ok().body(classRoomService.getAllClassRoom());
+    }
+
+    @GetMapping("/career")
+    @Operation(method = "GET", description = "특정 Career의 클래스룸을 조회합니다.")
+    public ResponseEntity<?> getClassRoomByCareer(@RequestParam Career career) {
+        return ResponseEntity.ok().body(classRoomService.getClassRoomByCareer(career));
+    }
 
 }
