@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,10 +46,9 @@ public class ReviewController {
 
     @Operation(method = "GET", description = "모든 리뷰를 조회합니다.")
     @GetMapping
-    public ResponseEntity<?> getAllReview(@RequestParam Long classRoomId) {
+    public ResponseEntity<?> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
         ClassRoom classRoom = classRoomService.findById(classRoomId);
-        return ResponseEntity.ok().body(reviewService.getAllReview(classRoom));
-
+        return ResponseEntity.ok().body(reviewService.getAllReview(classRoom, pageable));
     }
 
     @Operation(method = "PUT", description = "리뷰를 수정합니다.")

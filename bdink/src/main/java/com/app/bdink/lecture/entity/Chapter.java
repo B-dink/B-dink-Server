@@ -31,6 +31,7 @@ public class Chapter extends BaseTimeEntity {
 
     private String title; // 챕터 제목
 
+    // TODO: lectureCount 필드는 사용하지 않는 것으로 보입니다. 제거해도 될 것 같습니다.
     private int lectureCount; // 해당 챕터에 속한 강좌의 수
 
     private int number;

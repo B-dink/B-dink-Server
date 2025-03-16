@@ -1,29 +1,22 @@
 package com.app.bdink.lecture.service;
 
 import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
-import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class LectureService {
 
     private final LectureRepository lectureRepository;
-
-    private final MemberService memberService;
-    private final ClassRoomService classRoomService;
-
 
     public Lecture findById(Long id){
         return lectureRepository.findById(id).orElseThrow(
@@ -65,5 +58,16 @@ public class LectureService {
     public void deleteLecture(long id){
         Lecture lecture = findById(id);
         lectureRepository.delete(lecture);
+    }
+
+    @Transactional(readOnly = true)
+    public int countLectureByClassRoom(ClassRoom classRoom) {
+        return lectureRepository.countByClassRoom(classRoom);
+    }
+
+    public int getTotalLectureTime(ClassRoom classRoom) {
+        return lectureRepository.findAllByClassRoom(classRoom).stream()
+                .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
+                .sum();
     }
 }
