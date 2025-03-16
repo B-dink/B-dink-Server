@@ -3,6 +3,7 @@ package com.app.bdink.classroom.service;
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.AllClassRoomResponse;
 import com.app.bdink.classroom.controller.dto.response.ChapterResponse;
+import com.app.bdink.classroom.controller.dto.response.ClassRoomDetailResponse;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomSummeryDto;
 import com.app.bdink.classroom.domain.Career;
@@ -30,6 +31,8 @@ public class ClassRoomService {
     private final LectureService lectureService;
     private final ChapterRepository chapterRepository;
     private final LectureRepository lectureRepository;
+
+    private final BookmarkService bookmarkService;
 
     public ClassRoom findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -120,6 +123,21 @@ public class ClassRoomService {
         return classRooms.stream()
                 .map(classRoom -> AllClassRoomResponse.from(classRoom, new ChapterSummary(0, 0, LocalTime.of(0, 0))))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ClassRoomDetailResponse getClassRoomDetail(Long id) {
+        ClassRoom classRoom = findById(id);
+        long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
+
+        return new ClassRoomDetailResponse(
+                classRoom.getTitle(),
+                classRoom.getIntroduction(),
+                bookmarkCount,
+                classRoom.getInstructor().getMember().getName(),
+                classRoom.getThumbnail(),
+                classRoom.getPriceDetail()
+        );
     }
 
     private ChapterSummary getChapterSummary(Long id) {
