@@ -1,10 +1,12 @@
-package com.app.bdink.question.service;
+package com.app.bdink.qna.service;
 
 import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.question.controller.dto.request.QuestionRequest;
-import com.app.bdink.question.controller.dto.response.QuestionResponse;
-import com.app.bdink.question.entity.Question;
-import com.app.bdink.question.repository.QuestionRepository;
+import com.app.bdink.qna.controller.dto.response.AnswerDto;
+import com.app.bdink.qna.entity.Question;
+import com.app.bdink.qna.controller.dto.request.QnARequest;
+import com.app.bdink.qna.controller.dto.response.QnAResponse;
+import com.app.bdink.qna.controller.dto.response.QuestionResponse;
+import com.app.bdink.qna.repository.QuestionRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,10 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public String createQuestion(final ClassRoom classRoom, QuestionRequest questionRequest) {
-        Question question = Question.builder()
+    public String createQuestion(final ClassRoom classRoom, QnARequest qnARequest) {
+    Question question = Question.builder()
             .classRoom(classRoom)
-            .content(questionRequest.content())
+            .content(qnARequest.content())
             .build();
         return String.valueOf(questionRepository.save(question).getId());
     }
@@ -33,17 +35,18 @@ public class QuestionService {
             .collect(Collectors.toList());
     }
 
-    public QuestionResponse getQuestionDetail(Long questionId) {
+    public QnAResponse getQuestionAnswer(Long questionId) {
         Question question = getById(questionId);
-        return new QuestionResponse(question);
+
+        return QnAResponse.toEntity(question);
     }
 
     @Transactional
-    public void updateQuestion(Long questionId, QuestionRequest questionRequest) {
+    public void updateQuestion(Long questionId, QnARequest qnARequest) {
         // TODO: 로그인 한 사용자와 질문 작성자가 같은지 확인
         Question question = getById(questionId);
 
-        question.update(questionRequest.content());
+        question.update(qnARequest.content());
     }
 
     @Transactional
