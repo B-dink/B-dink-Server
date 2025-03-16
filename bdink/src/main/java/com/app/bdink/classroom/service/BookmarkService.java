@@ -39,4 +39,8 @@ public class BookmarkService {
         bookmarkRepository.deleteById(reviewId);
     }
 
+    public long getBookmarkCountForClassRoom(ClassRoom classRoom) {
+        return bookmarkRepository.countByClassRoom(classRoom);
+    }
+
 }

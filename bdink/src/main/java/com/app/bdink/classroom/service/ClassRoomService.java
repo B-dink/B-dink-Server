@@ -2,6 +2,7 @@ package com.app.bdink.classroom.service;
 
 import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.controller.dto.response.AllClassRoomResponse;
+import com.app.bdink.classroom.controller.dto.response.ClassRoomDetailResponse;
 import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.domain.ChapterSummary;
@@ -9,16 +10,12 @@ import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.lecture.service.LectureService;
-import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +25,7 @@ public class ClassRoomService {
     private final ClassRoomRepository classRoomRepository;
 
     private final LectureService lectureService;
+    private final BookmarkService bookmarkService;
 
     public ClassRoom findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -103,6 +101,21 @@ public class ClassRoomService {
         return classRooms.stream()
                 .map(classRoom -> AllClassRoomResponse.from(classRoom, new ChapterSummary(0, 0, LocalTime.of(0, 0))))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ClassRoomDetailResponse getClassRoomDetail(Long id) {
+        ClassRoom classRoom = findById(id);
+        long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
+
+        return new ClassRoomDetailResponse(
+                classRoom.getTitle(),
+                classRoom.getIntroduction(),
+                bookmarkCount,
+                classRoom.getInstructor().getMember().getName(),
+                classRoom.getThumbnail(),
+                classRoom.getPriceDetail()
+        );
     }
 
     private ChapterSummary getChapterSummary(Long id) {
