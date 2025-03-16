@@ -64,4 +64,10 @@ public class LectureService {
     public int countLectureByClassRoom(ClassRoom classRoom) {
         return lectureRepository.countByClassRoom(classRoom);
     }
+
+    public int getTotalLectureTime(ClassRoom classRoom) {
+        return lectureRepository.findAllByClassRoom(classRoom).stream()
+                .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
+                .sum();
+    }
 }

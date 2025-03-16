@@ -65,6 +65,12 @@ public class ClassRoomController {
         return ResponseEntity.ok(classRoomDto);
     }
 
+    @GetMapping("/chapter")
+    @Operation(method = "GET", description = "해당 클래스룸의 챕터 정보를 조회합니다.")
+    ResponseEntity<?> getChapterInfo(@RequestParam Long id) {
+        return ResponseEntity.ok(classRoomService.getChapterInfo(id));
+    }
+
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "클래스룸 정보를 수정합니다.")
     ResponseEntity<?> updateClassRoomInfo(
