@@ -8,8 +8,11 @@ import com.app.bdink.classroom.domain.ChapterSummary;
 import com.app.bdink.classroom.entity.ClassRoom;
 import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
+import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 public class ClassRoomService {
 
     private final ClassRoomRepository classRoomRepository;
+
+    private final LectureService lectureService;
 
     public ClassRoom findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -101,8 +106,9 @@ public class ClassRoomService {
     }
 
     private ChapterSummary getChapterSummary(Long id) {
-        int totalLectureCount = classRoomRepository.countById(id);
-        int totalChapterCount = findById(id).getChapters().size();
+        ClassRoom classRoom = findById(id) ;
+        int totalLectureCount = lectureService.countLectureByClassRoom(classRoom);
+        int totalChapterCount = classRoom.getChapters().size();
         LocalTime totalLectureTime = LocalTime.of(0, 0, 0);
 
         return new ChapterSummary(totalChapterCount, totalLectureCount, totalLectureTime);
