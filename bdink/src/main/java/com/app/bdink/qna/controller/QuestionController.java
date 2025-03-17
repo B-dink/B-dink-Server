@@ -29,7 +29,8 @@ public class QuestionController {
 
     @Operation(method = "POST", description = "질문을 생성합니다.")
     @PostMapping
-    public ResponseEntity<?> createQuestion(@RequestParam Long classRoomId, @RequestBody QnARequest qnARequest) {
+    public ResponseEntity<?> createQuestion(@RequestParam Long classRoomId,
+                                            @RequestBody QnARequest qnARequest) {
         ClassRoom classRoom = classRoomService.findById(classRoomId);
         String id = questionService.createQuestion(classRoom, qnARequest);
         return ResponseEntity.created(

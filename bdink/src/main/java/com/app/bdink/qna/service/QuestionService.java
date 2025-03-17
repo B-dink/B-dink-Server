@@ -31,7 +31,7 @@ public class QuestionService {
     public List<QuestionResponse> getAllQuestions(final ClassRoom classRoom) {
         List<Question> questionList = questionRepository.findByClassRoom(classRoom);
         return questionList.stream()
-            .map(QuestionResponse::new)
+            .map(QuestionResponse::from)
             .collect(Collectors.toList());
     }
 
