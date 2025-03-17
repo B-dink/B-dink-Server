@@ -1,7 +1,7 @@
 package com.app.bdink.lecture.service;
 
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.entity.Instructor;
+import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.lecture.controller.dto.InstructorDto;
 import com.app.bdink.lecture.controller.dto.request.UpdateInstructorDto;
 import com.app.bdink.lecture.controller.dto.response.InstructorInfoDto;

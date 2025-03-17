@@ -1,7 +1,7 @@
-package com.app.bdink.classroom.controller;
+package com.app.bdink.classroom.adapter.in.controller;
 
-import com.app.bdink.classroom.controller.dto.request.ReviewRequest;
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ReviewRequest;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.ReviewService;
 import com.app.bdink.member.entity.Member;
@@ -39,8 +39,8 @@ public class ReviewController {
     public ResponseEntity<?> saveReview(Principal principal, @RequestParam Long classRoomId,
                                         @RequestBody ReviewRequest reviewRequest) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        String id = reviewService.saveReview(member, classRoom, reviewRequest);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        String id = reviewService.saveReview(member, classRoomEntity, reviewRequest);
         return ResponseEntity.created(
             URI.create(id))
             .build();
@@ -49,8 +49,8 @@ public class ReviewController {
     @Operation(method = "GET", description = "모든 리뷰를 조회합니다.")
     @GetMapping
     public ResponseEntity<?> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        return ResponseEntity.ok().body(reviewService.getAllReview(classRoom, pageable));
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        return ResponseEntity.ok().body(reviewService.getAllReview(classRoomEntity, pageable));
     }
 
     @Operation(method = "PUT", description = "리뷰를 수정합니다.")

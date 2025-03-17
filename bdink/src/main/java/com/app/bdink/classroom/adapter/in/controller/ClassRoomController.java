@@ -1,11 +1,13 @@
-package com.app.bdink.classroom.controller;
+package com.app.bdink.classroom.adapter.in.controller;
 
-import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.controller.dto.response.ClassRoomDetailResponse;
-import com.app.bdink.classroom.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
@@ -30,6 +32,7 @@ import java.security.Principal;
 public class ClassRoomController {
 
     private final ClassRoomService classRoomService;
+    private final ClassRoomUseCase classRoomUseCase;
     private final S3Service s3Service;
     private final MediaService mediaService;
     private final InstructorUtilService instructorUtilService;
@@ -41,20 +44,21 @@ public class ClassRoomController {
                                       @RequestPart(value = "intro-video") MultipartFile video,
                                       @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
 
-        String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
-        String mediaKey = s3Service.uploadImageOrMedia("media/", video);
-
-
-        String id = classRoomService.createClassRoom(
+        // create Command
+        CreateClassRoomCommand command = CreateClassRoomCommand.of(
                 instructorUtilService.getInstructor(memberId),
-                thumbnailKey,
-                mediaKey,
+                s3Service.uploadImageOrMedia("image/", thumbnail),
+                s3Service.uploadImageOrMedia("media/", video),
                 classRoomDto
         );
 
-        mediaService.createMedia(Long.parseLong(id), mediaKey);
-        return ResponseEntity.created(
-                        URI.create(id))
+        // usecase의 메소드 호출.
+        String id = classRoomUseCase.createClassRoom(command);
+
+        //흠.. 밑에 애도 이런식으로 바꿔야하는데.
+        mediaService.createMedia(Long.parseLong(id), command.mediaKey());
+
+        return ResponseEntity.created(URI.create(id))
                 .build();
     }
 
@@ -86,13 +90,13 @@ public class ClassRoomController {
 
         String thumbnailKey = s3Service.uploadImageOrMedia("image/", thumbnail);
         String videoKey = s3Service.uploadImageOrMedia("media/", video);
-        ClassRoom classRoom = classRoomService.findById(id);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(id);
 
-        if (!classRoom.isEmptyThumbnail()) {
-            s3Service.deleteImageAndMedia(classRoom.getThumbnail());
+        if (!classRoomEntity.isEmptyThumbnail()) {
+            s3Service.deleteImageAndMedia(classRoomEntity.getThumbnail());
         }
 
-        ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoom, thumbnailKey, videoKey, classRoomDto);
+        ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoomEntity, thumbnailKey, videoKey, classRoomDto);
         return ResponseEntity.ok(classResponse);
     }
 
@@ -106,9 +110,9 @@ public class ClassRoomController {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
-        ClassRoom classRoom = classRoomService.findById(id);
-        s3Service.deleteImageAndMedia(classRoom.getThumbnail());
-        classRoomService.deleteClassRoom(classRoom);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(id);
+        s3Service.deleteImageAndMedia(classRoomEntity.getThumbnail());
+        classRoomService.deleteClassRoom(classRoomEntity);
 
         return ResponseEntity.noContent().build();
     }

@@ -1,7 +1,6 @@
 package com.app.bdink.lecture.service;
 
-import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.lecture.entity.Chapter;
 import com.app.bdink.lecture.repository.ChapterRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +20,16 @@ public class ChapterService {
 
 
 
-    public String createChapter(final ClassRoom classRoom, final String title){
-        Chapter chapter = new Chapter(classRoom, title);
-        boolean isNotFirstChapter = chapterRepository.existsByClassRoom(classRoom);
+    public String createChapter(final ClassRoomEntity classRoomEntity, final String title){
+        Chapter chapter = new Chapter(classRoomEntity, title);
+        boolean isNotFirstChapter = chapterRepository.existsByClassRoom(classRoomEntity);
 
         if (isNotFirstChapter){ //첫번째 챕터아니면 ++
             chapter.updateNumber();
         }
 
         chapter = chapterRepository.save(chapter);
-        classRoom.addChapter(chapter);
+        classRoomEntity.addChapter(chapter);
         return String.valueOf(chapter.getId());
 
     }

@@ -3,8 +3,6 @@ package com.app.bdink.qna.controller;
 import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.service.MemberService;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.entity.Question;
 import com.app.bdink.qna.service.AnswerService;

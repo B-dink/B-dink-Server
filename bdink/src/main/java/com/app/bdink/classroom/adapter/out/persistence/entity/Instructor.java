@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.entity;
+package com.app.bdink.classroom.adapter.out.persistence.entity;
 
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.common.entity.BaseTimeEntity;
@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 //강사만이 클래스룸 및 강좌를 등록할 수 있다.
+@Table(name = "Instructor")
 public class Instructor extends BaseTimeEntity {
 
     @Id

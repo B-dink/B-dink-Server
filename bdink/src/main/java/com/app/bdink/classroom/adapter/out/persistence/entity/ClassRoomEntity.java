@@ -1,6 +1,6 @@
-package com.app.bdink.classroom.entity;
+package com.app.bdink.classroom.adapter.out.persistence.entity;
 
-import com.app.bdink.classroom.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.lecture.entity.Chapter;
@@ -18,7 +18,8 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ClassRoom extends BaseTimeEntity {
+@Table(name = "ClassRoom")
+public class ClassRoomEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,9 +46,9 @@ public class ClassRoom extends BaseTimeEntity {
 
 
     @Builder
-    public ClassRoom(final String title, final String introduction,
-                     final String thumbnail, final String introLink,
-                     final Instructor instructor, final PriceDetail priceDetail) {
+    public ClassRoomEntity(final String title, final String introduction,
+                           final String thumbnail, final String introLink,
+                           final Instructor instructor, final PriceDetail priceDetail) {
 
         this.title = title;
         this.thumbnail = thumbnail;
@@ -56,6 +57,8 @@ public class ClassRoom extends BaseTimeEntity {
         this.priceDetail = priceDetail;
         this.introLink = introLink;
     }
+
+    //TODO: 도메인 로직꺼 호출하고 아래 싹 지우기.
 
     public void modifyClassRoom(final ClassRoomDto classRoomDto, final String thumbnailKey, final String videoKey){
         this.title = updateTitle(classRoomDto.title());

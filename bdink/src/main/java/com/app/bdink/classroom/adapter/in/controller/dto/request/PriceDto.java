@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.controller.dto.request;
+package com.app.bdink.classroom.adapter.in.controller.dto.request;
 
 import com.app.bdink.classroom.domain.PriceDetail;
 

@@ -1,6 +1,6 @@
 package com.app.bdink.qna.controller;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.service.QuestionService;
@@ -31,8 +31,8 @@ public class QuestionController {
     @PostMapping
     public ResponseEntity<?> createQuestion(@RequestParam Long classRoomId,
                                             @RequestBody QnARequest qnARequest) {
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        String id = questionService.createQuestion(classRoom, qnARequest);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        String id = questionService.createQuestion(classRoomEntity, qnARequest);
         return ResponseEntity.created(
                 URI.create(id))
             .build();
@@ -41,8 +41,8 @@ public class QuestionController {
     @Operation(method = "GET", description = "클래스룸 별 모든 질문을 조회합니다.")
     @GetMapping
     public ResponseEntity<?> getAllQuestions(@RequestParam Long classRoomId) {
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        return ResponseEntity.ok().body(questionService.getAllQuestions(classRoom));
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        return ResponseEntity.ok().body(questionService.getAllQuestions(classRoomEntity));
     }
 
     @Operation(method = "GET", description = "질문과 답변을 조회합니다.")

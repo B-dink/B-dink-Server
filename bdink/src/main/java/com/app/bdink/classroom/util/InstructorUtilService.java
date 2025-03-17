@@ -1,7 +1,7 @@
 package com.app.bdink.classroom.util;
 
-import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.entity.Instructor;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
@@ -42,36 +42,24 @@ public class InstructorUtilService {
     @Transactional(readOnly = true)
     public boolean validateClassRoomOwner(Principal principal, Long classRoomId){
         Instructor instructor = getInstructor(principal);
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
 
-        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
-            return false;
-        }
-
-        return true;
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
     }
 
     @Transactional(readOnly = true)
     public boolean validateLectureOwner(Principal principal, Long lectureId){
         Instructor instructor = getInstructor(principal);
-        ClassRoom classRoom = lectureService.findById(lectureId).getClassRoom();
+        ClassRoomEntity classRoomEntity = lectureService.findById(lectureId).getClassRoom();
 
-        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
-            return false;
-        }
-
-        return true;
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
     }
 
     @Transactional(readOnly = true)
-    public boolean validateAccessAnswer(Principal principal, final ClassRoom classRoom){
+    public boolean validateAccessAnswer(Principal principal, final ClassRoomEntity classRoomEntity){
         Instructor instructor = getInstructor(principal);
 
-        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
-            return false;
-        }
-
-        return true;
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
     }
 
     @Transactional(readOnly = true)
@@ -79,14 +67,10 @@ public class InstructorUtilService {
         Instructor instructor = getInstructor(principal);
         Answer answer = answerService.getById(id);
 
-        if (!instructor.equals(
+        return instructor.equals(
                 answer.getQuestion()
-                .getClassRoom()
-                .getInstructor())){
-            return false;
-        }
-
-        return true;
+                        .getClassRoom()
+                        .getInstructor());
     }
 
 

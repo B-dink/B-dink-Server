@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.controller.dto.response;
+package com.app.bdink.classroom.adapter.in.controller.dto.response;
 
 import com.app.bdink.lecture.entity.Chapter;
 import java.util.List;

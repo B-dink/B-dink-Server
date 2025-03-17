@@ -26,7 +26,6 @@ public class AnswerService {
 
     @Transactional
     public String createAnswer(final Question question, final QnARequest qnARequest) {
-        // TODO: 로그인한 사용자가 관리자인지 확인
         Answer answer = Answer.builder()
             .content(qnARequest.content())
             .question(question)
@@ -37,14 +36,12 @@ public class AnswerService {
 
     @Transactional
     public void updateAnswer(Long answerId, QnARequest qnARequest) {
-        // TODO: 로그인한 사용자가 관리자인지 확인
         Answer answer = getById(answerId);
         answer.update(qnARequest.content());
     }
 
     @Transactional
     public void deleteAnswer(Long answerId) {
-        // TODO: 로그인한 사용자가 관리자인지 확인
         Answer answer = getById(answerId);
         answerRepository.delete(answer);
     }

@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.controller.dto.response;
+package com.app.bdink.classroom.adapter.in.controller.dto.response;
 
 public record ClassRoomSummeryDto(
     int chapterCount, // 챕터 개수

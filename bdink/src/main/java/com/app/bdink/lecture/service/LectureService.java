@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.service;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
@@ -59,18 +59,18 @@ public class LectureService {
     }
 
     @Transactional(readOnly = true)
-    public int countLectureByClassRoom(ClassRoom classRoom) {
-        return lectureRepository.countByClassRoom(classRoom);
+    public int countLectureByClassRoom(ClassRoomEntity classRoomEntity) {
+        return lectureRepository.countByClassRoom(classRoomEntity);
     }
 
-    public int getTotalLectureTime(ClassRoom classRoom) {
-        return lectureRepository.findAllByClassRoom(classRoom).stream()
+    public int getTotalLectureTime(ClassRoomEntity classRoomEntity) {
+        return lectureRepository.findAllByClassRoom(classRoomEntity).stream()
                 .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
                 .sum();
     }
 
-    public int getChapterLectureTime(ClassRoom classRoom) {
-        return lectureRepository.findAllByClassRoom(classRoom).stream()
+    public int getChapterLectureTime(ClassRoomEntity classRoomEntity) {
+        return lectureRepository.findAllByClassRoom(classRoomEntity).stream()
                 .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
                 .sum();
     }

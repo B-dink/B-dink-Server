@@ -1,6 +1,6 @@
-package com.app.bdink.classroom.controller;
+package com.app.bdink.classroom.adapter.in.controller;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.BookmarkService;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.MemberUtilService;
@@ -35,8 +35,8 @@ public class BookmarkController {
     @Operation(method = "POST", description = "북마크를 저장합니다.")
     public ResponseEntity<?> saveBookmark(Principal principal, @RequestParam Long classRoomId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
-        String id = bookmarkService.saveBookmark(member, classRoom);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        String id = bookmarkService.saveBookmark(member, classRoomEntity);
         return ResponseEntity.created(
             URI.create(id))
             .build();
