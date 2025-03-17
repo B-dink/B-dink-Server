@@ -1,5 +1,7 @@
 package com.app.bdink.qna.service;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.entity.Answer;
@@ -16,8 +18,9 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
 
     public Answer getById(Long answerId) {
+
         return answerRepository.findById(answerId).orElseThrow(
-            () -> new IllegalStateException("해당 답변을 찾지 못했습니다.")
+            () -> new CustomException(Error.NOT_FOUND_ANSWER, Error.NOT_FOUND_ANSWER.getMessage())
         );
     }
 
@@ -28,6 +31,7 @@ public class AnswerService {
             .content(qnARequest.content())
             .question(question)
             .build();
+
         return String.valueOf(answerRepository.save(answer).getId());
     }
 

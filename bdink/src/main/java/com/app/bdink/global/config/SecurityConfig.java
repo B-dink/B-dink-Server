@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/callback/**").permitAll() // 이 경로에 대해서는 모든 사용자가 접근할 수 있도록 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
-                        .requestMatchers("/api/v1/**").permitAll()
+
                         .requestMatchers("/api/v1/member/join").permitAll()
                         .requestMatchers("/api/v1/member/login").permitAll()
                         .requestMatchers("/api/v1/oauth2/**").permitAll()

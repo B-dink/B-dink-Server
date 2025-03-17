@@ -8,10 +8,12 @@ public record QnAResponse(
     String questionContent,
     List<AnswerDto> answerContent
 ) {
-    public static QnAResponse toEntity(Question question) {
-        return new QnAResponse(question.getContent(), question.getAnswers().stream()
-            .map(answer -> new AnswerDto(answer.getId(), answer.getContent()))
-            .toList());
+    public static QnAResponse from(final Question question) {
+        return new QnAResponse(
+                question.getContent(),
+                question.getAnswers().stream()
+                        .map(AnswerDto::from)
+                        .toList());
     }
 
 }

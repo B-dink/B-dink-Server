@@ -6,7 +6,7 @@ public record AnswerDto(
     Long id,
     String content
 ) {
-    public AnswerDto from(Answer answer) {
+    public static AnswerDto from(Answer answer) {
         return new AnswerDto(answer.getId(), answer.getContent());
     }
 }

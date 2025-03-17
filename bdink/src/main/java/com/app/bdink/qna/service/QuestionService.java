@@ -38,7 +38,7 @@ public class QuestionService {
     public QnAResponse getQuestionAnswer(Long questionId) {
         Question question = getById(questionId);
 
-        return QnAResponse.toEntity(question);
+        return QnAResponse.from(question);
     }
 
     @Transactional

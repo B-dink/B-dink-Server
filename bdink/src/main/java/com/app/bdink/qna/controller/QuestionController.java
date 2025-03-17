@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/questions")
+@RequestMapping("/api/v1/questions")
 @Tag(name = "Q&A 질문 API", description = "Q&A 질문과 관련된 API들입니다.")
 public class QuestionController {
 

@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.crypto.dsig.SignatureProperty;
 import lombok.AccessLevel;
@@ -33,7 +35,7 @@ public class Question extends BaseTimeEntity {
     private ClassRoom classRoom;
 
     @OneToMany(mappedBy = "question")
-    private List<Answer> answers;
+    private List<Answer> answers = new ArrayList<>();
 
     @Builder
     public Question(String content, ClassRoom classRoom) {

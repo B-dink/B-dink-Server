@@ -8,6 +8,8 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.qna.entity.Answer;
+import com.app.bdink.qna.service.AnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class InstructorUtilService {
     private final MemberService memberService;
     private final ClassRoomService classRoomService;
     private final LectureService lectureService;
+    private final AnswerService answerService;
 
     @Transactional(readOnly = true)
     public Instructor getInstructor(Principal principal){
@@ -41,7 +44,7 @@ public class InstructorUtilService {
         Instructor instructor = getInstructor(principal);
         ClassRoom classRoom = classRoomService.findById(classRoomId);
 
-        if (instructor.getId().equals(classRoom.getInstructor().getId())){
+        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
             return false;
         }
 
@@ -53,7 +56,33 @@ public class InstructorUtilService {
         Instructor instructor = getInstructor(principal);
         ClassRoom classRoom = lectureService.findById(lectureId).getClassRoom();
 
-        if (instructor.getId().equals(classRoom.getInstructor().getId())){
+        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean validateAccessAnswer(Principal principal, final ClassRoom classRoom){
+        Instructor instructor = getInstructor(principal);
+
+        if (!instructor.getId().equals(classRoom.getInstructor().getId())){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean validateAccessAnswer(Principal principal, final Long id){
+        Instructor instructor = getInstructor(principal);
+        Answer answer = answerService.getById(id);
+
+        if (!instructor.equals(
+                answer.getQuestion()
+                .getClassRoom()
+                .getInstructor())){
             return false;
         }
 
