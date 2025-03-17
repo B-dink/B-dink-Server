@@ -5,12 +5,12 @@ import com.app.bdink.qna.entity.Question;
 import java.util.List;
 
 public record QnAResponse(
-    String questionContent,
+    QuestionResponse questionResponse,
     List<AnswerDto> answerContent
 ) {
     public static QnAResponse from(final Question question) {
         return new QnAResponse(
-                question.getContent(),
+                QuestionResponse.from(question),
                 question.getAnswers().stream()
                         .map(AnswerDto::from)
                         .toList());
