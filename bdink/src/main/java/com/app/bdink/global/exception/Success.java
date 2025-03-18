@@ -17,6 +17,9 @@ public enum Success {
     CREATE_CHAPTER_SUCCESS(HttpStatus.CREATED, "챕터 생성 성공"),
     CREATE_INSTRUCTOR_SUCCESS(HttpStatus.CREATED, "강사 생성 성공"),
     CREATE_LECTURE_SUCCESS(HttpStatus.CREATED, "강의 생성 성공"),
+    CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
+    CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
+
 
 
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
@@ -29,6 +32,9 @@ public enum Success {
     GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
     GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
     GET_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 조회 성공"),
+    GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
+    GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
+
 
 
 
@@ -45,6 +51,9 @@ public enum Success {
     UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
     UPDATE_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 수정 성공"),
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
+    UPDATE_ANSWER_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
+    UPDATE_QUESTION_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
+
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
 
 
@@ -71,6 +80,9 @@ public enum Success {
     DELETE_USER_SUCCESS(HttpStatus.NO_CONTENT, "회원 탈퇴가 정상적으로 이루어졌습니다."),
     DELETE_INSTRUCTOR_SUCCESS(HttpStatus.NO_CONTENT, "강사정보 삭제 성공"),
     DELETE_LECTURE_SUCCESS(HttpStatus.NO_CONTENT, "강의 삭제 성공"),
+    DELETE_ANSWER_SUCCESS(HttpStatus.NO_CONTENT, "답변 삭제 성공"),
+    DELETE_QUESTION_SUCCESS(HttpStatus.NO_CONTENT, "질문 삭제 성공"),
+
 
     ;
 
