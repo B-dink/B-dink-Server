@@ -1,6 +1,6 @@
 package com.app.bdink.classroom.domain;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.member.entity.Member;
 import jakarta.persistence.Entity;
@@ -28,10 +28,10 @@ public class Review extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne
-    private ClassRoom classRoom;
+    private ClassRoomEntity classRoom;
 
     @Builder
-    public Review(String content, Member member, ClassRoom classRoom) {
+    public Review(String content, Member member, ClassRoomEntity classRoom) {
         this.content = content;
         this.member = member;
         this.classRoom = classRoom;

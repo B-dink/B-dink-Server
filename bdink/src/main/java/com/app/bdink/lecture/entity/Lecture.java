@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.entity;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,7 +21,7 @@ public class Lecture extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private ClassRoom classRoom; //TODO: 얘 뭐지 흠.. 당장 문제는 안될거같긴한데
+    private ClassRoomEntity classRoom; //TODO: 얘 뭐지 흠.. 당장 문제는 안될거같긴한데
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id")
@@ -37,7 +37,7 @@ public class Lecture extends BaseTimeEntity {
     private String mediaLink;
 
     @Builder
-    public Lecture(ClassRoom classRoom, Chapter chapter, String title, LocalTime time, String mediaLink) {
+    public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink) {
         this.classRoom = classRoom;
         this.chapter = chapter;
         this.title = title;

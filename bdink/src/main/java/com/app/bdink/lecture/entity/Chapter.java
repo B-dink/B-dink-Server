@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.entity;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,7 +21,7 @@ public class Chapter extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classRoom_id")
-    private ClassRoom classRoom;
+    private ClassRoomEntity classRoom;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE)
     private List<Lecture> lectures = new ArrayList<>();
@@ -33,8 +33,8 @@ public class Chapter extends BaseTimeEntity {
 
     private int number;
 
-    public Chapter(ClassRoom classRoom, String title) {
-        this.classRoom = classRoom;
+    public Chapter(ClassRoomEntity classRoomEntity, String title) {
+        this.classRoom = classRoomEntity;
         this.title = title;
         this.lectureCount = 0;
         this.number = 1;

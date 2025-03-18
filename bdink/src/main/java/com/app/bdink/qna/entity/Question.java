@@ -1,6 +1,6 @@
 package com.app.bdink.qna.entity;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,8 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
 import java.util.List;
-import javax.xml.crypto.dsig.SignatureProperty;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,13 +32,13 @@ public class Question extends BaseTimeEntity {
     private String content;
 
     @ManyToOne
-    private ClassRoom classRoom;
+    private ClassRoomEntity classRoom;
 
     @OneToMany(mappedBy = "question")
-    private List<Answer> answers;
+    private List<Answer> answers = new ArrayList<>();
 
     @Builder
-    public Question(String content, ClassRoom classRoom) {
+    public Question(String content, ClassRoomEntity classRoom) {
         this.content = content;
         this.classRoom = classRoom;
     }

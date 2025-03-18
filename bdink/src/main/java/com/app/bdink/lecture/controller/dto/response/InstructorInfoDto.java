@@ -1,7 +1,5 @@
 package com.app.bdink.lecture.controller.dto.response;
 
-import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.entity.Instructor;
 import com.app.bdink.member.entity.Member;
 
 public record InstructorInfoDto(

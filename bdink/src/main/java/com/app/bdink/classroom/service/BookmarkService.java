@@ -1,8 +1,8 @@
 package com.app.bdink.classroom.service;
 
-import com.app.bdink.classroom.controller.dto.response.BookmarkResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.BookmarkResponse;
 import com.app.bdink.classroom.entity.Bookmark;
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.repository.BookmarkRepository;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
@@ -17,10 +17,10 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public String saveBookmark(final Member member, final ClassRoom classRoom){
+    public String saveBookmark(final Member member, final ClassRoomEntity classRoomEntity){
         // TODO: 이미 북마크를 만들었는지 확인
         Bookmark bookmark = Bookmark.builder()
-            .classRoom(classRoom)
+            .classRoom(classRoomEntity)
             .member(member)
             .build();
         return String.valueOf(bookmarkRepository.save(bookmark).getId());
@@ -39,8 +39,8 @@ public class BookmarkService {
         bookmarkRepository.deleteById(reviewId);
     }
 
-    public long getBookmarkCountForClassRoom(ClassRoom classRoom) {
-        return bookmarkRepository.countByClassRoom(classRoom);
+    public long getBookmarkCountForClassRoom(ClassRoomEntity classRoomEntity) {
+        return bookmarkRepository.countByClassRoom(classRoomEntity);
     }
 
 }
