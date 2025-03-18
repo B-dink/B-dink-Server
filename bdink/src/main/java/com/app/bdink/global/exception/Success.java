@@ -14,6 +14,7 @@ public enum Success {
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
     CREATE_CLASSROOM_SUCCESS(HttpStatus.CREATED, "클래스룸 생성 성공"),
     CREATE_REVIEW_SUCCESS(HttpStatus.CREATED, "리뷰 생성 성공"),
+    SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
 
     /**
@@ -23,6 +24,7 @@ public enum Success {
     GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
     GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
     GET_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 조회 성공"),
+
 
 
 
@@ -43,8 +45,10 @@ public enum Success {
     SMS_VERIFY_SUCCESS(HttpStatus.OK, "문자인증 성공"),
     RE_ISSUE_TOKEN_SUCCESS(HttpStatus.OK, "토큰 재발급 성공"),
     TOKEN_HEALTH_CHECKED_SUCCESS(HttpStatus.OK, "토큰 헬스체크 성공"),
+
+    DOUBLE_CHECK_SUCCESS(HttpStatus.OK, "비번 중복체크 성공"),
+
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
-    DELETE_USER_SUCCESS(HttpStatus.OK, "회원 탈퇴가 정상적으로 이루어졌습니다."),
 
 
     /**
@@ -54,6 +58,7 @@ public enum Success {
     DELETE_BOOKMARK_SUCCESS(HttpStatus.NO_CONTENT, "북마크 삭제 성공"),
     DELETE_CLASSROOM_SUCCESS(HttpStatus.NO_CONTENT, "클래스룸 삭제 성공"),
     DELETE_REVIEW_SUCCESS(HttpStatus.NO_CONTENT, "리뷰 삭제 성공"),
+    DELETE_USER_SUCCESS(HttpStatus.NO_CONTENT, "회원 탈퇴가 정상적으로 이루어졌습니다."),
     ;
 
     private final HttpStatus httpStatus;

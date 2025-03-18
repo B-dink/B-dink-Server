@@ -2,6 +2,7 @@ package com.app.bdink.member.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
@@ -96,11 +97,11 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean passwordDoubleCheck(String origin, String copy){
+    public DoubleCheckResponse passwordDoubleCheck(String origin, String copy){
         if (origin.equals(copy)){
-            return true;
+            return DoubleCheckResponse.from(true);
         }
-        return false;
+        return DoubleCheckResponse.from(false);
     }
 
     @Transactional
