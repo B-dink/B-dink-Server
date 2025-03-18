@@ -2,16 +2,14 @@ package com.app.bdink.global.template;
 
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 // 응답 템플릿
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class RspTemplate<T> {
     private final int statusCode;
     private final String message;
