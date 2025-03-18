@@ -3,8 +3,11 @@ package com.app.bdink.lecture.controller;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.service.ChapterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +30,7 @@ public class ChapterController {
 
     @PostMapping
     @Operation(method = "POST", description = "챕터를 생성합니다.")
-    public ResponseEntity<?> createChapter(
+    public RspTemplate<?> createChapter(
                                            Principal principal,
                                            @RequestParam Long classRoomId,
                                            @RequestParam String title) {
@@ -39,9 +42,7 @@ public class ChapterController {
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
 
         String chapterId = chapterService.createChapter(classRoomEntity, title);
-        return ResponseEntity.created(
-                URI.create(chapterId))
-                .build();
+        return RspTemplate.success(Success.CREATE_CHAPTER_SUCCESS, CreateIdDto.from(chapterId));
     }
 
 }

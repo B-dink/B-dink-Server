@@ -3,7 +3,10 @@ package com.app.bdink.classroom.adapter.in.controller;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.BookmarkService;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.common.util.MemberUtilService;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,27 +36,25 @@ public class BookmarkController {
 
     @PostMapping
     @Operation(method = "POST", description = "북마크를 저장합니다.")
-    public ResponseEntity<?> saveBookmark(Principal principal, @RequestParam Long classRoomId) {
+    public RspTemplate<CreateIdDto> saveBookmark(Principal principal, @RequestParam Long classRoomId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
         String id = bookmarkService.saveBookmark(member, classRoomEntity);
-        return ResponseEntity.created(
-            URI.create(id))
-            .build();
+        return RspTemplate.success(Success.CREATE_BOOKMARK_SUCCESS, CreateIdDto.from(id));
     }
 
     @GetMapping
     @Operation(method = "GET", description = "북마크한 클래스룸을 조회합니다.")
-    public ResponseEntity<?> getBookmarkClassRoom(Principal principal) {
+    public RspTemplate<?> getBookmarkClassRoom(Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        return ResponseEntity.ok().body(bookmarkService.getBookmarkClassRoom(member));
+        return RspTemplate.success(Success.GET_BOOKMARK_SUCCESS,bookmarkService.getBookmarkClassRoom(member));
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "북마크를 삭제합니다.")
-    public ResponseEntity<?> deleteBookmark(Principal principal, @RequestParam Long reviewId) {
+    public RspTemplate<?> deleteBookmark(Principal principal, @RequestParam Long reviewId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         bookmarkService.deleteBookmark(member, reviewId);
-        return ResponseEntity.noContent().build();
+        return RspTemplate.success(Success.DELETE_BOOKMARK_SUCCESS,Success.DELETE_BOOKMARK_SUCCESS.getMessage());
     }
 }

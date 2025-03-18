@@ -4,6 +4,9 @@ import com.app.bdink.classroom.adapter.in.controller.dto.request.ReviewRequest;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.ReviewService;
+import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,37 +39,36 @@ public class ReviewController {
 
     @Operation(method = "POST", description = "리뷰를 등록합니다.")
     @PostMapping
-    public ResponseEntity<?> saveReview(Principal principal, @RequestParam Long classRoomId,
+    public RspTemplate<?> saveReview(Principal principal, @RequestParam Long classRoomId,
                                         @RequestBody ReviewRequest reviewRequest) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
         String id = reviewService.saveReview(member, classRoomEntity, reviewRequest);
-        return ResponseEntity.created(
-            URI.create(id))
-            .build();
+        return RspTemplate.success(Success.CREATE_REVIEW_SUCCESS, CreateIdDto.from(id));
+
     }
 
     @Operation(method = "GET", description = "모든 리뷰를 조회합니다.")
     @GetMapping
-    public ResponseEntity<?> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
+    public RspTemplate<?> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
-        return ResponseEntity.ok().body(reviewService.getAllReview(classRoomEntity, pageable));
+        return RspTemplate.success(Success.GET_REVIEW_SUCCESS, reviewService.getAllReview(classRoomEntity, pageable));
     }
 
     @Operation(method = "PUT", description = "리뷰를 수정합니다.")
     @PutMapping
-    public ResponseEntity<?> updateReview(@RequestParam Long reviewId, Principal principal,
+    public RspTemplate<?> updateReview(@RequestParam Long reviewId, Principal principal,
                                           @RequestBody ReviewRequest reviewRequest) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         reviewService.updateReview(reviewId, member, reviewRequest);
-        return ResponseEntity.ok().build();
+        return RspTemplate.success(Success.UPDATE_REVIEW_SUCCESS, Success.UPDATE_REVIEW_SUCCESS.getMessage());
     }
 
     @Operation(method = "DELETE", description = "리뷰를 삭제합니다.")
     @DeleteMapping
-    public ResponseEntity<?> deleteReview(@RequestParam Long reviewId, Principal principal) {
+    public RspTemplate<?> deleteReview(@RequestParam Long reviewId, Principal principal) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         reviewService.deleteReview(reviewId, member);
-        return ResponseEntity.noContent().build();
+        return RspTemplate.success(Success.DELETE_REVIEW_SUCCESS,Success.DELETE_REVIEW_SUCCESS.getMessage());
     }
 }

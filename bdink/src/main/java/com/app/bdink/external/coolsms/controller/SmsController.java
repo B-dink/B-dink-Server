@@ -2,11 +2,16 @@ package com.app.bdink.external.coolsms.controller;
 
 import com.app.bdink.external.coolsms.controller.dto.PhoneRequest;
 import com.app.bdink.external.coolsms.controller.dto.PhoneResponse;
+import com.app.bdink.external.coolsms.controller.dto.VerifyResponse;
 import com.app.bdink.external.coolsms.dto.request.SmsSendRequest;
 import com.app.bdink.external.coolsms.entity.PhoneVerify;
 import com.app.bdink.external.coolsms.service.SmsService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +33,7 @@ import java.util.UUID;
 @Slf4j
 @RequestMapping("/api/v1/sms")
 @RequiredArgsConstructor
+@Tag(name = "SMS API", description = "문자인증과 관련된 API들입니다.")
 public class SmsController {
 
     private DefaultMessageService messageService;
@@ -49,7 +55,8 @@ public class SmsController {
     }
 
     @PostMapping("/send-one")
-    public ResponseEntity<?> sendOne(@RequestBody SmsSendRequest smsRequest) {
+    @Operation(method = "POST", description = "인증 코드를 메시지로 전송합니다. transactionId, 문자로 받은 인증코드를 verify로 전송하면됩니다.")
+    public RspTemplate<?> sendOne(@RequestBody SmsSendRequest smsRequest) {
         Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
         // random 6자리 숫자 발송.
@@ -66,11 +73,12 @@ public class SmsController {
             throw new CustomException(Error.INTERNAL_SERVER_ERROR, "문자 메시지를 보내는중 에러발생");
         }
 
-        return ResponseEntity.ok(PhoneResponse.from(phoneExpectedResponse));
+        return RspTemplate.success(Success.SMS_SEND_SUCCESS ,PhoneResponse.from(phoneExpectedResponse));
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody PhoneRequest phoneRequest){
+    @Operation(method = "POST", description = "인증을 진행합니다.")
+    public RspTemplate<?> verify(@RequestBody PhoneRequest phoneRequest){
         boolean isVerified = smsService.verifyPhone(phoneRequest);
         if (isVerified) {
             smsService.deleteVerify(
@@ -78,7 +86,7 @@ public class SmsController {
             );
         }
 
-        return ResponseEntity.ok(isVerified);
+        return RspTemplate.success(Success.SMS_VERIFY_SUCCESS , VerifyResponse.from(isVerified));
     }
 
 
