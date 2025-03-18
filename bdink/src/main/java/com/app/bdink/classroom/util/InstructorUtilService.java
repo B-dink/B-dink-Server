@@ -1,13 +1,15 @@
 package com.app.bdink.classroom.util;
 
-import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.classroom.entity.Instructor;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.qna.entity.Answer;
+import com.app.bdink.qna.service.AnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class InstructorUtilService {
     private final MemberService memberService;
     private final ClassRoomService classRoomService;
     private final LectureService lectureService;
+    private final AnswerService answerService;
 
     @Transactional(readOnly = true)
     public Instructor getInstructor(Principal principal){
@@ -39,25 +42,35 @@ public class InstructorUtilService {
     @Transactional(readOnly = true)
     public boolean validateClassRoomOwner(Principal principal, Long classRoomId){
         Instructor instructor = getInstructor(principal);
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
 
-        if (instructor.getId().equals(classRoom.getInstructor().getId())){
-            return false;
-        }
-
-        return true;
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
     }
 
     @Transactional(readOnly = true)
     public boolean validateLectureOwner(Principal principal, Long lectureId){
         Instructor instructor = getInstructor(principal);
-        ClassRoom classRoom = lectureService.findById(lectureId).getClassRoom();
+        ClassRoomEntity classRoomEntity = lectureService.findById(lectureId).getClassRoom();
 
-        if (instructor.getId().equals(classRoom.getInstructor().getId())){
-            return false;
-        }
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
+    }
 
-        return true;
+    @Transactional(readOnly = true)
+    public boolean validateAccessAnswer(Principal principal, final ClassRoomEntity classRoomEntity){
+        Instructor instructor = getInstructor(principal);
+
+        return instructor.getId().equals(classRoomEntity.getInstructor().getId());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean validateAccessAnswer(Principal principal, final Long id){
+        Instructor instructor = getInstructor(principal);
+        Answer answer = answerService.getById(id);
+
+        return instructor.equals(
+                answer.getQuestion()
+                        .getClassRoom()
+                        .getInstructor());
     }
 
 

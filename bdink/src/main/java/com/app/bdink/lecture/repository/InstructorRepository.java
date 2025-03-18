@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.repository;
 
-import com.app.bdink.classroom.entity.Instructor;
+import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 

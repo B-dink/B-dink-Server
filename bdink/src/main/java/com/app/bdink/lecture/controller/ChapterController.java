@@ -1,6 +1,6 @@
 package com.app.bdink.lecture.controller;
 
-import com.app.bdink.classroom.entity.ClassRoom;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.util.InstructorUtilService;
 import com.app.bdink.global.exception.CustomException;
@@ -36,9 +36,9 @@ public class ChapterController {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
-        ClassRoom classRoom = classRoomService.findById(classRoomId);
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
 
-        String chapterId = chapterService.createChapter(classRoom, title);
+        String chapterId = chapterService.createChapter(classRoomEntity, title);
         return ResponseEntity.created(
                 URI.create(chapterId))
                 .build();

@@ -1,7 +1,6 @@
 package com.app.bdink.qna.service;
 
-import com.app.bdink.classroom.entity.ClassRoom;
-import com.app.bdink.qna.controller.dto.response.AnswerDto;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.qna.entity.Question;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.controller.dto.response.QnAResponse;
@@ -20,25 +19,25 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public String createQuestion(final ClassRoom classRoom, QnARequest qnARequest) {
-    Question question = Question.builder()
+    public String createQuestion(final ClassRoomEntity classRoom, QnARequest qnARequest) {
+        Question question = Question.builder()
             .classRoom(classRoom)
             .content(qnARequest.content())
             .build();
         return String.valueOf(questionRepository.save(question).getId());
     }
 
-    public List<QuestionResponse> getAllQuestions(final ClassRoom classRoom) {
-        List<Question> questionList = questionRepository.findByClassRoom(classRoom);
+    public List<QuestionResponse> getAllQuestions(final ClassRoomEntity classRoomEntity) {
+        List<Question> questionList = questionRepository.findByClassRoom(classRoomEntity);
         return questionList.stream()
-            .map(QuestionResponse::new)
+            .map(QuestionResponse::from)
             .collect(Collectors.toList());
     }
 
     public QnAResponse getQuestionAnswer(Long questionId) {
         Question question = getById(questionId);
 
-        return QnAResponse.toEntity(question);
+        return QnAResponse.from(question);
     }
 
     @Transactional

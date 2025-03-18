@@ -1,7 +1,7 @@
 package com.app.bdink.member.entity;
 
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.entity.Instructor;
+import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import jakarta.persistence.*;
 import lombok.*;
 

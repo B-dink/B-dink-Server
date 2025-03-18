@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.entity;
 
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.member.entity.Member;
 import jakarta.persistence.Entity;
@@ -25,10 +26,10 @@ public class Bookmark extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne
-    private ClassRoom classRoom;
+    private ClassRoomEntity classRoom;
 
     @Builder
-    public Bookmark(Member member, ClassRoom classRoom) {
+    public Bookmark(Member member, ClassRoomEntity classRoom) {
         this.member = member;
         this.classRoom = classRoom;
     }

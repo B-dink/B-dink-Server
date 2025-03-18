@@ -1,5 +1,7 @@
 package com.app.bdink.global.config;
 
+import com.app.bdink.global.exception.CustomAccessDeniedHandler;
+import com.app.bdink.global.exception.CustomEntryPoint;
 import com.app.bdink.global.jwt.JwtFilter;
 import com.app.bdink.global.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -40,20 +41,29 @@ public class SecurityConfig {
                         .requestMatchers("/callback/**").permitAll() // 이 경로에 대해서는 모든 사용자가 접근할 수 있도록 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
-                        .requestMatchers("/api/v1/**").permitAll()
+
                         .requestMatchers("/api/v1/member/join").permitAll()
                         .requestMatchers("/api/v1/member/login").permitAll()
                         .requestMatchers("/api/v1/oauth2/**").permitAll()
                         .requestMatchers("/api/v1/sms/**").permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증이 필요하도록 설정
                 ) // 인증 및 권한 부여 규칙 설정
                 .cors(cors -> cors.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptionHandling -> {
+                    exceptionHandling.authenticationEntryPoint(new CustomEntryPoint());
+                    exceptionHandling.accessDeniedHandler(new CustomAccessDeniedHandler());
+                })
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 // jwt 토큰 인증을 위한 jwtfilter 추가
                 .build();
     }
+
+
+
+
 
     // CORS 설정을 정의하는 메서드.
     // CORS는 다른 도메인에서 리소스를 요청할 때 이를 허용할 지 여부를 결정하는 매커니즘
