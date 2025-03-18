@@ -1,6 +1,9 @@
 package com.app.bdink.lecture.controller;
 
+import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.common.util.MemberUtilService;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.controller.dto.InstructorDto;
 import com.app.bdink.lecture.controller.dto.request.UpdateInstructorDto;
 import com.app.bdink.lecture.controller.dto.response.InstructorInfoDto;
@@ -28,37 +31,35 @@ public class InstructorController {
 
     @PostMapping
     @Operation(method = "POST", description = "강사 정보를 생성합니다.")
-    public ResponseEntity<?> createInstructor(Principal principal, @RequestBody InstructorDto instructorDto){
+    public RspTemplate<?> createInstructor(Principal principal, @RequestBody InstructorDto instructorDto){
 
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         String instructorId = instructorService.createInstructor(member, instructorDto);
 
-        return ResponseEntity.created(
-                URI.create(instructorId))
-                .build();
+        return RspTemplate.success(Success.CREATE_INSTRUCTOR_SUCCESS, CreateIdDto.from(instructorId));
     }
 
     @GetMapping
     @Operation(method = "GET", description = "강사 정보를 조회합니다.")
-    public ResponseEntity<?> getInstructorInfo(Principal principal){
+    public RspTemplate<?> getInstructorInfo(Principal principal){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         InstructorInfoDto instructorInfo = instructorService.getInfo(member);
-        return ResponseEntity.ok(instructorInfo);
+        return RspTemplate.success(Success.GET_INSTRUCTOR_SUCCESS, instructorInfo);
     }
 
     @PutMapping
     @Operation(method = "PUT", description = "강사 정보를 수정합니다.")
-    public ResponseEntity<?> modifyInstructorInfo(Principal principal, @RequestBody UpdateInstructorDto instructorDto){
+    public RspTemplate<?> modifyInstructorInfo(Principal principal, @RequestBody UpdateInstructorDto instructorDto){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         InstructorInfoDto infoDto = instructorService.modifyInstructorInfo(member, instructorDto);
-        return ResponseEntity.ok(infoDto);
+        return RspTemplate.success(Success.UPDATE_INSTRUCTOR_SUCCESS, infoDto);
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "강사 정보를 삭제합니다. soft delete를 진행합니다. 강사정보를 제거하더라도 자신이 등록한 강의를 보유하고 싶을 수도 있기 때문에")
-    public ResponseEntity<?> deleteInstructor(Principal principal){
+    public RspTemplate<?> deleteInstructor(Principal principal){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         instructorService.deleteInstructor(member);
-        return ResponseEntity.noContent().build();
+        return RspTemplate.success(Success.DELETE_INSTRUCTOR_SUCCESS, Success.DELETE_INSTRUCTOR_SUCCESS.getMessage());
     }
 }

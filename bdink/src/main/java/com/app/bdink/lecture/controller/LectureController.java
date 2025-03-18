@@ -2,9 +2,12 @@ package com.app.bdink.lecture.controller;
 
 
 import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
@@ -35,7 +38,7 @@ public class LectureController {
     //TODO: 강사인지 확인하는 로직이 필요하다.
     @PostMapping
     @Operation(method = "POST", description = "강의를 생성합니다. 강의를 생성하면 해당 강의에 대한 시간정보, 강의 수가 해당 챕터에 업데이트 되는 로직입니다.")
-    public ResponseEntity<?> createLecture(
+    public RspTemplate<?> createLecture(
                                            Principal principal,
                                            @RequestParam Long classRoomId,
                                            @RequestParam Long chapterId,
@@ -56,21 +59,20 @@ public class LectureController {
 
         String uploadUrl = s3Service.generateOriginalLink(uploadUrlKey);
 
-        return ResponseEntity.created(URI.create(lectureService.createLecture(chapter, lectureDto, uploadUrl))).build();
+        return RspTemplate.success(Success.CREATE_LECTURE_SUCCESS, CreateIdDto.from(lectureService.createLecture(chapter, lectureDto, uploadUrl)));
     }
 
     @GetMapping
     @Operation(method = "GET", description = "강의 id를 받아 해당 강의의 정보를 조회합니다.")
-    public ResponseEntity<?> getLectureInfo(@RequestParam Long id) {
+    public RspTemplate<?> getLectureInfo(@RequestParam Long id) {
 
         LectureInfo lectureInfo = lectureService.getLectureInfo(id);
-        return ResponseEntity.ok()
-                .body(lectureInfo);
+        return RspTemplate.success(Success.GET_LECTURE_SUCCESS, lectureInfo);
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "강의를 삭제합니다. 현재 하드 delete로 구성되어있습니다.")
-    ResponseEntity<?> deleteLecture(Principal principal,
+    RspTemplate<?> deleteLecture(Principal principal,
                                     @RequestParam Long id){
 
         if (!instructorUtilService.validateLectureOwner(principal, id)){
@@ -78,6 +80,6 @@ public class LectureController {
         }
 
         lectureService.deleteLecture(id);
-        return ResponseEntity.noContent().build();
+        return RspTemplate.success(Success.DELETE_LECTURE_SUCCESS, Success.DELETE_LECTURE_SUCCESS.getMessage());
     }
 }
