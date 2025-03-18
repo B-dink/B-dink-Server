@@ -9,19 +9,20 @@ import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
 import java.security.Principal;
 
 @RestController
@@ -39,10 +40,10 @@ public class ClassRoomController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
-    ResponseEntity<?> createClassRoom(Principal memberId,
-                                      @RequestPart(value = "thumbnail") MultipartFile thumbnail,
-                                      @RequestPart(value = "intro-video") MultipartFile video,
-                                      @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
+    RspTemplate<?> createClassRoom(Principal memberId,
+                                   @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+                                   @RequestPart(value = "intro-video") MultipartFile video,
+                                   @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
 
         // create Command
         CreateClassRoomCommand command = CreateClassRoomCommand.of(
@@ -58,26 +59,25 @@ public class ClassRoomController {
         //흠.. 밑에 애도 이런식으로 바꿔야하는데.
         mediaService.createMedia(Long.parseLong(id), command.mediaKey());
 
-        return ResponseEntity.created(URI.create(id))
-                .build();
+        return RspTemplate.success(Success.CREATE_CLASSROOM_SUCCESS, CreateIdDto.from(id));
     }
 
     @GetMapping
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
-    ResponseEntity<?> getClassRoomInfo(@RequestParam Long id) {
+    RspTemplate<?> getClassRoomInfo(@RequestParam Long id) {
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
-        return ResponseEntity.ok(classRoomDto);
+        return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS ,classRoomDto);
     }
 
     @GetMapping("/chapter")
     @Operation(method = "GET", description = "해당 클래스룸의 챕터 정보를 조회합니다.")
-    ResponseEntity<?> getChapterInfo(@RequestParam Long id) {
-        return ResponseEntity.ok(classRoomService.getChapterInfo(id));
+    RspTemplate<?> getChapterInfo(@RequestParam Long id) {
+        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS ,classRoomService.getChapterInfo(id));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "클래스룸 정보를 수정합니다.")
-    ResponseEntity<?> updateClassRoomInfo(
+    RspTemplate<?> updateClassRoomInfo(
             Principal principal,
             @RequestParam Long id,
             @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto,
@@ -97,12 +97,12 @@ public class ClassRoomController {
         }
 
         ClassRoomResponse classResponse = classRoomService.updateClassRoomInfo(classRoomEntity, thumbnailKey, videoKey, classRoomDto);
-        return ResponseEntity.ok(classResponse);
+        return RspTemplate.success(Success.UPDATE_CLASSROOM_SUCCESS, classResponse);
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "클래스룸을 삭제합니다. 이는 hard delete로 구성되어있으며 클래스룸을 삭제하면 안에 있는 챕터, 강좌들이 함께 삭제됩니다.")
-    ResponseEntity<?> deleteClassRoom(
+    RspTemplate<?> deleteClassRoom(
             Principal principal,
             @RequestParam Long id) {
 
@@ -114,26 +114,26 @@ public class ClassRoomController {
         s3Service.deleteImageAndMedia(classRoomEntity.getThumbnail());
         classRoomService.deleteClassRoom(classRoomEntity);
 
-        return ResponseEntity.noContent().build();
+        return RspTemplate.success(Success.DELETE_CLASSROOM_SUCCESS);
     }
 
     @GetMapping("/all")
     @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
-    public ResponseEntity<?> getAllClassRoom() {
-        return ResponseEntity.ok().body(classRoomService.getAllClassRoom());
+    public RspTemplate<?> getAllClassRoom() {
+        return RspTemplate.success(Success.GET_ALL_CLASSROOM_SUCCESS, classRoomService.getAllClassRoom());
     }
 
     @GetMapping("/career")
     @Operation(method = "GET", description = "특정 Career의 클래스룸을 조회합니다.")
-    public ResponseEntity<?> getClassRoomByCareer(@RequestParam Career career) {
-        return ResponseEntity.ok().body(classRoomService.getClassRoomByCareer(career));
+    public RspTemplate<?> getClassRoomByCareer(@RequestParam Career career) {
+        return RspTemplate.success(Success.GET_CLASSROOM_CARRER_SUCCESS, classRoomService.getClassRoomByCareer(career));
     }
 
     @GetMapping("/class-detail/{id}")
     @Operation(method = "GET", description = "클래스 디테일 페이지를 조회합니다.")
-    public ResponseEntity<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id) {
+    public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id) {
         ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id);
-        return ResponseEntity.ok(classRoomDetailResponse);
+        return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
 
 }

@@ -19,16 +19,20 @@ public enum Success {
     /**
      * 200 OK
      */
-    GET_USER_MAIN_SUCCESS(HttpStatus.OK, "메인 페이지 유저 정보 조회 성공"),
-    GET_MYPAGE_SUCCESS(HttpStatus.OK, "마이 페이지 조회 성공"),
-    GET_BOOKMARK_SUCCESS(HttpStatus.CREATED, "내가 북마크한 클래스룸 조회 성공"),
+    GET_CLASSROOM_DETAIL_SUCCESS(HttpStatus.OK, "메인 페이지 유저 정보 조회 성공"),
+    GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
+    GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
 
 
-    GET_CATEORIES_SUCCESS(HttpStatus.OK, "전체 카테고리 조회 성공"),
+    GET_BOOKMARK_SUCCESS(HttpStatus.OK, "내가 북마크한 클래스룸 조회 성공"),
+    GET_CHAPTER_SUCCESS(HttpStatus.OK, "chapter 조회 성공"),
+
+
+
+    GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
+    UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
+
     GET_CATEORY_SUCCESS(HttpStatus.OK, "세부 카테고리 조회 성공"),
-    GET_TIMER_SUCCESS(HttpStatus.OK, "타이머 조회 성공"),
-    GET_TIMER_PAGE_SUCCESS(HttpStatus.OK, "타이머 페이지 조회 성공"),
-    GET_DUPLICATED_SUCCESS(HttpStatus.OK, "중복 여부 체크 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     SMS_SEND_SUCCESS(HttpStatus.OK, "문자전송 성공"),
@@ -44,8 +48,8 @@ public enum Success {
      */
     SEARCH_SUCCESS_BUT_IS_EMPTY(HttpStatus.NO_CONTENT, "검색에 성공했지만 조회된 내용이 없습니다."),
     DELETE_BOOKMARK_SUCCESS(HttpStatus.NO_CONTENT, "북마크 삭제 성공"),
-
-            ;
+    DELETE_CLASSROOM_SUCCESS(HttpStatus.NO_CONTENT, "클래스룸 삭제 성공"),
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;
