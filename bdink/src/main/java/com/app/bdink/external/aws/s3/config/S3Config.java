@@ -18,7 +18,7 @@ public class S3Config {
     private static final String AWS_SECRET_ACCESS_KEY = "aws.secretAccessKey";
 
     @Getter
-    private final String videoDir = "video";
+    private final String videoDir = "media";
 
     private final String accessKey;
     private final String secretKey;
