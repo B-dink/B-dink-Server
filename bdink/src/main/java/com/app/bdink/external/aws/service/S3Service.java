@@ -1,9 +1,8 @@
 package com.app.bdink.external.aws.service;
 
-import com.app.bdink.external.aws.S3Config;
+import com.app.bdink.external.aws.s3.config.S3Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
