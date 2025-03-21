@@ -1,13 +1,17 @@
 package com.app.bdink.schedule.controller;
 
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.common.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import com.app.bdink.schedule.controller.dto.request.ScheduleRequest;
 import com.app.bdink.schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,11 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    private final MemberService memberService;
+    private final MemberUtilService memberUtilService;
 
     @Operation(method = "POST", description = "캘린더 일정을 생성합니다.")
     @PostMapping
-    public RspTemplate<?> createSchedule(@RequestBody ScheduleRequest scheduleRequest) {
-        return RspTemplate.success(Success.CREATE_SCHEDULE_SUCCESS, CreateIdDto.from(scheduleService.createSchedule(scheduleRequest)));
+    public RspTemplate<?> createSchedule(Principal principal, @RequestBody ScheduleRequest scheduleRequest) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        return RspTemplate.success(Success.CREATE_SCHEDULE_SUCCESS, CreateIdDto.from(scheduleService.createSchedule(member, scheduleRequest)));
     }
 
     @Operation(method = "GET", description = "모든 캘린더 일정을 조회합니다.")
@@ -47,14 +54,16 @@ public class ScheduleController {
 
     @Operation(method = "PUT", description = "캘린더 일정을 수정합니다.")
     @PutMapping
-    public RspTemplate<?> updateSchedule(@RequestParam Long id, @RequestBody ScheduleRequest scheduleRequest) {
+    public RspTemplate<?> updateSchedule(Principal principal, @RequestParam Long id, @RequestBody ScheduleRequest scheduleRequest) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
         scheduleService.updateSchedule(id, scheduleRequest);
         return RspTemplate.success(Success.UPDATE_SCHEDULE_SUCCESS, Success.UPDATE_SCHEDULE_SUCCESS.getMessage());
     }
 
     @Operation(method = "DELETE", description = "캘린더 일정을 삭제합니다.")
     @DeleteMapping
-    public RspTemplate<?> deleteSchedule(@RequestParam Long id) {
+    public RspTemplate<?> deleteSchedule(Principal principal, @RequestParam Long id) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
         scheduleService.deleteSchedule(id);
         return RspTemplate.success(Success.DELETE_SCHEDULE_SUCCESS, Success.DELETE_SCHEDULE_SUCCESS.getMessage());
     }

@@ -4,6 +4,8 @@ import com.app.bdink.classroom.adapter.in.controller.dto.response.BookmarkRespon
 import com.app.bdink.classroom.entity.Bookmark;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.repository.BookmarkRepository;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,9 @@ public class BookmarkService {
 
     @Transactional
     public String saveBookmark(final Member member, final ClassRoomEntity classRoomEntity){
-        // TODO: 이미 북마크를 만들었는지 확인
+        if (bookmarkRepository.existsByClassRoomAndMember(classRoomEntity, member)) {
+            throw new CustomException(Error.EXIST_BOOKMARK, Error.EXIST_BOOKMARK.getMessage());
+        }
         Bookmark bookmark = Bookmark.builder()
             .classRoom(classRoomEntity)
             .member(member)
@@ -34,9 +38,14 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(final Member member, Long reviewId){
-        // TODO: 로그인한 멤버와 북마크를 만든 멤버가 같은지 확인
-        bookmarkRepository.deleteById(reviewId);
+    public void deleteBookmark(final Member member, Long bookmarkId){
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(
+            () -> new CustomException(Error.NOT_FOUND_BOOKMARK, Error.NOT_FOUND_BOOKMARK.getMessage())
+        );
+        if (!bookmark.getMember().equals(member)) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
+        bookmarkRepository.deleteById(bookmarkId);
     }
 
     public long getBookmarkCountForClassRoom(ClassRoomEntity classRoomEntity) {

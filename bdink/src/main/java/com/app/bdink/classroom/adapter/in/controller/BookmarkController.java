@@ -52,9 +52,9 @@ public class BookmarkController {
 
     @DeleteMapping
     @Operation(method = "DELETE", description = "북마크를 삭제합니다.")
-    public RspTemplate<?> deleteBookmark(Principal principal, @RequestParam Long reviewId) {
+    public RspTemplate<?> deleteBookmark(Principal principal, @RequestParam Long bookmarkId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        bookmarkService.deleteBookmark(member, reviewId);
+        bookmarkService.deleteBookmark(member, bookmarkId);
         return RspTemplate.success(Success.DELETE_BOOKMARK_SUCCESS,Success.DELETE_BOOKMARK_SUCCESS.getMessage());
     }
 }
