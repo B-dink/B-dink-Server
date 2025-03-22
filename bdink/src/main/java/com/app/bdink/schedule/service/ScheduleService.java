@@ -1,5 +1,9 @@
 package com.app.bdink.schedule.service;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.entity.Role;
 import com.app.bdink.schedule.controller.dto.request.ScheduleRequest;
 import com.app.bdink.schedule.controller.dto.response.ScheduleResponse;
 import com.app.bdink.schedule.entity.Schedule;
@@ -18,7 +22,8 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     @Transactional
-    public String createSchedule(final ScheduleRequest scheduleRequest) {
+    public String createSchedule(final Member member, final ScheduleRequest scheduleRequest) {
+        validateAdmin(member);
         Long id = scheduleRepository.save(
             scheduleRequest.toEntity())
             .getId();
@@ -40,14 +45,16 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateSchedule(Long scheduleId, final ScheduleRequest scheduleRequest) {
+    public void updateSchedule(final Member member, Long scheduleId, final ScheduleRequest scheduleRequest) {
+        validateAdmin(member);
         Schedule schedule = getById(scheduleId);
 
         schedule.update(scheduleRequest.title(), scheduleRequest.date(), scheduleRequest.scheduleType().toUpperCase());
     }
 
     @Transactional
-    public void deleteSchedule(Long scheduleId) {
+    public void deleteSchedule(final Member member, Long scheduleId) {
+        validateAdmin(member);
         Schedule schedule = getById(scheduleId);
 
         scheduleRepository.delete(schedule);
@@ -55,7 +62,13 @@ public class ScheduleService {
 
     public Schedule getById(Long scheduleId) {
         return scheduleRepository.findById(scheduleId).orElseThrow(
-            () -> new IllegalArgumentException("해당 일정을 찾지 못했습니다.")
+            () -> new CustomException(Error.NOT_FOUND_SCHEDULE, Error.NOT_FOUND_SCHEDULE.getMessage())
         );
+    }
+
+    public void validateAdmin(final Member member) {
+        if (!member.getRole().equals(Role.valueOf("ROLE_ADMIN"))) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
     }
 }

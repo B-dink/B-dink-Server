@@ -2,6 +2,8 @@ package com.app.bdink.lecture.service;
 
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.controller.dto.InstructorDto;
 import com.app.bdink.lecture.controller.dto.request.UpdateInstructorDto;
 import com.app.bdink.lecture.controller.dto.response.InstructorInfoDto;
@@ -19,7 +21,7 @@ public class InstructorService {
     @Transactional(readOnly = true)
     public Instructor findById(Long id){
         return instructorRepository.findById(id).orElseThrow(
-                ()-> new IllegalStateException("해당 강사를 찾지 못했습니다.")
+                ()-> new CustomException(Error.NOT_FOUND_INSTRUCTOR, Error.NOT_FOUND_INSTRUCTOR.getMessage())
         );
     }
 

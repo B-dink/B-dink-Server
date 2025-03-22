@@ -13,8 +13,16 @@ public enum Error {
      * 404 NOT FOUND
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다."),
+    NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND, "찾을 수 없는 질문입니다."),
     NOT_FOUND_ANSWER(HttpStatus.NOT_FOUND, "찾을 수 없는 답변입니다."),
-
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "찾을 수 없는 북마크입니다."),
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
+    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
+    NOT_FOUND_CLASSROOM(HttpStatus.NOT_FOUND, "찾을 수 없는 강의실입니다."),
+    NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
+    NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
+    NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
+    NOT_FOUND_INSTRUCTOR(HttpStatus.NOT_FOUND, "찾을 수 없는 강사입니다."),
 
     /**
      * 400 BAD REQUEST EXCEPTION
@@ -30,6 +38,8 @@ public enum Error {
     BAD_REQUEST_TIME(HttpStatus.BAD_REQUEST, "시간 형식이 다릅니다." ),
     REQUEST_MEDIA_TYPE_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "미디어 타입이 맞지않습니다. 동영상 .mp4파일만 보내주세요."),
     REQUEST_METHOD_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "메소드가 틀립니다."),
+    EXIST_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크한 강의입니다."),
+    EXIST_REVIEW(HttpStatus.BAD_REQUEST, "이미 리뷰한 강의입니다."),
 
     /**
      * 401 UNAUTHORIZED EXCEPTION

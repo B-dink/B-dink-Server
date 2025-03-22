@@ -5,6 +5,8 @@ import com.app.bdink.classroom.adapter.in.controller.dto.response.ReviewResponse
 import com.app.bdink.classroom.domain.Review;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.repository.ReviewRepository;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +23,16 @@ public class ReviewService {
 
     public Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(
-            () -> new IllegalStateException("해당 리뷰를 찾지 못했습니다.")
+            () -> new CustomException(Error.NOT_FOUND_REVIEW, Error.NOT_FOUND_REVIEW.getMessage())
         );
     }
 
     @Transactional
     public String saveReview(final Member member, final ClassRoomEntity classRoom, ReviewRequest reviewRequest) {
-        // TODO: 이미 리뷰를 만들었는지 & 강의 다 수강했는지 확인
+        if (reviewRepository.existsByClassRoomAndMember(classRoom, member)) {
+            throw new CustomException(Error.EXIST_REVIEW, Error.EXIST_REVIEW.getMessage());
+        }
+        // TODO: 강의 다 수강했는지 확인
         Review review = Review.builder()
             .classRoom(classRoom)
             .member(member)
@@ -45,15 +50,20 @@ public class ReviewService {
 
     @Transactional
     public void updateReview(Long reviewId, final Member member, ReviewRequest reviewRequest) {
-        // TODO: 로그인한 멤버와 리뷰를 작성한 멤버가 같은지 확인
         Review review = findById(reviewId);
+        validateReview(review, member);
         review.update(reviewRequest.content());
     }
 
     @Transactional
     public void deleteReview(Long reviewId, final Member member) {
-        // TODO: 로그인한 멤버와 리뷰를 작성한 멤버가 같은지 확인
+        Review review = findById(reviewId);
+        validateReview(review, member);
         reviewRepository.deleteById(reviewId);
     }
-
+    public void validateReview(final Review review, final Member member) {
+        if (!review.getMember().equals(member)) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
+    }
 }

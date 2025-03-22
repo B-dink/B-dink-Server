@@ -1,6 +1,8 @@
 package com.app.bdink.lecture.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.entity.Chapter;
 import com.app.bdink.lecture.repository.ChapterRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,7 @@ public class ChapterService {
 
     public Chapter findById(Long id){
         return chapterRepository.findById(id).orElseThrow(
-                ()-> new IllegalStateException("해당 챕터를 찾지 못했습니다.")
+                ()-> new CustomException(Error.NOT_FOUND_CHAPTER, Error.NOT_FOUND_CHAPTER.getMessage())
         );
     }
 

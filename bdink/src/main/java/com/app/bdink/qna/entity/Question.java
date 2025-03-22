@@ -2,6 +2,7 @@ package com.app.bdink.qna.entity;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,14 +33,18 @@ public class Question extends BaseTimeEntity {
     private String content;
 
     @ManyToOne
+    private Member member;
+
+    @ManyToOne
     private ClassRoomEntity classRoom;
 
     @OneToMany(mappedBy = "question")
     private List<Answer> answers = new ArrayList<>();
 
     @Builder
-    public Question(String content, ClassRoomEntity classRoom) {
+    public Question(String content, Member member, ClassRoomEntity classRoom) {
         this.content = content;
+        this.member = member;
         this.classRoom = classRoom;
     }
 
