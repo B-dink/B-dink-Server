@@ -54,17 +54,17 @@ public class ScheduleController {
 
     @Operation(method = "PUT", description = "캘린더 일정을 수정합니다.")
     @PutMapping
-    public RspTemplate<?> updateSchedule(Principal principal, @RequestParam Long id, @RequestBody ScheduleRequest scheduleRequest) {
+    public RspTemplate<?> updateSchedule(Principal principal, @RequestParam Long scheduleId, @RequestBody ScheduleRequest scheduleRequest) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        scheduleService.updateSchedule(id, scheduleRequest);
+        scheduleService.updateSchedule(member, scheduleId, scheduleRequest);
         return RspTemplate.success(Success.UPDATE_SCHEDULE_SUCCESS, Success.UPDATE_SCHEDULE_SUCCESS.getMessage());
     }
 
     @Operation(method = "DELETE", description = "캘린더 일정을 삭제합니다.")
     @DeleteMapping
-    public RspTemplate<?> deleteSchedule(Principal principal, @RequestParam Long id) {
+    public RspTemplate<?> deleteSchedule(Principal principal, @RequestParam Long scheduleId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        scheduleService.deleteSchedule(id);
+        scheduleService.deleteSchedule(member, scheduleId);
         return RspTemplate.success(Success.DELETE_SCHEDULE_SUCCESS, Success.DELETE_SCHEDULE_SUCCESS.getMessage());
     }
 }

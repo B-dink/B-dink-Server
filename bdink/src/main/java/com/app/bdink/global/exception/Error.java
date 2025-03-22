@@ -38,6 +38,8 @@ public enum Error {
     BAD_REQUEST_TIME(HttpStatus.BAD_REQUEST, "시간 형식이 다릅니다." ),
     REQUEST_MEDIA_TYPE_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "미디어 타입이 맞지않습니다. 동영상 .mp4파일만 보내주세요."),
     REQUEST_METHOD_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "메소드가 틀립니다."),
+    EXIST_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크한 강의입니다."),
+    EXIST_REVIEW(HttpStatus.BAD_REQUEST, "이미 리뷰한 강의입니다."),
 
     /**
      * 401 UNAUTHORIZED EXCEPTION
@@ -47,8 +49,6 @@ public enum Error {
     REFRESH_TOKEN_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 리프레시 토큰입니다. 재로그인해주세요."),
     EXPIRED_APPLE_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 아이덴티티 토큰입니다."),
     UN_AUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증을 안한 유저입니다."),
-    EXIST_BOOKMARK(HttpStatus.UNAUTHORIZED, "이미 북마크한 강의입니다."),
-    EXIST_REVIEW(HttpStatus.UNAUTHORIZED, "이미 리뷰한 강의입니다."),
 
     /**
      * 403 FORBIDDEN EXCEPTION
