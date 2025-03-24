@@ -3,6 +3,8 @@ package com.app.bdink.classroom.adapter.out.persistence.entity;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.entity.Chapter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -98,7 +100,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     public void addChapter(final Chapter chapter){
         if (chapter == null){
-            throw new IllegalStateException("chapter가 존재하지않습니다.");
+            throw new CustomException(Error.NOT_FOUND_CHAPTER, Error.NOT_FOUND_CHAPTER.getMessage());
         }
         this.chapters.add(chapter);
     }
