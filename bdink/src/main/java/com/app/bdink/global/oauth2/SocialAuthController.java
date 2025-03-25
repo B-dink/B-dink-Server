@@ -43,6 +43,7 @@ public class SocialAuthController {
     }
 
     @DeleteMapping("/revoke")
+    @Operation(method = "DELETE", description = "소셜로그인 회원탈퇴를 진행합니다. authcode는 애플로그인인 경우만 필요.")
     public RspTemplate<?> revoke(@RequestParam(required = false) String authCode, @RequestParam String provider, Principal principal) {
         authService.revoke(principal, authCode, provider);
         return RspTemplate.success(Success.REVOKE_SUCCESS , Success.REVOKE_SUCCESS.getMessage());
