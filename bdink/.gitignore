@@ -40,3 +40,4 @@ application.yaml
 *.yml
 *.yaml
 .DS_Store
+*.p8

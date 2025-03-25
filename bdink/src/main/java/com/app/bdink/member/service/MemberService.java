@@ -112,4 +112,10 @@ public class MemberService {
         member.updatePhoneNumber(memberPhoneUpdateRequestDto.phoneNumber());
     }
 
+    @Transactional
+    public void deleteMember(Long id){
+        Member member = findById(id);
+        member.delete();
+    }
+
 }

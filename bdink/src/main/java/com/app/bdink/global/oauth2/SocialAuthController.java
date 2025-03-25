@@ -42,6 +42,12 @@ public class SocialAuthController {
         return RspTemplate.success(Success.LOGIN_SUCCESS ,authService.signIn(provider, socialAccessToken));
     }
 
+    @DeleteMapping("/revoke")
+    public RspTemplate<?> revoke(@RequestParam(required = false) String authCode, @RequestParam String provider, Principal principal) {
+        authService.revoke(principal, authCode, provider);
+        return RspTemplate.success(Success.REVOKE_SUCCESS , Success.REVOKE_SUCCESS.getMessage());
+    }
+
     @PostMapping("/internal/sign-up")
     @Operation(method = "POST", description = "자체 로그인을 진행해 회원가입을 진행합니다. 진행하시기전에 더블체크 api로 패스워드 일치하는지 만들어놨습니다.")
     public RspTemplate<?> signUpInternal(
