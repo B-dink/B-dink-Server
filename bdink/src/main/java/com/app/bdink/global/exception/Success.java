@@ -20,6 +20,8 @@ public enum Success {
     CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
+    CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
+
 
 
 
@@ -37,6 +39,7 @@ public enum Success {
     GET_REVIEW_COUNT_SUCCESS(HttpStatus.OK, "리뷰 개수 조회 성공"),
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
+
 
 
 
@@ -74,6 +77,7 @@ public enum Success {
     DOUBLE_CHECK_SUCCESS(HttpStatus.OK, "비번 중복체크 성공"),
 
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
+    UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
 
 
     /**

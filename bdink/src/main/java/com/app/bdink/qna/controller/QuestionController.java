@@ -3,12 +3,16 @@ package com.app.bdink.qna.controller;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.common.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +31,8 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final ClassRoomService classRoomService;
+    private final MemberService memberService;
+    private final MemberUtilService memberUtilService;
 
     @Operation(method = "POST", description = "질문을 생성합니다.")
     @PostMapping
@@ -52,15 +58,17 @@ public class QuestionController {
 
     @Operation(method = "PUT", description = "질문을 수정합니다.")
     @PutMapping
-    public RspTemplate<?> updateQuestion(@RequestParam Long questionId, @RequestBody QnARequest qnARequest) {
-        questionService.updateQuestion(questionId, qnARequest);
+    public RspTemplate<?> updateQuestion(Principal principal,  @RequestParam Long questionId, @RequestBody QnARequest qnARequest) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        questionService.updateQuestion(member, questionId, qnARequest);
         return RspTemplate.success(Success.UPDATE_QUESTION_SUCCESS, Success.UPDATE_QUESTION_SUCCESS.getMessage());
     }
 
     @Operation(method = "DELETE", description = "질문을 삭제합니다.")
     @DeleteMapping
-    public RspTemplate<?> deleteQuestion(@RequestParam Long questionId) {
-        questionService.deleteQuestion(questionId);
+    public RspTemplate<?> deleteQuestion(Principal principal, @RequestParam Long questionId) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        questionService.deleteQuestion(member, questionId);
         return RspTemplate.success(Success.DELETE_QUESTION_SUCCESS, Success.DELETE_QUESTION_SUCCESS.getMessage());
     }
 }

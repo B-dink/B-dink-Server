@@ -11,6 +11,7 @@ import com.app.bdink.member.service.MemberService;
 import com.app.bdink.qna.entity.Answer;
 import com.app.bdink.qna.service.AnswerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InstructorUtilService {
 
     //TODO: 나중에 여기가 레포지터리로 변할듯.

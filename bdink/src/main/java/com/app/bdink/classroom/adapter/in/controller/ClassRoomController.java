@@ -84,7 +84,7 @@ public class ClassRoomController {
             @RequestPart(value = "thumbnail") MultipartFile thumbnail,
             @RequestPart(value = "intro-video") MultipartFile video) {
 
-        if (instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
@@ -106,7 +106,7 @@ public class ClassRoomController {
             Principal principal,
             @RequestParam Long id) {
 
-        if (instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
