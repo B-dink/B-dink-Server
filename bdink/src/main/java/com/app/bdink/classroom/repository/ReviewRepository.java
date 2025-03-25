@@ -11,4 +11,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     void deleteById(Long id);
     Page<Review> findAllByClassRoom(ClassRoomEntity classRoomEntity, Pageable pageable);
+    int countByClassRoom(ClassRoomEntity classRoomEntity);
 }

@@ -56,4 +56,7 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
     }
 
+    public int countReview(ClassRoomEntity classRoom) {
+        return reviewRepository.countByClassRoom(classRoom);
+    }
 }
