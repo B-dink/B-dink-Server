@@ -15,6 +15,7 @@ public class ClassRoomMapper {
                 .introduction(command.classRoomDto().introduction())
                 .thumbnail(command.thumbnailKey())
                 .introLink(command.mediaKey())
+                .level(command.classRoomDto().level())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class ClassRoomMapper {
                 .thumbnail(classRoom.getThumbnail())
                 .introLink(classRoom.getIntroLink())
                 .priceDetail(priceDetail)
+                .level(classRoom.getLevel())
                 .build();
     }
 
@@ -36,6 +38,7 @@ public class ClassRoomMapper {
                 .introduction(classRoomEntity.getIntroduction())
                 .thumbnail(classRoomEntity.getThumbnail())
                 .introLink(classRoomEntity.getIntroLink())
+                .level(classRoomEntity.getLevel())
                 .build();
 
     }

@@ -137,7 +137,8 @@ public class ClassRoomService implements ClassRoomUseCase {
                 bookmarkCount,
                 classRoomEntity.getInstructor().getMember().getName(),
                 classRoomEntity.getThumbnail(),
-                classRoomEntity.getPriceDetail()
+                classRoomEntity.getPriceDetail(),
+                classRoomEntity.getLevel()
         );
     }
 

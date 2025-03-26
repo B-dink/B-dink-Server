@@ -71,4 +71,11 @@ public class ReviewController {
         reviewService.deleteReview(reviewId, member);
         return RspTemplate.success(Success.DELETE_REVIEW_SUCCESS,Success.DELETE_REVIEW_SUCCESS.getMessage());
     }
+
+    @Operation(method = "GET", description = "클래스룸의 리뷰 개수를 조회합니다.")
+    @GetMapping("/count")
+    public RspTemplate<?> countReview(@RequestParam Long classRoomId) {
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        return RspTemplate.success(Success.GET_REVIEW_COUNT_SUCCESS, reviewService.countReview(classRoomEntity));
+    }
 }

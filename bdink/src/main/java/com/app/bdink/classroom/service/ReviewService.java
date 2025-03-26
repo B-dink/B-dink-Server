@@ -61,6 +61,10 @@ public class ReviewService {
         validateReview(review, member);
         reviewRepository.deleteById(reviewId);
     }
+
+    public int countReview(ClassRoomEntity classRoom) {
+        return reviewRepository.countByClassRoom(classRoom);
+
     public void validateReview(final Review review, final Member member) {
         if (!review.getMember().equals(member)) {
             throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
