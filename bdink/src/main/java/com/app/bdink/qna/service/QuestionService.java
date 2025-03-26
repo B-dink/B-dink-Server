@@ -22,8 +22,9 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public String createQuestion(final ClassRoomEntity classRoom, QnARequest qnARequest) {
+    public String createQuestion(final Member member, final ClassRoomEntity classRoom, QnARequest qnARequest) {
         Question question = Question.builder()
+            .member(member)
             .classRoom(classRoom)
             .content(qnARequest.content())
             .build();

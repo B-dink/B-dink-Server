@@ -36,11 +36,11 @@ public class QuestionController {
 
     @Operation(method = "POST", description = "질문을 생성합니다.")
     @PostMapping
-    public RspTemplate<?> createQuestion(@RequestParam Long classRoomId,
+    public RspTemplate<?> createQuestion(Principal principal, @RequestParam Long classRoomId,
                                             @RequestBody QnARequest qnARequest) {
-
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
-        return RspTemplate.success(Success.CREATE_ANSWER_SUCCESS, CreateIdDto.from(questionService.createQuestion(classRoomEntity, qnARequest)));
+        return RspTemplate.success(Success.CREATE_QUESTION_SUCCESS, CreateIdDto.from(questionService.createQuestion(member, classRoomEntity, qnARequest)));
     }
 
     @Operation(method = "GET", description = "클래스룸 별 모든 질문을 조회합니다.")
