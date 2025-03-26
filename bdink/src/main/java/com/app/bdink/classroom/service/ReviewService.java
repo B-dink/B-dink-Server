@@ -64,6 +64,7 @@ public class ReviewService {
 
     public int countReview(ClassRoomEntity classRoom) {
         return reviewRepository.countByClassRoom(classRoom);
+    }
 
     public void validateReview(final Review review, final Member member) {
         if (!review.getMember().equals(member)) {
