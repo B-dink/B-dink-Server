@@ -30,7 +30,7 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = true)
     private String email;
 
     private Long kakaoId;
@@ -70,5 +70,18 @@ public class Member {
             return instructor.getCareer();
         }
         return Career.EXERCISE;
+    }
+
+    public void delete(){
+        this.name = null;
+        this.password = null;
+        this.gender = false;
+        this.instructor = null;
+        this.email = null;
+        this.phoneNumber = null;
+        this.appleId = null;
+        this.kakaoId = null;
+        this.pictureUrl = null;
+        this.refreshToken =null;
     }
 }

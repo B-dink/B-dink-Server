@@ -1,5 +1,7 @@
 package com.app.bdink.global.oauth2.kakao.service;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.domain.LoginResult;
 import com.app.bdink.global.oauth2.kakao.dto.KakaoTokenResDto;
 import com.app.bdink.global.oauth2.kakao.info.KakaoUserInfo;
@@ -14,7 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-
+import java.util.HashMap;
 import java.util.Optional;
 
 @Slf4j
@@ -24,6 +26,9 @@ public class KakaoSignInService {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String KAKAO_AK;
 
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com"; // 액세스 토큰 발급 서버
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com"; // 사용자 정보 서버
@@ -72,16 +77,16 @@ public class KakaoSignInService {
 
         Optional<Member> member = getByKaKaoId(kakaoId);
 
-        if (member.isEmpty()){
+        if (member.isEmpty()) {
             member = Optional.of(memberRepository.save(
                     Member.builder()
-                    .name(userInfo.getKakaoAccount().getProfile().getNickName())
-                    .email(userInfo.getKakaoAccount().getEmail())
-                    .phoneNumber("")
-                    .kakaoId(kakaoId)
-                    .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
-                    .role(Role.ROLE_USER)
-                    .build()));
+                            .name(userInfo.getKakaoAccount().getProfile().getNickName())
+                            .email(userInfo.getKakaoAccount().getEmail())
+                            .phoneNumber("")
+                            .kakaoId(kakaoId)
+                            .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
+                            .role(Role.ROLE_USER)
+                            .build()));
         }
 
         return new LoginResult(member.get());
@@ -89,8 +94,33 @@ public class KakaoSignInService {
 
     }
 
+    public void revokeMember(final Member member) {
+        HashMap responseMap = null;
+
+        try {
+            responseMap = WebClient.create(KAUTH_USER_URL_HOST)
+                    .post()
+                    .uri(uriBuilder -> uriBuilder
+                            .scheme("https")
+                            .path("/v1/user/unlink")
+                            .queryParam("target_id_type", "user_id")
+                            .queryParam("target_id", member.getKakaoId())
+                            .build(true))
+                    .header(HttpHeaders.CONTENT_TYPE,
+                            HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                    .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + KAKAO_AK)
+                    .retrieve()
+                    .bodyToMono(HashMap.class)
+                    .block();
+        }catch (Exception e){
+            log.info(e.getMessage());
+            throw new CustomException(Error.UNPROCESSABLE_KAKAO_SERVER_EXCEPTION, Error.UNPROCESSABLE_KAKAO_SERVER_EXCEPTION.getMessage());
+        }
+        log.info("삭제된 id:"+ responseMap.get("id").toString());
+    }
+
     @Transactional(readOnly = true)
-    public Optional<Member> getByKaKaoId(Long kakaoId){
+    public Optional<Member> getByKaKaoId(Long kakaoId) {
         return memberRepository.findByKakaoId(kakaoId);
     }
 }

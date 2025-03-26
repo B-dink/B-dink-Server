@@ -69,6 +69,7 @@ public enum Success {
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
+    REVOKE_SUCCESS(HttpStatus.OK, "회원탈퇴 성공"),
     SMS_SEND_SUCCESS(HttpStatus.OK, "문자전송 성공"),
     SMS_VERIFY_SUCCESS(HttpStatus.OK, "문자인증 성공"),
     RE_ISSUE_TOKEN_SUCCESS(HttpStatus.OK, "토큰 재발급 성공"),
