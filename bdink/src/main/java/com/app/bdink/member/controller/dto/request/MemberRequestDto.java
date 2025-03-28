@@ -9,7 +9,9 @@ public record MemberRequestDto(
         String password,
         boolean passwordDoubleCheck,
         @NotBlank
-        String name
+        String name,
+
+        String phone
 
 ) {
 }

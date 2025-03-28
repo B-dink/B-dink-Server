@@ -39,6 +39,7 @@ public enum Success {
     GET_REVIEW_COUNT_SUCCESS(HttpStatus.OK, "리뷰 개수 조회 성공"),
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
+    EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
 
 
 
@@ -80,6 +81,10 @@ public enum Success {
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
 
+    /**
+     * 202 accepted
+     */
+    LOGIN_ACCEPTED(HttpStatus.ACCEPTED, "소셜 로그인 통신이 성공했습니다. 다음 api를 호출해주세요."),
 
     /**
      * 204 NO_CONTENT

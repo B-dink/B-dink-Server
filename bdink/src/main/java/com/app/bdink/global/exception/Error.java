@@ -30,6 +30,7 @@ public enum Error {
     BAD_REQUEST_ID(HttpStatus.BAD_REQUEST, "잘못된 id값입니다."),
     BAD_REQUEST_VALIDATION(HttpStatus.BAD_REQUEST, "유효한 값으로 요청을 다시 보내주세요."),
     BAD_REQUEST_PROVIDER(HttpStatus.BAD_REQUEST, "다른 소셜로그인으로 가입하신 경우 자체 로그인에서 회원가입을 한번 시켜주시면 업데이트 됩니다."),
+    BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
     BAD_REQUEST_FILE_SIZE(HttpStatus.BAD_REQUEST, "파일크기가 잘못된 것 같습니다. 최대 5MB"),

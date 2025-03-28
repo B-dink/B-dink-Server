@@ -14,10 +14,15 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import software.amazon.awssdk.http.Header;
 
 import java.security.PublicKey;
 import java.util.Map;
@@ -42,6 +47,10 @@ public class AppleSignInService {
 
     @Value("${apple-property.apple-client-id}")
     private String clientId;
+
+    @Value("${apple-property.apple-bundle-id}")
+    private String bundleId;
+    private String serviceId = "service.www.kr.co.bdink";
 
     @Value("${apple-property.apple-private-key}")
     private String ApplePrivateKey;
@@ -71,7 +80,7 @@ public class AppleSignInService {
                             .phoneNumber("")
                             .pictureUrl("")
                             .appleId(appleId)
-                            .role(Role.ROLE_USER)
+                            .role(Role.SIGNUP_PROGRESS)
                             .build()));
         }
         return LoginResult.from(member.get());
@@ -82,15 +91,20 @@ public class AppleSignInService {
         return memberRepository.findByAppleId(appleId);
     }
 
-    public boolean revokeMember(String authCode){
+    public boolean revokeMember(String authCode, final Member member){
         String secret = publicKeyGenerator.generateClientSecret();
         log.info(secret);
-
-        ResponseEntity<TokenResponse> tokenResponse = restClient.post()
-                .uri("/token")
-                        .body(Parts.of(clientId, secret, authCode, "authorization_code" ))
-                        .retrieve()
-                        .toEntity(TokenResponse.class);
+        ResponseEntity<TokenResponse> tokenResponse = null;
+        try {
+            tokenResponse = restClient.post()
+                    .uri("/token")
+                    .header(Header.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .body(createFormData(bundleId, secret, authCode))
+                    .retrieve()
+                    .toEntity(TokenResponse.class);
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
 
         TokenResponse body = tokenResponse.getBody();
         String refreshToken = body.refresh_token();
@@ -98,7 +112,9 @@ public class AppleSignInService {
 
         ResponseEntity<?> revoke = (ResponseEntity<?>) restClient.post()
                 .uri("/revoke")
-                .body(RevokeParts.of(clientId, secret, refreshToken, "refresh_token"));
+                .header(Header.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .body(createRevoke(bundleId, secret, refreshToken))
+                .retrieve();
 
         if (revoke.getStatusCode().is2xxSuccessful()){
             return true;
@@ -106,4 +122,23 @@ public class AppleSignInService {
         return false;
 
     }
+
+    private MultiValueMap<String, String> createFormData(String clientId, String secret, String authCode) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", clientId);
+        formData.add("client_secret", secret);
+        formData.add("code", authCode);
+        formData.add("grant_type", "authorization_code"); // grant_type 추가
+        return formData;
+    }
+
+    private MultiValueMap<String, String> createRevoke(String clientId, String secret, String authCode) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", clientId);
+        formData.add("client_secret", secret);
+        formData.add("code", authCode);
+        formData.add("token_type_hint", "refresh_token"); // grant_type 추가
+        return formData;
+    }
+
 }

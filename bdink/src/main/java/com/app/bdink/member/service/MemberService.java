@@ -3,9 +3,12 @@ package com.app.bdink.member.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
+import com.app.bdink.global.oauth2.controller.request.EmailDto;
+import com.app.bdink.global.oauth2.domain.EmailValidator;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
+import com.app.bdink.member.controller.dto.response.EmailCheckDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginRequestDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
@@ -28,6 +31,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final EmailValidator emailValidator;
 
     @Transactional(readOnly = true)
     public Member findById(Long id) {
@@ -73,11 +77,18 @@ public class MemberService {
                 .name(memberSaveRequestDto.name())
                 .email(memberSaveRequestDto.email())
                 .password(passwordEncoder.encode(memberSaveRequestDto.password()))
+                .phoneNumber(memberSaveRequestDto.phone())
                 .role(Role.ROLE_USER)
                 .build();
 
         return memberRepository.save(member);
 
+    }
+
+    @Transactional
+    public Member socialJoin(final Member member, MemberRequestDto memberSaveRequestDto){
+        member.modifyingInSocialSignUp(memberSaveRequestDto.name(), memberSaveRequestDto.email());
+        return member;
     }
 
     // 로그인
@@ -96,7 +107,21 @@ public class MemberService {
         return member;
     }
 
-    @Transactional
+
+    @Transactional(readOnly = true)
+    public DoubleCheckResponse passwordCheck(final Member member, String password){
+        if(password.isBlank()){
+            throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
+        }
+
+        if (!passwordEncoder.matches(password,member.getPassword())) {
+            throw new InvalidMemberException("비밀번호가 일치하지 않습니다.");
+        }
+        return DoubleCheckResponse.from(true);
+    }
+
+
+    @Transactional(readOnly = true)
     public DoubleCheckResponse passwordDoubleCheck(String origin, String copy){
         if (origin.equals(copy)){
             return DoubleCheckResponse.from(true);
@@ -113,9 +138,20 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMember(Long id){
-        Member member = findById(id);
+    public void deleteMember(final Member member){
         member.delete();
+    }
+
+    @Transactional(readOnly = true)
+    public EmailCheckDto checkEmail(EmailDto emailDto){
+        String email = emailDto.email();
+
+        boolean isValidEmail = EmailValidator.isValidEmail(email); //유효하고,
+
+        boolean isExist = memberRepository.existsByEmail(email); //존재하지않아야지만 통과.
+
+        return EmailCheckDto.from(isValidEmail && !isExist);
+
     }
 
 }
