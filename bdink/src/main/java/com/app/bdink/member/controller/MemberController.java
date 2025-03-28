@@ -6,6 +6,7 @@ import com.app.bdink.global.oauth2.domain.PasswordDto;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
+import com.app.bdink.member.controller.dto.response.SocialTypeDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +50,14 @@ public class MemberController {
         memberService.updatePassword(member, passwordDto);
         return RspTemplate.success(Success.UPDATE_PASSWORD_SUCCESS, Success.UPDATE_PASSWORD_SUCCESS.getMessage());
     }
+
+    @GetMapping("/social-type")
+    @Operation(method = "GET", description = "어떤 로그인으로 하던 유저인지 확인")
+    public RspTemplate<SocialTypeDto> getSocialType(Principal principal){
+        Member member = memberService.findById(Long.parseLong(principal.getName()));
+        return RspTemplate.success(Success.GET_SOCIAL_TYPE_SUCCESS, SocialTypeDto.from(member.getSocialType()));
+    }
+
 
 //    @PatchMapping("/restore-id")
 //    public RspTemplate<?> restoreId(Principal principal,
