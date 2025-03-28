@@ -51,7 +51,6 @@ public class AppleSignInService {
 
     @Value("${apple-property.apple-bundle-id}")
     private String bundleId;
-    private String serviceId = "service.www.kr.co.bdink";
 
     @Value("${apple-property.apple-private-key}")
     private String ApplePrivateKey;
@@ -93,6 +92,7 @@ public class AppleSignInService {
         return memberRepository.findByAppleId(appleId);
     }
 
+    @Deprecated
     public boolean revokeMember(String authCode, final Member member){
         String secret = publicKeyGenerator.generateClientSecret();
         log.info(secret);
