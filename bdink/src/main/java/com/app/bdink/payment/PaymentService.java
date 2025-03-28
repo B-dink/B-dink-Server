@@ -16,17 +16,18 @@ public class PaymentService {
     private String WIDGET_SECRET = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //TODO: 테스트에서 나중에 사업자등록된거로 받기.
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
-    public void confirm(){
+    public PaymentConfirmResponse confirm(ConfirmRequest confirmRequest){
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);
         RestClient restClient = RestClient.create(tossUrl);
-        restClient.post()
+        return restClient.post()
                 .uri("/confirm")
                 .header("Authorization", authorizations)
                 .header("Content-Type", "application/json")
+                .body(confirmRequest)
                 .retrieve()
-                .toEntity(PaymentConfirmResponse.class);
+                .toEntity(PaymentConfirmResponse.class).getBody();
     }
 
 }

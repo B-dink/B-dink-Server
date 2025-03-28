@@ -21,7 +21,7 @@ public enum Success {
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
     CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
-
+    CREATE_PAYMENT_SUCCESS(HttpStatus.CREATED, "결제 성공"),
 
 
 
