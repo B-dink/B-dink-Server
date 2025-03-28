@@ -57,9 +57,13 @@ public enum Success {
     GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
     UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
     UPDATE_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 수정 성공"),
+    UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
+
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_ANSWER_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_QUESTION_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
+    UPDATE_MAKETING_SUCCESS(HttpStatus.OK, "마케팅 수신 수정 성공"),
+
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
     UPDATE_SCHEDULE_SUCCESS(HttpStatus.OK, "스케줄 수정 성공"),

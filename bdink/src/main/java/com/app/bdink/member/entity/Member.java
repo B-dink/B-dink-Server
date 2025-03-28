@@ -52,9 +52,12 @@ public class Member extends BaseTimeEntity {
 
     private String refreshToken;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean eventAgree;
+
     @Builder
     public Member(String email, String password, String name, Role role, String phoneNumber, String pictureUrl,
-                  String appleId, Long kakaoId, SocialType socialType) {
+                  String appleId, Long kakaoId, SocialType socialType, boolean eventAgree) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -64,6 +67,7 @@ public class Member extends BaseTimeEntity {
         this.appleId = appleId;
         this.kakaoId = kakaoId;
         this.socialType = socialType;
+        this.eventAgree = eventAgree;
     }
 
     public void updatePhoneNumber(String phoneNumber) {
@@ -74,6 +78,10 @@ public class Member extends BaseTimeEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void updateEventAgree(boolean eventAgree){
+        this.eventAgree = eventAgree;
     }
 
     public Career getInterest(){
