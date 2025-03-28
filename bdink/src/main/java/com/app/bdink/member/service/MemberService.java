@@ -41,21 +41,21 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByRefreshToken(String refreshToken) {
         return memberRepository.findByRefreshToken(refreshToken).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
@@ -77,9 +77,9 @@ public class MemberService {
 //                return existingMemberForUpdate;
 //            }
 //        }
-        if (existingMember.isPresent()){
+        if (existingMember.isPresent()) {
             Member member = existingMember.get();
-            if (member.getSocialType().equals(SocialType.APPLE) || member.getSocialType().equals(SocialType.KAKAO)){
+            if (member.getSocialType().equals(SocialType.APPLE) || member.getSocialType().equals(SocialType.KAKAO)) {
                 throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
             }
             throw new CustomException(Error.EXIST_USER, Error.EXIST_USER.getMessage());
@@ -99,8 +99,10 @@ public class MemberService {
     }
 
     @Transactional
-    public Member socialJoin(final Member member, MemberSocialRequestDto memberSaveRequestDto){
-        member.modifyingInSocialSignUp(memberSaveRequestDto.name(), memberSaveRequestDto.email());
+    public Member socialJoin(final Member member, MemberSocialRequestDto memberSaveRequestDto) {
+        if (member.getRole().equals(Role.SIGNUP_PROGRESS)) {
+            member.modifyingInSocialSignUp(memberSaveRequestDto.name(), memberSaveRequestDto.email(), passwordEncoder.encode(memberSaveRequestDto.password()));
+        }
         return member;
     }
 
@@ -118,7 +120,7 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public int passwordCheck(PasswordValidDto passwordDto){
+    public int passwordCheck(PasswordValidDto passwordDto) {
 
         String password = passwordDto.password();
 
@@ -127,8 +129,8 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public DoubleCheckResponse passwordDoubleCheck(String origin, String copy){
-        if (origin.equals(copy)){
+    public DoubleCheckResponse passwordDoubleCheck(String origin, String copy) {
+        if (origin.equals(copy)) {
             return DoubleCheckResponse.from(true);
         }
         return DoubleCheckResponse.from(false);
@@ -136,19 +138,20 @@ public class MemberService {
 
     @Transactional
     public void updatePhoneNumber(Long id, MemberPhoneUpdateRequestDto memberPhoneUpdateRequestDto) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundMemberException("회원 정보를 찾을 수 없습니다."));
+        Member member = memberRepository.findById(id).orElseThrow(
+                    () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
+                );
 
         member.updatePhoneNumber(memberPhoneUpdateRequestDto.phoneNumber());
     }
 
     @Transactional
-    public void deleteMember(final Member member){
+    public void deleteMember(final Member member) {
         member.delete();
     }
 
     @Transactional(readOnly = true)
-    public EmailCheckDto checkEmail(EmailDto emailDto){
+    public EmailCheckDto checkEmail(EmailDto emailDto) {
         String email = emailDto.email();
 
         boolean isValidEmail = EmailValidator.isValidEmail(email); //유효하고,

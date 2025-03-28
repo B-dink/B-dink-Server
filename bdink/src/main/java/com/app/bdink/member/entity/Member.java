@@ -83,9 +83,10 @@ public class Member extends BaseTimeEntity {
         return Career.EXERCISE;
     }
 
-    public void modifyingInSocialSignUp(String name, String email){
+    public void modifyingInSocialSignUp(String name, String email, String password){
         this.name = name;
         this.email = email;
+        this.password = password;
         this.role = Role.ROLE_USER;
     }
 
