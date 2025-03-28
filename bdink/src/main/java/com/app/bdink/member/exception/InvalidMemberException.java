@@ -1,11 +1,11 @@
 package com.app.bdink.member.exception;
 
-public class InvalidMemberException extends RuntimeException{
-    public InvalidMemberException(final String message) {
-        super(message);
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
+
+public class InvalidMemberException extends CustomException {
+    public InvalidMemberException(Error error, String message) {
+        super(error, message);
     }
 
-    public InvalidMemberException() {
-        this("잘못된 회원의 정보입니다.");
-    }
 }

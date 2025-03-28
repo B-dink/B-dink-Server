@@ -11,6 +11,7 @@ public record MemberRequestDto(
         @NotBlank
         String name,
 
+        @NotBlank
         String phone
 
 ) {

@@ -7,6 +7,7 @@ import com.app.bdink.global.oauth2.domain.LoginResult;
 import com.app.bdink.global.oauth2.apple.response.ApplePublicKeys;
 import com.app.bdink.global.oauth2.apple.verify.AppleJwtParser;
 import com.app.bdink.global.oauth2.apple.verify.PublicKeyGenerator;
+import com.app.bdink.global.oauth2.domain.SocialType;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.repository.MemberRepository;
@@ -80,6 +81,7 @@ public class AppleSignInService {
                             .phoneNumber("")
                             .pictureUrl("")
                             .appleId(appleId)
+                            .socialType(SocialType.APPLE)
                             .role(Role.SIGNUP_PROGRESS)
                             .build()));
         }

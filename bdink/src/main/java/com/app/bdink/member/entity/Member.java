@@ -6,6 +6,7 @@ import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.domain.EmailValidator;
+import com.app.bdink.global.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,9 @@ public class Member extends BaseTimeEntity {
 
     private String appleId;
 
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
@@ -50,7 +54,7 @@ public class Member extends BaseTimeEntity {
 
     @Builder
     public Member(String email, String password, String name, Role role, String phoneNumber, String pictureUrl,
-                  String appleId, Long kakaoId) {
+                  String appleId, Long kakaoId, SocialType socialType) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -59,6 +63,7 @@ public class Member extends BaseTimeEntity {
         this.pictureUrl = pictureUrl;
         this.appleId = appleId;
         this.kakaoId = kakaoId;
+        this.socialType = socialType;
     }
 
     public void updatePhoneNumber(String phoneNumber) {

@@ -77,6 +77,7 @@ public enum Success {
     TOKEN_HEALTH_CHECKED_SUCCESS(HttpStatus.OK, "토큰 헬스체크 성공"),
 
     DOUBLE_CHECK_SUCCESS(HttpStatus.OK, "비번 중복체크 성공"),
+    PASSWORD_IS_VALID(HttpStatus.OK, "비번유효성 통과"),
 
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),

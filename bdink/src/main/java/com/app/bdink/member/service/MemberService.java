@@ -2,12 +2,17 @@ package com.app.bdink.member.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.oauth2.controller.request.PasswordValidDto;
 import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
 import com.app.bdink.global.oauth2.controller.request.EmailDto;
 import com.app.bdink.global.oauth2.domain.EmailValidator;
+import com.app.bdink.global.oauth2.domain.PasswordValidator;
+import com.app.bdink.global.oauth2.domain.SocialType;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
+import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.controller.dto.response.EmailCheckDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginRequestDto;
 import com.app.bdink.member.entity.Member;
@@ -57,20 +62,27 @@ public class MemberService {
     // 회원가입
     @Transactional
     public Member join(MemberRequestDto memberSaveRequestDto) {
-        Optional<Member> existingMember = memberRepository.findByEmail(memberSaveRequestDto.email());
 
-        if (existingMember.isPresent()) { //기존 멤버 존재하는데
-            Member existingMemberForUpdate = existingMember.get();
-            if (existingMemberForUpdate.getPassword() ==null || existingMemberForUpdate.getPassword().isBlank()) { //패스워드가 비어잇음.
-                if (existingMemberForUpdate.getKakaoId() == null &&
-                        existingMemberForUpdate.getAppleId() == null) { //카카오 유저나 애플 유저도 아니면 에러
-                    log.info("이메일 회원가입 중 반례 발생. : id=" + existingMember.get().getId());
-                    throw new CustomException(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage());
-                }
-                existingMemberForUpdate.updatePassword(passwordEncoder.encode(memberSaveRequestDto.password()));
-                return existingMemberForUpdate;
+        Optional<Member> existingMember = memberRepository.findByEmail(memberSaveRequestDto.email()); //이메일로 있는지 확인
+
+//        if (existingMember.isPresent()) { //기존 멤버 존재하는데
+//            Member existingMemberForUpdate = existingMember.get();
+//            if (existingMemberForUpdate.getPassword() ==null || existingMemberForUpdate.getPassword().isBlank()) { //패스워드가 비어잇음.
+//                if (existingMemberForUpdate.getKakaoId() == null &&
+//                        existingMemberForUpdate.getAppleId() == null) { //카카오 유저나 애플 유저도 아니면 에러
+//                    log.info("이메일 회원가입 중 반례 발생. : id=" + existingMember.get().getId());
+//                    throw new CustomException(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage());
+//                }
+//                existingMemberForUpdate.updatePassword(passwordEncoder.encode(memberSaveRequestDto.password()));
+//                return existingMemberForUpdate;
+//            }
+//        }
+        if (existingMember.isPresent()){
+            Member member = existingMember.get();
+            if (member.getSocialType().equals(SocialType.APPLE) || member.getSocialType().equals(SocialType.KAKAO)){
+                throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
             }
-
+            throw new CustomException(Error.EXIST_USER, Error.EXIST_USER.getMessage());
         }
 
         Member member = Member.builder()
@@ -78,6 +90,7 @@ public class MemberService {
                 .email(memberSaveRequestDto.email())
                 .password(passwordEncoder.encode(memberSaveRequestDto.password()))
                 .phoneNumber(memberSaveRequestDto.phone())
+                .socialType(SocialType.INTERNAL)
                 .role(Role.ROLE_USER)
                 .build();
 
@@ -86,7 +99,7 @@ public class MemberService {
     }
 
     @Transactional
-    public Member socialJoin(final Member member, MemberRequestDto memberSaveRequestDto){
+    public Member socialJoin(final Member member, MemberSocialRequestDto memberSaveRequestDto){
         member.modifyingInSocialSignUp(memberSaveRequestDto.name(), memberSaveRequestDto.email());
         return member;
     }
@@ -96,12 +109,8 @@ public class MemberService {
     public Member login(MemberLoginRequestDto memberRequestDto) {
         Member member = findByEmail(memberRequestDto.email());
 
-        if(member.getPassword().isBlank()){
-            throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
-        }
-
-        if (!passwordEncoder.matches(memberRequestDto.password(), member.getPassword())) {
-            throw new InvalidMemberException("비밀번호가 일치하지 않습니다.");
+        if (member.getPassword().isBlank() || !passwordEncoder.matches(memberRequestDto.password(), member.getPassword())) {
+            throw new InvalidMemberException(Error.BAD_REQUEST_PASSWORD, Error.BAD_REQUEST_PASSWORD.getMessage());
         }
 
         return member;
@@ -109,15 +118,11 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public DoubleCheckResponse passwordCheck(final Member member, String password){
-        if(password.isBlank()){
-            throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
-        }
+    public int passwordCheck(PasswordValidDto passwordDto){
 
-        if (!passwordEncoder.matches(password,member.getPassword())) {
-            throw new InvalidMemberException("비밀번호가 일치하지 않습니다.");
-        }
-        return DoubleCheckResponse.from(true);
+        String password = passwordDto.password();
+
+        return PasswordValidator.validatePassword(password);
     }
 
 

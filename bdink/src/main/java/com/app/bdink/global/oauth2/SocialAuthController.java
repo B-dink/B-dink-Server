@@ -1,13 +1,17 @@
 package com.app.bdink.global.oauth2;
 
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.oauth2.AuthService;
 import com.app.bdink.global.oauth2.controller.request.EmailDto;
+import com.app.bdink.global.oauth2.controller.request.PasswordValidDto;
+import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
 import com.app.bdink.global.oauth2.domain.PasswordDto;
 import com.app.bdink.global.oauth2.domain.RefreshToken;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
+import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginRequestDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
@@ -61,7 +65,7 @@ public class SocialAuthController {
     @Operation(method = "POST", description = "자체 로그인을 진행해 회원가입을 진행합니다.")
     public RspTemplate<?> signUpSocial(
             Principal principal,
-            @RequestBody @Valid MemberRequestDto memberRequestDto
+            @RequestBody @Valid MemberSocialRequestDto memberRequestDto
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         member = memberService.socialJoin(member, memberRequestDto);
@@ -92,9 +96,13 @@ public class SocialAuthController {
     }
 
     @PostMapping("/password/check")
-    @Operation(method = "POST", description = "PASSWORD와 디비 일치여부를 true, false로 return 합니다.")
-    public RspTemplate<?> checkPassword(@RequestBody PasswordDto passwordDto) {
-        return RspTemplate.success(Success.DOUBLE_CHECK_SUCCESS , memberService.passwordDoubleCheck(passwordDto.origin(), passwordDto.copy()));
+    @Operation(method = "POST", description = "PASSWORD가 규칙에 맞게 작성되었는지 검증합니다.")
+    public RspTemplate<?> checkPassword(@RequestBody PasswordValidDto passwordDto) {
+        int status = memberService.passwordCheck(passwordDto);
+        if (status == 200){
+            return RspTemplate.success(Success.PASSWORD_IS_VALID, DoubleCheckResponse.from(true));
+        }
+        return RspTemplate.error(status, Error.BAD_REQUEST_PASSWORD.getMessage());
     }
 
     @PostMapping("/email")
