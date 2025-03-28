@@ -10,6 +10,7 @@ import com.app.bdink.global.oauth2.domain.PasswordValidator;
 import com.app.bdink.global.oauth2.domain.SocialType;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.global.token.TokenProvider;
+import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
@@ -160,6 +161,16 @@ public class MemberService {
 
         return EmailCheckDto.from(isValidEmail && !isExist);
 
+    }
+
+    @Transactional
+    public void updateMarketing(final Member member, MemberMarketingDto memberMarketingDto){
+        member.updateEventAgree(memberMarketingDto.isAgree());
+    }
+
+    @Transactional
+    public void updatePassword(final Member member, PasswordValidDto passwordValidDto){
+        member.updatePassword(passwordEncoder.encode(passwordValidDto.password()));
     }
 
 }
