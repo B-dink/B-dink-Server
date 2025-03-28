@@ -1,7 +1,7 @@
 package com.app.bdink.payment.domain;
 
 public record Card(
-        Double amount,                // 카드사에 결제 요청한 금액
+        Integer amount,                // 카드사에 결제 요청한 금액
         String issuerCode,            // 카드 발급사 코드
         String acquirerCode,          // 카드 매입사 코드 (nullable)
         String number,                // 카드 번호 (마스킹 처리됨)
