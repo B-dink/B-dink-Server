@@ -168,4 +168,9 @@ public class MemberService {
         member.updateEventAgree(memberMarketingDto.isAgree());
     }
 
+    @Transactional
+    public void updatePassword(final Member member, PasswordValidDto passwordValidDto){
+        member.updatePassword(passwordEncoder.encode(passwordValidDto.password()));
+    }
+
 }
