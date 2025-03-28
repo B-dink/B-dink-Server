@@ -33,6 +33,7 @@ public enum Success {
      * 200 OK
      */
     GET_CLASSROOM_DETAIL_SUCCESS(HttpStatus.OK, "메인 페이지 유저 정보 조회 성공"),
+    GET_SOCIAL_TYPE_SUCCESS(HttpStatus.OK, "로그인 플랫폼 정보 조회 성공"),
     GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
     GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
     GET_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 조회 성공"),
@@ -57,9 +58,15 @@ public enum Success {
     GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
     UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
     UPDATE_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 수정 성공"),
+    UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
+    UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
+
+
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_ANSWER_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_QUESTION_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
+    UPDATE_MAKETING_SUCCESS(HttpStatus.OK, "마케팅 수신 수정 성공"),
+
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
     UPDATE_SCHEDULE_SUCCESS(HttpStatus.OK, "스케줄 수정 성공"),
