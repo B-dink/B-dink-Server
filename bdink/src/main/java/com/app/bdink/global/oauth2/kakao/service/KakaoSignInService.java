@@ -3,6 +3,7 @@ package com.app.bdink.global.oauth2.kakao.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.oauth2.domain.LoginResult;
+import com.app.bdink.global.oauth2.domain.SocialType;
 import com.app.bdink.global.oauth2.kakao.dto.KakaoTokenResDto;
 import com.app.bdink.global.oauth2.kakao.info.KakaoUserInfo;
 import com.app.bdink.member.entity.Member;
@@ -84,6 +85,7 @@ public class KakaoSignInService {
                             .email(userInfo.getKakaoAccount().getEmail())
                             .phoneNumber("")
                             .kakaoId(kakaoId)
+                            .socialType(SocialType.KAKAO)
                             .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                             .role(Role.ROLE_USER)
                             .build()));

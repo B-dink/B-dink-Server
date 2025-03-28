@@ -39,6 +39,10 @@ public class PublicKeyGenerator {
     private static final String KEY_ID_HEADER_KEY = "kid";
     private static final int POSITIVE_SIGN_NUMBER = 1;
 
+    @Value("${apple-property.apple-bundle-id}")
+    private String bundleId;
+
+
     @Value("${apple-property.apple-team}")
     private String teamId;
 
@@ -75,17 +79,20 @@ public class PublicKeyGenerator {
     }
 
     public String generateClientSecret() {
-        Date expirationDate = Date.from(LocalDateTime.now().plusMinutes(5)
+        Date expirationDate = Date.from(LocalDateTime.now().plusMinutes(20)
                 .atZone(ZoneId.systemDefault()).toInstant());
+
+        long issuedAt = System.currentTimeMillis() / 1000; // 초 단위 변환
+        long expiration = expirationDate.getTime() / 1000; // 초 단위 변환
         try {
             return Jwts.builder()
                     .setHeaderParam("alg", SignatureAlgorithm.ES256)
                     .setHeaderParam("kid", applePrivateKey)
                     .setIssuer(teamId)
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(expirationDate)
+                    .setIssuedAt(new Date(issuedAt * 1000))
+                    .setExpiration(new Date(expiration * 1000))
                     .setAudience(AUDIENCE)
-                    .setSubject(clientId)
+                    .setSubject(bundleId)
                     .signWith(getSigningKey(), SignatureAlgorithm.ES256)
                     .compact();
         }catch (Exception e){

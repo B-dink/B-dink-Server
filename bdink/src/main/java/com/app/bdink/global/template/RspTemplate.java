@@ -41,4 +41,8 @@ public class RspTemplate<T> {
     public static RspTemplate error(Error error, String message){
         return new RspTemplate<>(error.getErrorCode(), message);
     }
+
+    public static RspTemplate error(int customCode, String message){
+        return new RspTemplate<>(customCode, message);
+    }
 }

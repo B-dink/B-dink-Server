@@ -33,8 +33,9 @@ public class AuthService {
 
 
     @Transactional
-    public TokenDto signIn(String socialType, String socialAccessToken) {
+    public TokenDto signUpOrSignIn(String socialType, String socialAccessToken) {
         LoginResult result = null;
+
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
             result = appleSignInService.getAppleId(socialAccessToken);
         } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
@@ -52,33 +53,18 @@ public class AuthService {
     }
 
     @Transactional
-    public void revoke(Principal principal, String authCode, String socialType) {
+    public void revoke(Principal principal, String socialType) {
         Long id = Long.parseLong(principal.getName());
-        if (SocialType.valueOf(socialType).name().equals("APPLE")) {
-            if (!appleSignInService.revokeMember(authCode)) {
-                log.info("회원탈퇴 중 에러발생. + id=" + id);
-                throw new CustomException(Error.UNPROCESSABLE_APPLE_SERVER_EXCEPTION, Error.UNPROCESSABLE_APPLE_SERVER_EXCEPTION.getMessage());
-            }
-        } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
+        Member member = memberService.findById(id);
+         if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
             kakaoSignInService.revokeMember(memberService.findById(id));
         }
         try {
-            memberService.deleteMember(id);
+            memberService.deleteMember(member);
         } catch (Exception e) {
             log.info("회원탈퇴 jpa 에러발생. + id=" + id);
             throw new CustomException(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage());
         }
-    }
-
-
-    @Transactional
-    public TokenDto signUpInternal(final Member member) {
-        return tokenProvider.createToken(member);
-    }
-
-    @Transactional
-    public TokenDto signInInternal(final Member member) {
-        return tokenProvider.createToken(member);
     }
 
 
