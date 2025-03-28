@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.adapter.in.controller.dto.response;
 
+import com.app.bdink.classroom.domain.Level;
 import com.app.bdink.classroom.domain.PriceDetail;
 
 public record ClassRoomDetailResponse(
@@ -9,6 +10,7 @@ public record ClassRoomDetailResponse(
         String instructor,
 
         String thumbnail,
-        PriceDetail priceDetail
+        PriceDetail priceDetail,
+        Level level
 ) {
 }

@@ -22,12 +22,15 @@ public class ClassRoom {
 
     private String introLink;
 
+    @Enumerated(EnumType.STRING)
+    private Level level;
 
     public void modifyClassRoom(final ClassRoomDto classRoomDto, final String thumbnailKey, final String videoKey){
         this.title = updateTitle(classRoomDto.title());
         this.introduction = updateIntroduction(classRoomDto.introduction());
         this.thumbnail = thumbnailKey; //TODO: 이미지 관련해서 어떤 예외가 생길 수 있는지?
         this.introLink = videoKey;
+        this.level = updateLevel(classRoomDto.level());
     }
 
     public String updateTitle(final String title) {
@@ -44,6 +47,14 @@ public class ClassRoom {
         }
         this.introduction = introduction;
         return this.introduction;
+    }
+
+    public Level updateLevel(final Level level) {
+        if (level == null) {
+            return this.level;
+        }
+        this.level = level;
+        return this.level;
     }
 
     public void updateCDNLink(String cdnLink){

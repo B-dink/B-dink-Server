@@ -13,15 +13,26 @@ public enum Error {
      * 404 NOT FOUND
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다."),
+    NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND, "찾을 수 없는 질문입니다."),
     NOT_FOUND_ANSWER(HttpStatus.NOT_FOUND, "찾을 수 없는 답변입니다."),
-
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "찾을 수 없는 북마크입니다."),
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
+    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
+    NOT_FOUND_CLASSROOM(HttpStatus.NOT_FOUND, "찾을 수 없는 강의실입니다."),
+    NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
+    NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
+    NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
+    NOT_FOUND_INSTRUCTOR(HttpStatus.NOT_FOUND, "찾을 수 없는 강사입니다."),
 
     /**
      * 400 BAD REQUEST EXCEPTION
      */
     BAD_REQUEST_ID(HttpStatus.BAD_REQUEST, "잘못된 id값입니다."),
+    BAD_REQUEST_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 패스워드 요청"),
     BAD_REQUEST_VALIDATION(HttpStatus.BAD_REQUEST, "유효한 값으로 요청을 다시 보내주세요."),
-    BAD_REQUEST_PROVIDER(HttpStatus.BAD_REQUEST, "다른 소셜로그인으로 가입하신 경우 자체 로그인에서 회원가입을 한번 시켜주시면 업데이트 됩니다."),
+    BAD_REQUEST_PROVIDER(HttpStatus.BAD_REQUEST, "다른 유형 로그인으로 가입하셨습니다."),
+    BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
+    EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
     BAD_REQUEST_FILE_SIZE(HttpStatus.BAD_REQUEST, "파일크기가 잘못된 것 같습니다. 최대 5MB"),
@@ -30,6 +41,8 @@ public enum Error {
     BAD_REQUEST_TIME(HttpStatus.BAD_REQUEST, "시간 형식이 다릅니다." ),
     REQUEST_MEDIA_TYPE_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "미디어 타입이 맞지않습니다. 동영상 .mp4파일만 보내주세요."),
     REQUEST_METHOD_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "메소드가 틀립니다."),
+    EXIST_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크한 강의입니다."),
+    EXIST_REVIEW(HttpStatus.BAD_REQUEST, "이미 리뷰한 강의입니다."),
 
     /**
      * 401 UNAUTHORIZED EXCEPTION
@@ -53,6 +66,7 @@ public enum Error {
      */
     UNPROCESSABLE_ENTITY_DELETE_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "서버에서 요청을 이해해 삭제하려는 도중 문제가 생겼습니다."),
     UNPROCESSABLE_KAKAO_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
+    UNPROCESSABLE_APPLE_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
 
 
     /**

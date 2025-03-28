@@ -2,10 +2,18 @@ package com.app.bdink.member.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.oauth2.controller.request.PasswordValidDto;
 import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
+import com.app.bdink.global.oauth2.controller.request.EmailDto;
+import com.app.bdink.global.oauth2.domain.EmailValidator;
+import com.app.bdink.global.oauth2.domain.PasswordValidator;
+import com.app.bdink.global.oauth2.domain.SocialType;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberRequestDto;
+import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
+import com.app.bdink.member.controller.dto.response.EmailCheckDto;
 import com.app.bdink.member.controller.dto.response.MemberLoginRequestDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
@@ -28,51 +36,61 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final EmailValidator emailValidator;
 
     @Transactional(readOnly = true)
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
     @Transactional(readOnly = true)
     public Member findByRefreshToken(String refreshToken) {
         return memberRepository.findByRefreshToken(refreshToken).orElseThrow(
-                () -> new NotFoundMemberException("해당 멤버를 찾지 못했습니다.")
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
     }
 
     // 회원가입
     @Transactional
     public Member join(MemberRequestDto memberSaveRequestDto) {
-        Optional<Member> existingMember = memberRepository.findByEmail(memberSaveRequestDto.email());
 
-        if (existingMember.isPresent()) { //기존 멤버 존재하는데
-            Member existingMemberForUpdate = existingMember.get();
-            if (existingMemberForUpdate.getPassword() ==null || existingMemberForUpdate.getPassword().isBlank()) { //패스워드가 비어잇음.
-                if (existingMemberForUpdate.getKakaoId() == null &&
-                        existingMemberForUpdate.getAppleId() == null) { //카카오 유저나 애플 유저도 아니면 에러
-                    log.info("이메일 회원가입 중 반례 발생. : id=" + existingMember.get().getId());
-                    throw new CustomException(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage());
-                }
-                existingMemberForUpdate.updatePassword(passwordEncoder.encode(memberSaveRequestDto.password()));
-                return existingMemberForUpdate;
+        Optional<Member> existingMember = memberRepository.findByEmail(memberSaveRequestDto.email()); //이메일로 있는지 확인
+
+//        if (existingMember.isPresent()) { //기존 멤버 존재하는데
+//            Member existingMemberForUpdate = existingMember.get();
+//            if (existingMemberForUpdate.getPassword() ==null || existingMemberForUpdate.getPassword().isBlank()) { //패스워드가 비어잇음.
+//                if (existingMemberForUpdate.getKakaoId() == null &&
+//                        existingMemberForUpdate.getAppleId() == null) { //카카오 유저나 애플 유저도 아니면 에러
+//                    log.info("이메일 회원가입 중 반례 발생. : id=" + existingMember.get().getId());
+//                    throw new CustomException(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage());
+//                }
+//                existingMemberForUpdate.updatePassword(passwordEncoder.encode(memberSaveRequestDto.password()));
+//                return existingMemberForUpdate;
+//            }
+//        }
+        if (existingMember.isPresent()) {
+            Member member = existingMember.get();
+            if (member.getSocialType().equals(SocialType.APPLE) || member.getSocialType().equals(SocialType.KAKAO)) {
+                throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
             }
-
+            throw new CustomException(Error.EXIST_USER, Error.EXIST_USER.getMessage());
         }
 
         Member member = Member.builder()
                 .name(memberSaveRequestDto.name())
                 .email(memberSaveRequestDto.email())
                 .password(passwordEncoder.encode(memberSaveRequestDto.password()))
+                .phoneNumber(memberSaveRequestDto.phone())
+                .socialType(SocialType.INTERNAL)
                 .role(Role.ROLE_USER)
                 .build();
 
@@ -80,25 +98,39 @@ public class MemberService {
 
     }
 
+    @Transactional
+    public Member socialJoin(final Member member, MemberSocialRequestDto memberSaveRequestDto) {
+        if (member.getRole().equals(Role.SIGNUP_PROGRESS)) {
+            member.modifyingInSocialSignUp(memberSaveRequestDto.name(), memberSaveRequestDto.email(), passwordEncoder.encode(memberSaveRequestDto.password()));
+        }
+        return member;
+    }
+
     // 로그인
     @Transactional
     public Member login(MemberLoginRequestDto memberRequestDto) {
         Member member = findByEmail(memberRequestDto.email());
 
-        if(member.getPassword().isBlank()){
-            throw new CustomException(Error.BAD_REQUEST_PROVIDER, Error.BAD_REQUEST_PROVIDER.getMessage());
-        }
-
-        if (!passwordEncoder.matches(memberRequestDto.password(), member.getPassword())) {
-            throw new InvalidMemberException("비밀번호가 일치하지 않습니다.");
+        if (member.getPassword().isBlank() || !passwordEncoder.matches(memberRequestDto.password(), member.getPassword())) {
+            throw new InvalidMemberException(Error.BAD_REQUEST_PASSWORD, Error.BAD_REQUEST_PASSWORD.getMessage());
         }
 
         return member;
     }
 
-    @Transactional
-    public DoubleCheckResponse passwordDoubleCheck(String origin, String copy){
-        if (origin.equals(copy)){
+
+    @Transactional(readOnly = true)
+    public int passwordCheck(PasswordValidDto passwordDto) {
+
+        String password = passwordDto.password();
+
+        return PasswordValidator.validatePassword(password);
+    }
+
+
+    @Transactional(readOnly = true)
+    public DoubleCheckResponse passwordDoubleCheck(String origin, String copy) {
+        if (origin.equals(copy)) {
             return DoubleCheckResponse.from(true);
         }
         return DoubleCheckResponse.from(false);
@@ -106,10 +138,28 @@ public class MemberService {
 
     @Transactional
     public void updatePhoneNumber(Long id, MemberPhoneUpdateRequestDto memberPhoneUpdateRequestDto) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundMemberException("회원 정보를 찾을 수 없습니다."));
+        Member member = memberRepository.findById(id).orElseThrow(
+                    () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
+                );
 
         member.updatePhoneNumber(memberPhoneUpdateRequestDto.phoneNumber());
+    }
+
+    @Transactional
+    public void deleteMember(final Member member) {
+        member.delete();
+    }
+
+    @Transactional(readOnly = true)
+    public EmailCheckDto checkEmail(EmailDto emailDto) {
+        String email = emailDto.email();
+
+        boolean isValidEmail = EmailValidator.isValidEmail(email); //유효하고,
+
+        boolean isExist = memberRepository.existsByEmail(email); //존재하지않아야지만 통과.
+
+        return EmailCheckDto.from(isValidEmail && !isExist);
+
     }
 
 }

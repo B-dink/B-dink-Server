@@ -2,15 +2,19 @@ package com.app.bdink.member.entity;
 
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.oauth2.domain.EmailValidator;
+import com.app.bdink.global.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +27,6 @@ public class Member {
     @Column(name = "password")
     private String password;
 
-    //TODO: 나중에 "M", "F" 이런식으로 바꿔주기
-    @Column(name =  "gender")
-    private boolean gender;
-
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Instructor instructor;
 
@@ -36,6 +36,9 @@ public class Member {
     private Long kakaoId;
 
     private String appleId;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @Column(name = "phoneNumber")
     private String phoneNumber;
@@ -50,9 +53,17 @@ public class Member {
     private String refreshToken;
 
     @Builder
-    public Member(String email, String password, String auth) {
+    public Member(String email, String password, String name, Role role, String phoneNumber, String pictureUrl,
+                  String appleId, Long kakaoId, SocialType socialType) {
+        this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
+        this.phoneNumber = phoneNumber;
+        this.pictureUrl = pictureUrl;
+        this.appleId = appleId;
+        this.kakaoId = kakaoId;
+        this.socialType = socialType;
     }
 
     public void updatePhoneNumber(String phoneNumber) {
@@ -70,5 +81,24 @@ public class Member {
             return instructor.getCareer();
         }
         return Career.EXERCISE;
+    }
+
+    public void modifyingInSocialSignUp(String name, String email, String password){
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = Role.ROLE_USER;
+    }
+
+    public void delete(){
+        this.name = null;
+        this.password = null;
+        this.instructor = null;
+        this.email = "";
+        this.phoneNumber = "";
+        this.appleId = null;
+        this.kakaoId = null;
+        this.pictureUrl = null;
+        this.refreshToken =null;
     }
 }

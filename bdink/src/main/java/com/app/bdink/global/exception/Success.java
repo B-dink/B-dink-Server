@@ -36,8 +36,10 @@ public enum Success {
     GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
     GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
     GET_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 조회 성공"),
+    GET_REVIEW_COUNT_SUCCESS(HttpStatus.OK, "리뷰 개수 조회 성공"),
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
+    EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
 
 
 
@@ -68,16 +70,22 @@ public enum Success {
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
+    REVOKE_SUCCESS(HttpStatus.OK, "회원탈퇴 성공"),
     SMS_SEND_SUCCESS(HttpStatus.OK, "문자전송 성공"),
     SMS_VERIFY_SUCCESS(HttpStatus.OK, "문자인증 성공"),
     RE_ISSUE_TOKEN_SUCCESS(HttpStatus.OK, "토큰 재발급 성공"),
     TOKEN_HEALTH_CHECKED_SUCCESS(HttpStatus.OK, "토큰 헬스체크 성공"),
 
     DOUBLE_CHECK_SUCCESS(HttpStatus.OK, "비번 중복체크 성공"),
+    PASSWORD_IS_VALID(HttpStatus.OK, "비번유효성 통과"),
 
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
 
+    /**
+     * 202 accepted
+     */
+    LOGIN_ACCEPTED(HttpStatus.ACCEPTED, "소셜 로그인 통신이 성공했습니다. 다음 api를 호출해주세요."),
 
     /**
      * 204 NO_CONTENT

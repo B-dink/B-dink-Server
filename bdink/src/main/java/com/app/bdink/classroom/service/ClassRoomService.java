@@ -16,6 +16,8 @@ import com.app.bdink.classroom.mapper.PriceDetailMapper;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.repository.ChapterRepository;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
@@ -43,7 +45,7 @@ public class ClassRoomService implements ClassRoomUseCase {
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
-                () -> new IllegalStateException("해당 클래스를 찾지 못했습니다.")
+                () -> new CustomException(Error.NOT_FOUND_CLASSROOM, Error.NOT_FOUND_CLASSROOM.getMessage())
         );
     }
 
@@ -135,7 +137,8 @@ public class ClassRoomService implements ClassRoomUseCase {
                 bookmarkCount,
                 classRoomEntity.getInstructor().getMember().getName(),
                 classRoomEntity.getThumbnail(),
-                classRoomEntity.getPriceDetail()
+                classRoomEntity.getPriceDetail(),
+                classRoomEntity.getLevel()
         );
     }
 

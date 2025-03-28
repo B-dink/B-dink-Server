@@ -1,6 +1,9 @@
 package com.app.bdink.qna.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
+import com.app.bdink.member.entity.Member;
 import com.app.bdink.qna.entity.Question;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.controller.dto.response.QnAResponse;
@@ -19,8 +22,9 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public String createQuestion(final ClassRoomEntity classRoom, QnARequest qnARequest) {
+    public String createQuestion(final Member member, final ClassRoomEntity classRoom, QnARequest qnARequest) {
         Question question = Question.builder()
+            .member(member)
             .classRoom(classRoom)
             .content(qnARequest.content())
             .build();
@@ -41,16 +45,16 @@ public class QuestionService {
     }
 
     @Transactional
-    public void updateQuestion(Long questionId, QnARequest qnARequest) {
-        // TODO: 로그인 한 사용자와 질문 작성자가 같은지 확인
+    public void updateQuestion(final Member member,Long questionId, QnARequest qnARequest) {
+        validateQuestion(member, questionId);
         Question question = getById(questionId);
 
         question.update(qnARequest.content());
     }
 
     @Transactional
-    public void deleteQuestion(Long questionId) {
-        // TODO: 로그인 한 사용자와 질문 작성자가 같은지 확인
+    public void deleteQuestion(final Member member,Long questionId) {
+        validateQuestion(member, questionId);
         Question question = getById(questionId);
 
         questionRepository.delete(question);
@@ -58,7 +62,13 @@ public class QuestionService {
 
     public Question getById(Long questionId) {
         return questionRepository.findById(questionId).orElseThrow(
-            () -> new IllegalArgumentException("해당 질문을 찾지 못했습니다.")
+            () -> new CustomException(Error.NOT_FOUND_QUESTION, Error.NOT_FOUND_QUESTION.getMessage())
         );
+    }
+
+    public void validateQuestion(final Member member, Long questionId) {
+        if (!member.equals(getById(questionId).getMember())) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
     }
 }

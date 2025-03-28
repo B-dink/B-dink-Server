@@ -1,6 +1,8 @@
 package com.app.bdink.lecture.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Chapter;
@@ -19,7 +21,7 @@ public class LectureService {
 
     public Lecture findById(Long id){
         return lectureRepository.findById(id).orElseThrow(
-                ()-> new IllegalStateException("해당 강좌를 찾지 못했습니다.")
+                ()-> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage())
         );
     }
 
@@ -45,10 +47,7 @@ public class LectureService {
     @Transactional(readOnly = true)
     public LectureInfo getLectureInfo(Long id){
 
-        Lecture lecture = lectureRepository.findById(id)
-                .orElseThrow(
-                        () -> new IllegalStateException("존재하지 않는 강의입니다.")
-        );
+        Lecture lecture = findById(id);
         return LectureInfo.from(lecture);
     }
 
