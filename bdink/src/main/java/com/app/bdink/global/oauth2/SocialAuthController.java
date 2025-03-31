@@ -1,5 +1,6 @@
 package com.app.bdink.global.oauth2;
 
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.oauth2.AuthService;
@@ -21,7 +22,9 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -35,6 +38,7 @@ public class SocialAuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
+    private final S3Service s3Service;
 
     @GetMapping
     @Operation(method = "GET", description = "소셜 로그인(KAKAO,APPLE)을 진행해 회원가입 및 로그인을 진행합니다. 소셜 로그인은 자체 회원가입으로 넘어갑니다. 여기서 넘겨주는 토큰을 social-signup으로 넘겨주세요.")
@@ -52,36 +56,39 @@ public class SocialAuthController {
         return RspTemplate.success(Success.REVOKE_SUCCESS , Success.REVOKE_SUCCESS.getMessage());
     }
 
-    @PostMapping("/internal/sign-up")
-    @Operation(method = "POST", description = "자체 로그인을 진행해 회원가입을 진행합니다.")
-    public RspTemplate<?> signUpInternal(
-            @RequestBody @Valid MemberRequestDto memberRequestDto
-    ) {
-        Member member = memberService.join(memberRequestDto);
-        return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
-    }
+//    @PostMapping("/internal/sign-up")
+//    @Deprecated
+//    @Operation(method = "POST", description = "자체 로그인을 진행해 회원가입을 진행합니다.")
+//    public RspTemplate<?> signUpInternal(
+//            @RequestBody @Valid MemberRequestDto memberRequestDto
+//    ) {
+//        Member member = memberService.join(memberRequestDto);
+//        return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
+//    }
 
-    @PostMapping("/social/sign-up")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/social/sign-up")
     @Operation(method = "POST", description = "in-progress인 소셜 로그인 유저를 회원가입을 완료시킵니다.")
     public RspTemplate<?> signUpSocial(
             Principal principal,
-            @RequestBody @Valid MemberSocialRequestDto memberRequestDto
+            @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
+            @RequestPart(value = "profile") MultipartFile profileImage
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
-        member = memberService.socialJoin(member, memberRequestDto);
+        String image = s3Service.uploadImageOrMedia("image/", profileImage);
+        member = memberService.socialJoin(member, memberRequestDto, image);
         return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
     }
 
 
 
-    @PostMapping("/internal/sign-in")
-    @Operation(method = "POST", description = "자체 로그인을 진행해 로그인을 진행합니다.")
-    public RspTemplate<?> signInInternal(
-            @RequestBody @Valid MemberLoginRequestDto memberRequestDto
-    ) {
-        Member member = memberService.login(memberRequestDto);
-        return RspTemplate.success(Success.LOGIN_SUCCESS , tokenProvider.createToken(member));
-    }
+//    @PostMapping("/internal/sign-in")
+//    @Operation(method = "POST", description = "자체 로그인을 진행해 로그인을 진행합니다.")
+//    public RspTemplate<?> signInInternal(
+//            @RequestBody @Valid MemberLoginRequestDto memberRequestDto
+//    ) {
+//        Member member = memberService.login(memberRequestDto);
+//        return RspTemplate.success(Success.LOGIN_SUCCESS , tokenProvider.createToken(member));
+//    }
 
     @PostMapping("/token")
     @Operation(method = "POST", description = "리프레시토큰을 통해 엑세스, 리프레시토큰을 발급받습니다. 이 API에서 에러가 나오는 경우 리프레시도 만료된 케이스 이기 때문에 새로 로그인 하는 방식을 생각하고 있습니다.")
@@ -89,26 +96,28 @@ public class SocialAuthController {
         return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS ,authService.reIssueToken(token));
     }
 
-    @PostMapping("/password/double-check")
-    @Operation(method = "POST", description = "PASSWORD 확인시 일치여부를 true, false로 return 합니다.")
-    public RspTemplate<?> doubleCheckPassword(@RequestBody PasswordDto passwordDto) {
-        return RspTemplate.success(Success.DOUBLE_CHECK_SUCCESS , memberService.passwordDoubleCheck(passwordDto.origin(), passwordDto.copy()));
-    }
+//    @PostMapping("/password/double-check")
+//    @Deprecated
+//    @Operation(method = "POST", description = "PASSWORD 확인시 일치여부를 true, false로 return 합니다.")
+//    public RspTemplate<?> doubleCheckPassword(@RequestBody PasswordDto passwordDto) {
+//        return RspTemplate.success(Success.DOUBLE_CHECK_SUCCESS , memberService.passwordDoubleCheck(passwordDto.origin(), passwordDto.copy()));
+//    }
 
-    @PostMapping("/password/check")
-    @Operation(method = "POST", description = "PASSWORD가 규칙에 맞게 작성되었는지 검증합니다.")
-    public RspTemplate<?> checkPassword(@RequestBody PasswordValidDto passwordDto) {
-        int status = memberService.passwordCheck(passwordDto);
-        if (status == 200){
-            return RspTemplate.success(Success.PASSWORD_IS_VALID, DoubleCheckResponse.from(true));
-        }
-        return RspTemplate.error(status, Error.BAD_REQUEST_PASSWORD.getMessage());
-    }
+//    @PostMapping("/password/check")
+//    @Deprecated
+//    @Operation(method = "POST", description = "PASSWORD가 규칙에 맞게 작성되었는지 검증합니다.")
+//    public RspTemplate<?> checkPassword(@RequestBody PasswordValidDto passwordDto) {
+//        int status = memberService.passwordCheck(passwordDto);
+//        if (status == 200){
+//            return RspTemplate.success(Success.PASSWORD_IS_VALID, DoubleCheckResponse.from(true));
+//        }
+//        return RspTemplate.error(status, Error.BAD_REQUEST_PASSWORD.getMessage());
+//    }
 
-    @PostMapping("/email")
-    @Operation(method = "POST", description = "이메일 검증 api")
-    public RspTemplate<?> checkEmail(@RequestBody EmailDto emailDto){
-        return RspTemplate.success(Success.EMAIL_CHECK_SUCCESS, memberService.checkEmail(emailDto));
+    @GetMapping("/name")
+    @Operation(method = "GET", description = "이름 검증 api")
+    public RspTemplate<?> checkName(@RequestParam String name){
+        return RspTemplate.success(Success.EMAIL_CHECK_SUCCESS, memberService.checkName(name));
     }
 
     @PostMapping("/sign-out")
