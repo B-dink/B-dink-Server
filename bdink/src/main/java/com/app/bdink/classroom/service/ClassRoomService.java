@@ -1,11 +1,7 @@
 package com.app.bdink.classroom.service;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.AllClassRoomResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ChapterResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomSummeryDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.ClassRoomRepositoryAdapter;
 import com.app.bdink.classroom.domain.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
@@ -21,6 +17,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.repository.ChapterRepository;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
+import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,5 +146,20 @@ public class ClassRoomService implements ClassRoomUseCase {
         int totalLectureTime = lectureService.getChapterLectureTime(classRoomEntity);
 
         return new ChapterSummary(totalChapterCount, totalLectureCount, totalLectureTime);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClassRoomProgressResponse> getLectureProgress(Member member, Long classRoomId) {
+        ClassRoomEntity classRoom = findById(classRoomId);
+        int progress = lectureService.lectureProgress(member, classRoom);
+
+        return classRoom.getChapters().stream()
+                .flatMap(chapter -> chapter.getLectures().stream())
+                .map(lecture -> new ClassRoomProgressResponse(
+                        lecture.getTitle(),
+                        classRoom.getInstructor().getMember().getName(),
+                        progress + "%"
+                ))
+                .collect(Collectors.toList());
     }
 }

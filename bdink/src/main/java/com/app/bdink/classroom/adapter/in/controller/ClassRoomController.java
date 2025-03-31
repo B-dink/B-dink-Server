@@ -1,6 +1,7 @@
 package com.app.bdink.classroom.adapter.in.controller;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomProgressResponse;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.Career;
@@ -16,6 +17,8 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +42,7 @@ public class ClassRoomController {
     private final S3Service s3Service;
     private final MediaService mediaService;
     private final InstructorUtilService instructorUtilService;
+    private final MemberService memberService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
@@ -135,5 +141,24 @@ public class ClassRoomController {
         ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id);
         return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
+
+    @GetMapping("/{id}/progress")
+    @Operation(method = "GET", description = "특정 클래스룸의 학습 진행도를 조회합니다.")
+    public RspTemplate<?> getLectureProgress(Principal principal, @PathVariable Long id) {
+        Long memberId = Long.parseLong(principal.getName()); // 현재 로그인한 사용자의 ID 가져오기
+        Member member = memberService.findById(memberId);
+
+        List<ClassRoomProgressResponse> progressList = classRoomService.getLectureProgress(member, id);
+
+        List<ClassRoomProgressResponse> progressWithStatus = progressList.stream()
+                .map(progress -> {
+                    String status = progress.status().equals("완강") ? "완강" : progress.status();
+                    return new ClassRoomProgressResponse(progress.title(), progress.instructor(), status);
+                })
+                .collect(Collectors.toList());
+
+        return RspTemplate.success(Success.GET_CLASSROOM_PROGRESS_SUCCESS, progressWithStatus);
+    }
+
 
 }

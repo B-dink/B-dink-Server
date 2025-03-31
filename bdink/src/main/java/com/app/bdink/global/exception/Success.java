@@ -41,6 +41,7 @@ public enum Success {
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
+    GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
 
 
 
