@@ -19,16 +19,29 @@ public class MediaService {
     private String CDN_URL;
 
     @Transactional
-    public void createMedia(Long classRoomId, String videoKey){
+    public void createMedia(Long classRoomId, String videoKey, String assetId){
         Media media = Media.builder()
                 .classRoomId(classRoomId)
                 .s3Key(videoKey)
+                .media360Key(generateCdn360Link(assetId, videoKey))
+                .media720Key(generateCdn720Link(assetId, videoKey))
                 .build();
         mediaRepository.save(media);
     }
 
     public String generateCdn360Link(String assetId, String s3Key){
+        if (assetId == null){
+            return "";
+        }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
+        return CDN_URL+assetId+"/HLS/"+s3Key;
+    }
+
+    public String generateCdn720Link(String assetId, String s3Key){
+        if (assetId == null){
+            return "";
+        }
+        String updateS3Path = s3Key.replace(".mp4", "_720.m3u8");
         return CDN_URL+assetId+"/HLS/"+s3Key;
     }
 

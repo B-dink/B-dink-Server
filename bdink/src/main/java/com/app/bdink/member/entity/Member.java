@@ -91,10 +91,10 @@ public class Member extends BaseTimeEntity {
         return Career.EXERCISE;
     }
 
-    public void modifyingInSocialSignUp(String name, String email, String password){
+    public void modifyingInSocialSignUp(String name, String profileImage, String phone){
         this.name = name;
-        this.email = email;
-        this.password = password;
+        this.pictureUrl = profileImage;
+        this.phoneNumber = phone;
         this.role = Role.ROLE_USER;
     }
 
