@@ -2,6 +2,7 @@ package com.app.bdink.lecture.entity;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.sugang.entity.Sugang;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,6 +37,10 @@ public class Lecture extends BaseTimeEntity {
 
     @Column(name = "media_link")
     private String mediaLink;
+
+    @Getter
+    @OneToMany(mappedBy = "lecture")
+    private List<Sugang> sugangs; // 수강 신청 목록
 
     @Builder
     public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink) {

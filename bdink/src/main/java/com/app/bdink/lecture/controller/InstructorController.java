@@ -1,5 +1,7 @@
 package com.app.bdink.lecture.controller;
 
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.common.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class InstructorController {
     private final InstructorService instructorService;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
+    private final ClassRoomService classRoomService;
 
     @PostMapping
     @Operation(method = "POST", description = "강사 정보를 생성합니다.")
@@ -59,7 +63,8 @@ public class InstructorController {
     @Operation(method = "DELETE", description = "강사 정보를 삭제합니다. soft delete를 진행합니다. 강사정보를 제거하더라도 자신이 등록한 강의를 보유하고 싶을 수도 있기 때문에")
     public RspTemplate<?> deleteInstructor(Principal principal){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        instructorService.deleteInstructor(member);
+        List<ClassRoomEntity> classRoomEntityList = classRoomService.getClassRoomByInstructor(member.getInstructor());
+        instructorService.deleteInstructor(member, classRoomEntityList);
         return RspTemplate.success(Success.DELETE_INSTRUCTOR_SUCCESS, Success.DELETE_INSTRUCTOR_SUCCESS.getMessage());
     }
 }
