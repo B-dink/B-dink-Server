@@ -42,14 +42,15 @@ public class MemberController {
         return RspTemplate.success(Success.UPDATE_MAKETING_SUCCESS, Success.UPDATE_MAKETING_SUCCESS.getMessage());
     }
 
-    @PatchMapping("/password/reset")
-    @Operation(method = "PATCH", description = "비밀번호 재설정")
-    public RspTemplate<?> resetPassword(Principal principal,
-                                          @RequestBody PasswordValidDto passwordDto) {
-        Member member = memberService.findById(Long.parseLong(principal.getName()));
-        memberService.updatePassword(member, passwordDto);
-        return RspTemplate.success(Success.UPDATE_PASSWORD_SUCCESS, Success.UPDATE_PASSWORD_SUCCESS.getMessage());
-    }
+//    @PatchMapping("/password/reset")
+//    @Deprecated
+//    @Operation(method = "PATCH", description = "비밀번호 재설정")
+//    public RspTemplate<?> resetPassword(Principal principal,
+//                                          @RequestBody PasswordValidDto passwordDto) {
+//        Member member = memberService.findById(Long.parseLong(principal.getName()));
+//        memberService.updatePassword(member, passwordDto);
+//        return RspTemplate.success(Success.UPDATE_PASSWORD_SUCCESS, Success.UPDATE_PASSWORD_SUCCESS.getMessage());
+//    }
 
     @GetMapping("/social-type")
     @Operation(method = "GET", description = "어떤 로그인으로 하던 유저인지 확인")
