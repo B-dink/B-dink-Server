@@ -12,6 +12,8 @@ public enum Success {
      * 201 CREATED
      */
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
+    CREATE_SUGANG_SUCCESS(HttpStatus.CREATED, "수강 생성 성공"),
+
     CREATE_CLASSROOM_SUCCESS(HttpStatus.CREATED, "클래스룸 생성 성공"),
     CREATE_REVIEW_SUCCESS(HttpStatus.CREATED, "리뷰 생성 성공"),
     CREATE_CHAPTER_SUCCESS(HttpStatus.CREATED, "챕터 생성 성공"),
@@ -76,6 +78,7 @@ public enum Success {
     GET_CATEORY_SUCCESS(HttpStatus.OK, "세부 카테고리 조회 성공"),
     GET_ALL_SCHEDULE_SUCCESS(HttpStatus.OK, "전체 스케줄 조회 성공"),
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
+    GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REVOKE_SUCCESS(HttpStatus.OK, "회원탈퇴 성공"),

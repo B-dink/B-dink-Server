@@ -63,7 +63,7 @@ public class ClassRoomController {
         String id = classRoomUseCase.createClassRoom(command);
 
         //흠.. 밑에 애도 이런식으로 바꿔야하는데.
-        mediaService.createMedia(Long.parseLong(id), command.mediaKey(), null);
+        mediaService.createMedia(Long.parseLong(id), command.mediaKey(), null, command.thumbnailKey());
 
         return RspTemplate.success(Success.CREATE_CLASSROOM_SUCCESS, CreateIdDto.from(id));
     }

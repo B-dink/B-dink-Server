@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface MediaRepository extends JpaRepository<Media, Long> {
 
     Optional<Media> findByS3Key(String s3Key);
+
+    Optional<Media> findByLectureId(Long lectureId);
 }
