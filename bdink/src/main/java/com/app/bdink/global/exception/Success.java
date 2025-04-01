@@ -32,7 +32,7 @@ public enum Success {
     /**
      * 200 OK
      */
-    GET_CLASSROOM_DETAIL_SUCCESS(HttpStatus.OK, "메인 페이지 유저 정보 조회 성공"),
+    GET_CLASSROOM_DETAIL_SUCCESS(HttpStatus.OK, "클래스 디테일 페이지를 조회 성공"),
     GET_SOCIAL_TYPE_SUCCESS(HttpStatus.OK, "로그인 플랫폼 정보 조회 성공"),
     GET_ALL_CLASSROOM_SUCCESS(HttpStatus.OK, "전체 클래스룸 조회 성공"),
     GET_CLASSROOM_CARRER_SUCCESS(HttpStatus.OK, "카테고리 별 클래스룸 조회 성공"),
