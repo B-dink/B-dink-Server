@@ -126,4 +126,9 @@ public class ClassRoomEntity extends BaseTimeEntity {
     public boolean isEmptyThumbnail(){
         return this.thumbnail == null || this.thumbnail.isBlank();
     }
+
+    public Void softDeleteInstructor(){
+        this.instructor = null;
+        return null;
+    }
 }

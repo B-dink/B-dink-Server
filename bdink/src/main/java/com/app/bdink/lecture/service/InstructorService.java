@@ -1,5 +1,6 @@
 package com.app.bdink.lecture.service;
 
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.global.exception.CustomException;
@@ -12,6 +13,8 @@ import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,8 +52,9 @@ public class InstructorService {
     }
 
     @Transactional
-    public void deleteInstructor(final Member member){
+    public void deleteInstructor(final Member member, List<ClassRoomEntity> classRoomList){
         Instructor instructor = member.getInstructor();
+        classRoomList.stream().map(ClassRoomEntity::softDeleteInstructor);
         instructor.softDelete();
     }
 }

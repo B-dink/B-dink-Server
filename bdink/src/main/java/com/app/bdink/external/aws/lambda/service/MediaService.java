@@ -19,14 +19,22 @@ public class MediaService {
     private String CDN_URL;
 
     @Transactional
-    public void createMedia(Long classRoomId, String videoKey, String assetId){
+    public void createMedia(Long classRoomId, String videoKey, String assetId, String thumbnailKey){
         Media media = Media.builder()
                 .classRoomId(classRoomId)
                 .s3Key(videoKey)
                 .media360Key(generateCdn360Link(assetId, videoKey))
                 .media720Key(generateCdn720Link(assetId, videoKey))
+                .classRoomThumbnail(generateCdnThumbnail(assetId, thumbnailKey))
+                .mp4Link(generateCdnMp4Link(assetId, videoKey))
                 .build();
         mediaRepository.save(media);
+    }
+
+    public Media findByLectureId(Long lectureId){
+        return mediaRepository.findByLectureId(lectureId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_FILE, Error.NOT_FOUND_FILE.getMessage())
+        );
     }
 
     public String generateCdn360Link(String assetId, String s3Key){
@@ -34,7 +42,22 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
+        return CDN_URL+assetId+"/HLS/"+updateS3Path;
+    }
+
+
+    public String generateCdnMp4Link(String assetId, String s3Key){
+        if (assetId == null){
+            return "";
+        }
         return CDN_URL+assetId+"/HLS/"+s3Key;
+    }
+    public String generateCdnThumbnail(String assetId, String s3Key){
+        if (assetId == null){
+            return "";
+        }
+        String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
+        return CDN_URL+assetId+"/thumbnail/"+updateS3Path;
     }
 
     public String generateCdn720Link(String assetId, String s3Key){
@@ -42,7 +65,7 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_720.m3u8");
-        return CDN_URL+assetId+"/HLS/"+s3Key;
+        return CDN_URL+assetId+"/HLS/"+updateS3Path;
     }
 
     public Media findByKey(String videoKey){

@@ -124,6 +124,11 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
+    public List<ClassRoomEntity> getClassRoomByInstructor(final Instructor instructor){
+        return classRoomRepository.findAllByInstructor(instructor);
+    }
+
+    @Transactional(readOnly = true)
     public ClassRoomDetailResponse getClassRoomDetail(Long id) {
         ClassRoomEntity classRoomEntity = findById(id);
         long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoomEntity);
