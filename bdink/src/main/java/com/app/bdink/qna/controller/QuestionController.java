@@ -3,7 +3,7 @@ package com.app.bdink.qna.controller;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
-import com.app.bdink.common.util.MemberUtilService;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
