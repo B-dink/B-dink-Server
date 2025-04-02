@@ -1,4 +1,4 @@
-package com.app.bdink.common.util;
+package com.app.bdink.member.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
