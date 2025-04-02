@@ -1,6 +1,6 @@
 package com.app.bdink.classroom.adapter.in.controller.dto.response;
 
-import com.app.bdink.classroom.domain.ChapterSummary;
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 
 public record AllClassRoomResponse(

@@ -1,20 +1,23 @@
 package com.app.bdink.classroom.service;
 
+import com.app.bdink.bookmark.service.BookmarkService;
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.ClassRoomRepositoryAdapter;
 import com.app.bdink.classroom.domain.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.mapper.ClassRoomMapper;
-import com.app.bdink.classroom.mapper.InstructorMapper;
-import com.app.bdink.classroom.mapper.PriceDetailMapper;
+import com.app.bdink.instructor.mapper.InstructorMapper;
+import com.app.bdink.price.domain.PriceDetail;
+import com.app.bdink.price.mapper.PriceDetailMapper;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.lecture.repository.ChapterRepository;
+import com.app.bdink.chapter.repository.ChapterRepository;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;

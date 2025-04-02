@@ -1,6 +1,6 @@
 package com.app.bdink.classroom.repository;
 
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
