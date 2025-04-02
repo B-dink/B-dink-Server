@@ -1,11 +1,11 @@
-package com.app.bdink.payment;
+package com.app.bdink.payment.controller;
 
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
-import com.app.bdink.payment.domain.PaymentApplyRequest;
+import com.app.bdink.payment.controller.dto.ConfirmRequest;
+import com.app.bdink.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

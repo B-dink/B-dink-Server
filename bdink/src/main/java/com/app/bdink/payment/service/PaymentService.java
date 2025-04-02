@@ -1,5 +1,7 @@
-package com.app.bdink.payment;
+package com.app.bdink.payment.service;
 
+import com.app.bdink.payment.controller.dto.ConfirmRequest;
+import com.app.bdink.payment.repository.PaymentRepository;
 import com.app.bdink.payment.domain.PaymentConfirmResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.app.bdink.payment;
+package com.app.bdink.payment.controller.dto;
 
 public record ConfirmRequest(
     String paymentKey,

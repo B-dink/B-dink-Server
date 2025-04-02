@@ -1,4 +1,4 @@
-package com.app.bdink.payment;
+package com.app.bdink.payment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
