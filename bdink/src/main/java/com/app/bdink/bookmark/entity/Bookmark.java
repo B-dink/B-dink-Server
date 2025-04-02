@@ -1,4 +1,4 @@
-package com.app.bdink.classroom.entity;
+package com.app.bdink.bookmark.entity;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
