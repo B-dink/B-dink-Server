@@ -1,6 +1,6 @@
 package com.app.bdink.sugang.controller;
 
-import com.app.bdink.common.util.MemberUtilService;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.external.aws.lambda.domain.Media;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.global.exception.Success;
@@ -10,7 +10,6 @@ import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
-import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.service.SugangService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
