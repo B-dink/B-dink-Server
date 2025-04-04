@@ -1,6 +1,7 @@
 package com.app.bdink.instructor.adapter.in.controller;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.member.util.MemberUtilService;
@@ -55,6 +56,12 @@ public class InstructorController {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         InstructorInfoDto infoDto = instructorService.modifyInstructorInfo(member, instructorDto);
         return RspTemplate.success(Success.UPDATE_INSTRUCTOR_SUCCESS, infoDto);
+    }
+
+    @GetMapping("/career")
+    @Operation(method = "GET", description = "특정 Career의 강사를 조회합니다.")
+    public RspTemplate<?> getClassRoomByCareer(@RequestParam Career career) {
+        return RspTemplate.success(Success.GET_CLASSROOM_CARRER_SUCCESS, instructorService.getInstructorInfoByCareer(career));
     }
 
     @DeleteMapping

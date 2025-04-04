@@ -11,6 +11,8 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long
     int countById(Long id);
     List<ClassRoomEntity> findAllByInstructorCareer(Career career);
 
+    List<ClassRoomEntity> findAllByCareer(Career career);
+
     List<ClassRoomEntity> findAllByInstructor(Instructor instructor);
 
 }
