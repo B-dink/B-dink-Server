@@ -1,27 +1,31 @@
 package com.app.bdink.classroom.service;
 
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.ClassRoomRepositoryAdapter;
 import com.app.bdink.classroom.domain.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.mapper.ClassRoomMapper;
-import com.app.bdink.classroom.mapper.InstructorMapper;
-import com.app.bdink.classroom.mapper.PriceDetailMapper;
+import com.app.bdink.instructor.mapper.InstructorMapper;
+import com.app.bdink.price.domain.PriceDetail;
+import com.app.bdink.price.mapper.PriceDetailMapper;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.lecture.repository.ChapterRepository;
+import com.app.bdink.chapter.repository.ChapterRepository;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,11 +38,11 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final LectureService lectureService;
     private final ChapterRepository chapterRepository;
     private final LectureRepository lectureRepository;
-    private final BookmarkService bookmarkService;
     private final ClassRoomMapper classRoomMapper;
     private final PriceDetailMapper priceDetailMapper;
     private final InstructorMapper instructorMapper;
     private final ClassRoomRepositoryAdapter classRoomRepositoryAdapter;
+    private final ReviewService reviewService;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -105,22 +109,31 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<AllClassRoomResponse> getAllClassRoom() {
-        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAll();
-        return classRoomEntities.stream()
-                .map(classRoom -> {
-                    ChapterSummary chapterSummary = getChapterSummary(classRoom.getId());
-                    return AllClassRoomResponse.from(classRoom, chapterSummary);
-                })
-                .collect(Collectors.toList());
+    public CareerListDto getAllClassRoom() {
+        List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
+        List<PromotionDto> dtos = promotions.stream()
+                .map(PromotionDto::from)
+                .toList();
+        List<CategorizedClassroomDto> result = new ArrayList<>();
+        for(Career career : Career.values()){
+            if(career.equals(Career.PROMOTION)){
+                continue;
+            }
+            List<CareerClassroomDto> classroomsByCareer = getClassRoomByCareer(career);
+            result.add(CategorizedClassroomDto.from(classroomsByCareer));
+        }
+
+        return CareerListDto.of(dtos, result);
     }
 
     @Transactional(readOnly = true)
-    public List<AllClassRoomResponse> getClassRoomByCareer(Career career) {
-        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByInstructorCareer(career);
-        return classRoomEntities.stream()
-                .map(classRoom -> AllClassRoomResponse.from(classRoom, getChapterSummary(classRoom.getId())))
-                .collect(Collectors.toList());
+    public List<CareerClassroomDto> getClassRoomByCareer(Career career) {
+        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
+
+        List<CareerClassroomDto> careerClassroomDtos = classRoomEntities.stream()
+                .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                .toList();
+        return careerClassroomDtos;
     }
 
     @Transactional(readOnly = true)
@@ -129,9 +142,8 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public ClassRoomDetailResponse getClassRoomDetail(Long id) {
+    public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount) {
         ClassRoomEntity classRoomEntity = findById(id);
-        long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoomEntity);
 
         return new ClassRoomDetailResponse(
                 classRoomEntity.getTitle(),

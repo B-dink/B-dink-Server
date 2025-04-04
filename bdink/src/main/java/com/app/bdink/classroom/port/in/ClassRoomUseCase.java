@@ -1,12 +1,9 @@
 package com.app.bdink.classroom.port.in;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.AllClassRoomResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ChapterResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.domain.ChapterSummary;
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 
@@ -30,11 +27,10 @@ public interface ClassRoomUseCase {
 
     void deleteClassRoom(final ClassRoomEntity classRoomEntity);
 
-    List<AllClassRoomResponse> getAllClassRoom();
+    CareerListDto getAllClassRoom();
 
-    List<AllClassRoomResponse> getClassRoomByCareer(Career career);
+    List<CareerClassroomDto> getClassRoomByCareer(Career career);
 
-    ClassRoomDetailResponse getClassRoomDetail(Long id);
-
+    ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount);
     ChapterSummary getChapterSummary(Long id);
 }

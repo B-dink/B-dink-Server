@@ -1,15 +1,14 @@
 package com.app.bdink.classroom.adapter.in.controller;
 
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomProgressResponse;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
+import com.app.bdink.bookmark.service.BookmarkService;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
-import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
@@ -43,6 +42,7 @@ public class ClassRoomController {
     private final MediaService mediaService;
     private final InstructorUtilService instructorUtilService;
     private final MemberService memberService;
+    private final BookmarkService bookmarkService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
@@ -125,20 +125,22 @@ public class ClassRoomController {
 
     @GetMapping("/all")
     @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
-    public RspTemplate<?> getAllClassRoom() {
+    public RspTemplate<CareerListDto> getAllClassRoom() {
         return RspTemplate.success(Success.GET_ALL_CLASSROOM_SUCCESS, classRoomService.getAllClassRoom());
     }
 
     @GetMapping("/career")
     @Operation(method = "GET", description = "특정 Career의 클래스룸을 조회합니다.")
-    public RspTemplate<?> getClassRoomByCareer(@RequestParam Career career) {
+    public RspTemplate<List<CareerClassroomDto>> getClassRoomByCareer(@RequestParam Career career) {
         return RspTemplate.success(Success.GET_CLASSROOM_CARRER_SUCCESS, classRoomService.getClassRoomByCareer(career));
     }
 
     @GetMapping("/class-detail/{id}")
     @Operation(method = "GET", description = "클래스 디테일 페이지를 조회합니다.")
     public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id) {
-        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id);
+        ClassRoomEntity classRoom = classRoomService.findById(id);
+        long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
+        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount);
         return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
 

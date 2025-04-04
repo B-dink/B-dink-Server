@@ -31,6 +31,19 @@ public class MediaService {
         mediaRepository.save(media);
     }
 
+    @Transactional
+    public Media createLecture(Long lectureId, String videoKey, String assetId, String thumbnailKey){
+        Media media = Media.builder()
+                .lectureId(lectureId)
+                .s3Key(videoKey)
+                .media360Key(generateCdn360Link(assetId, videoKey))
+                .media720Key(generateCdn720Link(assetId, videoKey))
+                .classRoomThumbnail(generateCdnThumbnail(assetId, thumbnailKey))
+                .mp4Link(generateCdnMp4Link(assetId, videoKey))
+                .build();
+        return mediaRepository.save(media);
+    }
+
     public Media findByLectureId(Long lectureId){
         return mediaRepository.findByLectureId(lectureId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_FILE, Error.NOT_FOUND_FILE.getMessage())

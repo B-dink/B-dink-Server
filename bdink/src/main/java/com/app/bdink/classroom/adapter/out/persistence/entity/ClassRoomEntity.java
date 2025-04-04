@@ -1,12 +1,14 @@
 package com.app.bdink.classroom.adapter.out.persistence.entity;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.domain.Level;
-import com.app.bdink.classroom.domain.PriceDetail;
+import com.app.bdink.price.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.lecture.entity.Chapter;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.chapter.entity.Chapter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -40,6 +42,9 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Level level;
 
+    @Enumerated(EnumType.STRING)
+    private Career career;
+
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.REMOVE)
     private List<Chapter> chapters = new ArrayList<>();
 
@@ -54,7 +59,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Builder
     public ClassRoomEntity(final String title, final String introduction,
                            final String thumbnail, final String introLink,
-                           final Instructor instructor, final PriceDetail priceDetail, final Level level) {
+                           final Instructor instructor, final PriceDetail priceDetail, final Level level, final Career career) {
 
         this.title = title;
         this.thumbnail = thumbnail;
@@ -63,6 +68,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
         this.priceDetail = priceDetail;
         this.introLink = introLink;
         this.level = level;
+        this.career = career;
     }
 
     //TODO: 도메인 로직꺼 호출하고 아래 싹 지우기.
@@ -74,6 +80,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
         this.thumbnail = thumbnailKey; //TODO: 이미지 관련해서 어떤 예외가 생길 수 있는지?
         this.introLink = videoKey;
         this.level = updateLevel(classRoomDto.level());
+        this.career = updateCarrer(classRoomDto.career());
     }
 
     public String updateTitle(final String title) {
@@ -106,6 +113,14 @@ public class ClassRoomEntity extends BaseTimeEntity {
         }
         this.level = level;
         return this.level;
+    }
+
+    public Career updateCarrer(final Career career) {
+        if (career == null) {
+            return this.career;
+        }
+        this.career = career;
+        return this.career;
     }
 
     public boolean isOwner(final Instructor instructor){

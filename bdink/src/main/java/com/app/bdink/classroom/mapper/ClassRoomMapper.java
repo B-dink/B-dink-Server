@@ -2,8 +2,8 @@ package com.app.bdink.classroom.mapper;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.ClassRoom;
-import com.app.bdink.classroom.domain.PriceDetail;
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.price.domain.PriceDetail;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import org.springframework.stereotype.Component;
 

@@ -44,9 +44,20 @@ public class Sugang {
     }
 
     public double updateProgress(){
-        int totalSize = media.getTotalLength();
+        if (this.progress > 100){
+            this.progress = 100;
+            completed = true;
+            return 100;
+        }
+        double totalSize = media.getTotalLength();
         double presentSize = (double) totalSize / 10;
         this.progress += presentSize *100;
+
+        if (this.progress > 100){
+            this.progress=100;
+            completed = true;
+        }
+
         return this.progress;
     }
 

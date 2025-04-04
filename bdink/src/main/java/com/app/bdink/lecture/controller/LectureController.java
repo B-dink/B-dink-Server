@@ -1,7 +1,7 @@
 package com.app.bdink.lecture.controller;
 
 
-import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
@@ -10,18 +10,16 @@ import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
-import com.app.bdink.lecture.entity.Chapter;
-import com.app.bdink.lecture.service.ChapterService;
+import com.app.bdink.chapter.entity.Chapter;
+import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.lecture.service.LectureService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
 import java.security.Principal;
 
 @RestController

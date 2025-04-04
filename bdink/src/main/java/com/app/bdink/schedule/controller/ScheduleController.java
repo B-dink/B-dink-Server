@@ -1,7 +1,7 @@
 package com.app.bdink.schedule.controller;
 
 import com.app.bdink.common.util.CreateIdDto;
-import com.app.bdink.common.util.MemberUtilService;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
@@ -10,10 +10,9 @@ import com.app.bdink.schedule.controller.dto.request.ScheduleRequest;
 import com.app.bdink.schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URI;
+
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
