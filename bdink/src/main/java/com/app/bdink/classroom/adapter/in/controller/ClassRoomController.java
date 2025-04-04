@@ -9,7 +9,7 @@ import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
-import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;

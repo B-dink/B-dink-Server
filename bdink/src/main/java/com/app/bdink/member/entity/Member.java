@@ -1,11 +1,8 @@
 package com.app.bdink.member.entity;
 
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.common.entity.BaseTimeEntity;
-import com.app.bdink.global.exception.CustomException;
-import com.app.bdink.global.exception.Error;
-import com.app.bdink.global.oauth2.domain.EmailValidator;
 import com.app.bdink.global.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;

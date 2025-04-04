@@ -1,5 +1,6 @@
 package com.app.bdink.lecture.entity;
 
+import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.sugang.entity.Sugang;

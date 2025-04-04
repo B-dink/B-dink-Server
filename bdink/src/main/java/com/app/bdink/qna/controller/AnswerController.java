@@ -1,6 +1,6 @@
 package com.app.bdink.qna.controller;
 
-import com.app.bdink.classroom.util.InstructorUtilService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;

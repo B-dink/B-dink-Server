@@ -2,11 +2,12 @@ package com.app.bdink.classroom.adapter.out.persistence.entity;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.Level;
-import com.app.bdink.classroom.domain.PriceDetail;
+import com.app.bdink.price.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.lecture.entity.Chapter;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.chapter.entity.Chapter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

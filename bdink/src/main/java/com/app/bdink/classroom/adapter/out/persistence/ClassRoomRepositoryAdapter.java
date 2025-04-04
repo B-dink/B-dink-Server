@@ -2,14 +2,12 @@ package com.app.bdink.classroom.adapter.out.persistence;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.ClassRoom;
-import com.app.bdink.classroom.domain.InstructorDomain;
-import com.app.bdink.classroom.domain.PriceDetail;
-import com.app.bdink.classroom.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.price.domain.PriceDetail;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.mapper.ClassRoomMapper;
-import com.app.bdink.classroom.mapper.InstructorMapper;
+import com.app.bdink.instructor.mapper.InstructorMapper;
 import com.app.bdink.classroom.port.out.CreateClassRoomPort;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
-import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

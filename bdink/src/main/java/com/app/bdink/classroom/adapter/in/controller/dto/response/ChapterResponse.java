@@ -1,6 +1,7 @@
 package com.app.bdink.classroom.adapter.in.controller.dto.response;
 
-import com.app.bdink.lecture.entity.Chapter;
+import com.app.bdink.lecture.controller.dto.response.LectureResponse;
+import com.app.bdink.chapter.entity.Chapter;
 import java.util.List;
 
 public record ChapterResponse(

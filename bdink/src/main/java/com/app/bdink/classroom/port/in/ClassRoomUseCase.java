@@ -6,7 +6,7 @@ import com.app.bdink.classroom.adapter.in.controller.dto.response.ChapterRespons
 import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomDetailResponse;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.ClassRoomResponse;
 import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.classroom.domain.ChapterSummary;
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 
