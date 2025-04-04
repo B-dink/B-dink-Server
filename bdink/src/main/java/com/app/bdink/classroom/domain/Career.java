@@ -4,6 +4,7 @@ public enum Career {
     PODCAST,
     NUTRITION,
     EXERCISE,
-    REHABILITATION
+    REHABILITATION,
+    PROMOTION
 
 }
