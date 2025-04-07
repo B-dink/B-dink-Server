@@ -28,14 +28,31 @@ public class Instructor extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Career career;
 
+    private String marketingImage;
+
+    private String marketingText;
+
+    private String marketingSites;
+
     @Builder
-    public Instructor(Member member, Career career) {
+    public Instructor(Member member, Career career,
+                      String marketingImage, String marketingText, String marketingSites) {
         this.member = member;
         this.career = career;
+        this.marketingImage = marketingImage;
+        this.marketingSites = marketingSites;
+        this.marketingText = marketingText;
     }
 
-    public void modify(final Career career){
+    public void modify(final Career career, String marketingImage, String marketingSites, String marketingText){
         this.career = career;
+        this.marketingText = marketingText;
+        this.marketingSites = marketingSites;
+        this.marketingImage = marketingImage;
+    }
+
+    public boolean isEmptyThumbnail(){
+        return this.marketingImage == null || this.marketingImage.isBlank();
     }
 
     public void softDelete(){

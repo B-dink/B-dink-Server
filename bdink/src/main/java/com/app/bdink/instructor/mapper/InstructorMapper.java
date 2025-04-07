@@ -12,6 +12,9 @@ public class InstructorMapper {
         return InstructorDomain.builder()
                 .id(command.instructor().getId())
                 .career(command.instructor().getCareer())
+                .marketingImage(command.instructor().getMarketingImage())
+                .marketingSites(command.instructor().getMarketingSites())
+                .marketingText(command.instructor().getMarketingText())
                 .build();
     }
 
@@ -19,6 +22,9 @@ public class InstructorMapper {
         return Instructor.builder()
                 .member(member)
                 .career(instructorDomain.getCareer())
+                .marketingImage(instructorDomain.getMarketingImage())
+                .marketingSites(instructorDomain.getMarketingSites())
+                .marketingText(instructorDomain.getMarketingText())
                 .build();
     }
 
