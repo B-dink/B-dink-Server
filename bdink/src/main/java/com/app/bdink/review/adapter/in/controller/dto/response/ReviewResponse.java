@@ -4,13 +4,15 @@ import com.app.bdink.review.domain.Review;
 
 public record ReviewResponse(
     String content,
-    String memberName
+    String memberName,
+    String memberProfile
 ) {
 
     public static ReviewResponse from(Review review) {
         return new ReviewResponse(
             review.getContent(),
-            review.getMember().getName()
+            review.getMember().getName(),
+            review.getMember().getPictureUrl()
         );
     }
 }
