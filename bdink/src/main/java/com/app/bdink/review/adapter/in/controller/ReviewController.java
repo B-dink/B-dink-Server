@@ -3,6 +3,7 @@ package com.app.bdink.review.adapter.in.controller;
 import com.app.bdink.review.adapter.in.controller.dto.request.ReviewRequest;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.review.adapter.in.controller.dto.response.ReviewResponse;
 import com.app.bdink.review.service.ReviewService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.Success;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.security.Principal;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/reviews")
+@RequestMapping("/api/v1/reviews")
 @Tag(name = "리뷰 API", description = "클래스룸 리뷰와 관련된 API들입니다.")
 public class ReviewController {
 
@@ -49,7 +51,7 @@ public class ReviewController {
 
     @Operation(method = "GET", description = "모든 리뷰를 조회합니다.")
     @GetMapping
-    public RspTemplate<?> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
+    public RspTemplate<List<ReviewResponse>> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
         return RspTemplate.success(Success.GET_REVIEW_SUCCESS, reviewService.getAllReview(classRoomEntity, pageable));
     }

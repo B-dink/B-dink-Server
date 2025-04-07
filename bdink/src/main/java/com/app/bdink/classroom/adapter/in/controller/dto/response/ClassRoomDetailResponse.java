@@ -9,6 +9,8 @@ public record ClassRoomDetailResponse(
         long bookmarkCount,
         String instructor,
 
+        String instructorProfile,
+
         String thumbnail,
         PriceDetail priceDetail,
         Level level

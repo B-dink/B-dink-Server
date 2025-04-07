@@ -96,7 +96,7 @@ public class InstructorController {
 
     @GetMapping("/classroom")
     @Operation(method = "GET", description = "강사가 만든 클래스룸을 조회합니다.")
-    public RspTemplate<?> getClassRoomByInstructor(Principal principal){
+    public RspTemplate<List<CareerClassroomDto>> getClassRoomByInstructor(Principal principal){
         Instructor instructor = instructorUtilService.getInstructor(principal);
         List<CareerClassroomDto> classRoomEntityList = classRoomService.getFilteredClassroomByInstructor(instructor);
         return RspTemplate.success(Success.GET_CLASSROOM_FILTERED_INSTURCTOR_SUCCESS, classRoomEntityList);
