@@ -137,9 +137,18 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<ClassRoomEntity> getClassRoomByInstructor(final Instructor instructor){
+    public List<ClassRoomEntity> getClassRoomEntityByInstructor(final Instructor instructor){
         return classRoomRepository.findAllByInstructor(instructor);
     }
+
+    @Transactional(readOnly = true)
+    public List<CareerClassroomDto> getFilteredClassroomByInstructor(final Instructor instructor){
+        return classRoomRepository.findAllByInstructor(instructor).stream()
+                .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                .toList();
+    }
+
+
 
     @Transactional(readOnly = true)
     public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount) {

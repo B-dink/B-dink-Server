@@ -7,6 +7,8 @@ public record InstructorInfoDto(
         String career,
 
         String name,
+
+        String instructorProfile,
         String marketingImage,
 
         String marketingText,
@@ -19,6 +21,7 @@ public record InstructorInfoDto(
         return new InstructorInfoDto(
                 member.getInstructor().getCareer().toString(),
                 member.getName(),
+                member.getPictureUrl(),
                 member.getInstructor().getMarketingImage(),
                 member.getInstructor().getMarketingText(),
                 member.getInstructor().getMarketingSites()

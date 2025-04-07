@@ -1,11 +1,14 @@
 package com.app.bdink.instructor.adapter.in.controller;
 
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.CareerClassroomDto;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
@@ -36,6 +39,7 @@ public class InstructorController {
     private final MemberUtilService memberUtilService;
     private final ClassRoomService classRoomService;
     private final S3Service s3Service;
+    private final InstructorUtilService instructorUtilService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "강사 정보를 생성합니다.")
@@ -90,12 +94,21 @@ public class InstructorController {
         return RspTemplate.success(Success.GET_CLASSROOM_CARRER_SUCCESS, instructorService.getInstructorInfoByCareer(career));
     }
 
+    @GetMapping("/classroom")
+    @Operation(method = "GET", description = "강사가 만든 클래스룸을 조회합니다.")
+    public RspTemplate<?> getClassRoomByInstructor(Principal principal){
+        Instructor instructor = instructorUtilService.getInstructor(principal);
+        List<CareerClassroomDto> classRoomEntityList = classRoomService.getFilteredClassroomByInstructor(instructor);
+        return RspTemplate.success(Success.GET_CLASSROOM_FILTERED_INSTURCTOR_SUCCESS, classRoomEntityList);
+    }
+
+
     @DeleteMapping
     @Operation(method = "DELETE", description = "강사 정보를 삭제합니다. soft delete를 진행합니다. 강사정보를 제거하더라도 자신이 등록한 강의를 보유하고 싶을 수도 있기 때문에")
     public RspTemplate<?> deleteInstructor(Principal principal){
-        Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        List<ClassRoomEntity> classRoomEntityList = classRoomService.getClassRoomByInstructor(member.getInstructor());
-        instructorService.deleteInstructor(member, classRoomEntityList);
+        Instructor instructor = instructorUtilService.getInstructor(principal);
+        List<ClassRoomEntity> classRoomEntityList = classRoomService.getClassRoomEntityByInstructor(instructor);
+        instructorService.deleteInstructor(instructor, classRoomEntityList);
         return RspTemplate.success(Success.DELETE_INSTRUCTOR_SUCCESS, Success.DELETE_INSTRUCTOR_SUCCESS.getMessage());
     }
 }

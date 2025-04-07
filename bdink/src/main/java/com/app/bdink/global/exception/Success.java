@@ -59,6 +59,8 @@ public enum Success {
 
 
     GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
+    GET_CLASSROOM_FILTERED_INSTURCTOR_SUCCESS(HttpStatus.OK, "강사 필터링 클래스룸 조회 성공"),
+
     UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 수정 성공"),
     UPDATE_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 수정 성공"),
     UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
