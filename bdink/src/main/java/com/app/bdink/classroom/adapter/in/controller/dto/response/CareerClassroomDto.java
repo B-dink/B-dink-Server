@@ -10,6 +10,7 @@ public record CareerClassroomDto(
         Long id,
         Career career,
         String title,
+        String classRoomThumbnail,
         String instructor,
         PriceDetail priceDetail,
 
@@ -21,6 +22,7 @@ public record CareerClassroomDto(
                 classRoomEntity.getId(),
                 classRoomEntity.getCareer(),
                 classRoomEntity.getTitle(),
+                classRoomEntity.getThumbnail(),
                 classRoomEntity.getInstructor().getMember().getName(),
                 classRoomEntity.getPriceDetail(),
                 chapterSummary.getTotalLectureCount(),
