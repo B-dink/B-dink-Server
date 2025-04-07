@@ -1,6 +1,5 @@
 package com.app.bdink.instructor.service;
 
-import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.AllClassRoomResponse;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
@@ -37,11 +36,14 @@ public class InstructorService {
     }
 
     @Transactional
-    public String createInstructor(final Member member, InstructorDto instructorDto){
+    public String createInstructor(final Member member, InstructorDto instructorDto, String marketingImage){
         Long id = instructorRepository.save(
                 Instructor.builder()
                         .member(member)
                         .career(instructorDto.toCareer())
+                        .marketingText(instructorDto.marketingText())
+                        .marketingImage(marketingImage)
+                        .marketingSites(instructorDto.marketingSites())
                         .build()
         ).getId();
         return id.toString();
@@ -53,9 +55,15 @@ public class InstructorService {
     }
 
     @Transactional
-    public InstructorInfoDto modifyInstructorInfo(final Member member, final UpdateInstructorDto instructorDto){
+    public InstructorInfoDto modifyInstructorInfo(final Member member, final UpdateInstructorDto instructorDto, String marketingImage){
         Instructor instructor = member.getInstructor();
-        instructor.modify(Career.valueOf(instructorDto.career()));
+
+        instructor.modify(
+                Career.valueOf(instructorDto.career()),
+                marketingImage,
+                instructorDto.marketingSites(),
+                instructorDto.marketingText()
+        );
         return InstructorInfoDto.from(member);
     }
 

@@ -39,8 +39,8 @@ public class AuthService {
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
             result = appleSignInService.getAppleId(socialAccessToken);
         } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
-            String accessToken = kakaoSignInService.getAccessToken(socialAccessToken);
-            result = kakaoSignInService.loginOrSignUp(accessToken);
+            //String accessToken = kakaoSignInService.getAccessToken(socialAccessToken);
+            result = kakaoSignInService.loginOrSignUp(socialAccessToken);
         }
 
         if (result == null) {
