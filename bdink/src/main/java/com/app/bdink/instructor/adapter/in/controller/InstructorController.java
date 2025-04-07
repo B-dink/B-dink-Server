@@ -1,9 +1,11 @@
 package com.app.bdink.instructor.adapter.in.controller;
 
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
@@ -16,7 +18,9 @@ import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -31,13 +35,22 @@ public class InstructorController {
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
     private final ClassRoomService classRoomService;
+    private final S3Service s3Service;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "강사 정보를 생성합니다.")
-    public RspTemplate<?> createInstructor(Principal principal, @RequestBody InstructorDto instructorDto){
+    public RspTemplate<?> createInstructor(Principal principal,
+                                           @RequestPart(value = "instructorDto") InstructorDto instructorDto,
+                                           @RequestPart(value = "marketingImage", required = false) MultipartFile marketingImage){
 
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        String instructorId = instructorService.createInstructor(member, instructorDto);
+        String thumbnailKey = null;
+
+        if (marketingImage !=null && !marketingImage.isEmpty()){
+            thumbnailKey = s3Service.uploadImageOrMedia("image/", marketingImage);
+        }
+
+        String instructorId = instructorService.createInstructor(member, instructorDto, thumbnailKey);
 
         return RspTemplate.success(Success.CREATE_INSTRUCTOR_SUCCESS, CreateIdDto.from(instructorId));
     }
@@ -50,11 +63,24 @@ public class InstructorController {
         return RspTemplate.success(Success.GET_INSTRUCTOR_SUCCESS, instructorInfo);
     }
 
-    @PutMapping
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "강사 정보를 수정합니다.")
-    public RspTemplate<?> modifyInstructorInfo(Principal principal, @RequestBody UpdateInstructorDto instructorDto){
+    public RspTemplate<?> modifyInstructorInfo(Principal principal,
+                                               @RequestPart(value = "instructorDto") UpdateInstructorDto instructorDto,
+                                               @RequestPart(value = "marketingImage", required = false) MultipartFile marketingImage){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        InstructorInfoDto infoDto = instructorService.modifyInstructorInfo(member, instructorDto);
+
+        String thumbnailKey = null;
+
+        if (marketingImage !=null && !marketingImage.isEmpty()){
+            thumbnailKey = s3Service.uploadImageOrMedia("image/", marketingImage);
+        }
+
+        if (!member.getInstructor().isEmptyThumbnail()) {
+            s3Service.deleteImageAndMedia(thumbnailKey);
+        }
+
+        InstructorInfoDto infoDto = instructorService.modifyInstructorInfo(member, instructorDto, thumbnailKey);
         return RspTemplate.success(Success.UPDATE_INSTRUCTOR_SUCCESS, infoDto);
     }
 

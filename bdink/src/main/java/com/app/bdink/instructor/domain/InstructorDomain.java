@@ -17,6 +17,12 @@ public class InstructorDomain {
     @Enumerated(EnumType.STRING)
     private Career career;
 
+    private String marketingImage;
+
+    private String marketingText;
+
+    private String marketingSites;
+
     public void modify(final Career career){
         this.career = career;
     }
