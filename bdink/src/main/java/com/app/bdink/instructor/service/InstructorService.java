@@ -77,8 +77,7 @@ public class InstructorService {
 
 
     @Transactional
-    public void deleteInstructor(final Member member, List<ClassRoomEntity> classRoomList){
-        Instructor instructor = member.getInstructor();
+    public void deleteInstructor(final Instructor instructor, List<ClassRoomEntity> classRoomList){
         classRoomList.stream().map(ClassRoomEntity::softDeleteInstructor);
         instructor.softDelete();
     }
