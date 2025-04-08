@@ -21,6 +21,12 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
+    public Question findById(Long id){
+        return questionRepository.findById(id).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_QUESTION, Error.NOT_FOUND_QUESTION.getMessage())
+        );
+    }
+
     @Transactional
     public String createQuestion(final Member member, final ClassRoomEntity classRoom, QnARequest qnARequest) {
         Question question = Question.builder()

@@ -25,9 +25,6 @@ public enum Success {
     CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
     CREATE_PAYMENT_SUCCESS(HttpStatus.CREATED, "결제 성공"),
 
-
-
-
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
 
@@ -44,6 +41,8 @@ public enum Success {
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
     GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
+    GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
+
 
 
 
@@ -83,6 +82,8 @@ public enum Success {
     GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
+    REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
+
     REVOKE_SUCCESS(HttpStatus.OK, "회원탈퇴 성공"),
     SMS_SEND_SUCCESS(HttpStatus.OK, "문자전송 성공"),
     SMS_VERIFY_SUCCESS(HttpStatus.OK, "문자인증 성공"),
