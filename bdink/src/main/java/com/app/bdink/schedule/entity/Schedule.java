@@ -1,6 +1,7 @@
 package com.app.bdink.schedule.entity;
 
 import com.app.bdink.common.entity.BaseTimeEntity;
+import com.app.bdink.schedule.domain.CompetitionType;
 import com.app.bdink.schedule.domain.ScheduleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,21 +32,33 @@ public class Schedule extends BaseTimeEntity {
     @Column(name = "date")
     private LocalDate date;
 
+    private String competitionImage;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "schedule_type", length = 10)
     private ScheduleType scheduleType;
 
+    @Enumerated(EnumType.STRING)
+    private CompetitionType competitionType;
+
     @Builder
-    public Schedule(String title, LocalDate date, ScheduleType scheduleType) {
+    public Schedule(String title, LocalDate date, String competitionImage,ScheduleType scheduleType, CompetitionType competitionType) {
         this.title = title;
         this.date = date;
+        this.competitionImage = competitionImage;
         this.scheduleType = scheduleType;
+        this.competitionType = competitionType;
     }
 
-    public void update(String title, LocalDate date, String scheduleType) {
+    public void update(String title, LocalDate date,
+                       String scheduleType,
+                       String competitionImage,
+                       CompetitionType competitionType) {
         this.title = updateTitle(title);
         this.date = updateDate(date);
         this.scheduleType = updateScheduleType(scheduleType);
+        this.competitionImage = updateImage(competitionImage);
+        this.competitionType = updateCompetitionType(competitionType);
     }
 
     public String updateTitle(String title) {
@@ -64,6 +77,16 @@ public class Schedule extends BaseTimeEntity {
         if (scheduleType == null)
             return this.scheduleType;
         return ScheduleType.valueOf(scheduleType);
+    }
+    public String updateImage(String image) {
+        if (image == null)
+            return this.competitionImage;
+        return image;
+    }
+    private CompetitionType updateCompetitionType(CompetitionType competitionType) {
+        if (competitionType == null)
+            return this.competitionType;
+        return competitionType;
     }
 
 }

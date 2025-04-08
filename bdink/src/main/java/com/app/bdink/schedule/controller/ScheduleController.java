@@ -1,6 +1,7 @@
 package com.app.bdink.schedule.controller;
 
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
@@ -12,15 +13,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.security.Principal;
+import java.time.LocalDate;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import retrofit2.http.Multipart;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,18 +30,33 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
+    private final S3Service s3Service;
 
     @Operation(method = "POST", description = "캘린더 일정을 생성합니다.")
-    @PostMapping
-    public RspTemplate<?> createSchedule(Principal principal, @RequestBody ScheduleRequest scheduleRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RspTemplate<?> createSchedule(Principal principal,
+                                         @RequestPart(value = "scheduleDto") ScheduleRequest scheduleRequest,
+                                         @RequestPart(value = "image") MultipartFile image) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        return RspTemplate.success(Success.CREATE_SCHEDULE_SUCCESS, CreateIdDto.from(scheduleService.createSchedule(member, scheduleRequest)));
+        String key = null;
+
+        if (image != null && !image.isEmpty()){
+            key = s3Service.uploadImageOrMedia("/competition", image);
+        }
+
+        return RspTemplate.success(Success.CREATE_SCHEDULE_SUCCESS, CreateIdDto.from(scheduleService.createSchedule(member, scheduleRequest, key)));
     }
 
     @Operation(method = "GET", description = "모든 캘린더 일정을 조회합니다.")
     @GetMapping
     public RspTemplate<?> getAllSchedule() {
         return RspTemplate.success(Success.GET_ALL_SCHEDULE_SUCCESS, scheduleService.getAllSchedule());
+    }
+
+    @Operation(method = "GET", description = "해당 날짜의 캘린더 일정들을 조회합니다.")
+    @GetMapping("/date")
+    public RspTemplate<?> getAllScheduleByDate(@RequestParam String date) {
+        return RspTemplate.success(Success.GET_ALL_SCHEDULE_SUCCESS, scheduleService.getScheduleByDate(date));
     }
 
     @Operation(method = "GET", description = "카테고리 별 캘린더 일정을 조회합니다.")
@@ -52,10 +66,18 @@ public class ScheduleController {
     }
 
     @Operation(method = "PUT", description = "캘린더 일정을 수정합니다.")
-    @PutMapping
-    public RspTemplate<?> updateSchedule(Principal principal, @RequestParam Long scheduleId, @RequestBody ScheduleRequest scheduleRequest) {
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RspTemplate<?> updateSchedule(Principal principal, @RequestParam Long scheduleId,
+                                         @RequestPart(value = "scheduleDto") ScheduleRequest scheduleRequest,
+                                         @RequestPart(value = "image", required = false) MultipartFile image) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        scheduleService.updateSchedule(member, scheduleId, scheduleRequest);
+        String key = null;
+
+        if (image != null && !image.isEmpty()){
+            key = s3Service.uploadImageOrMedia("/competition", image);
+        }
+
+        scheduleService.updateSchedule(member, scheduleId, scheduleRequest, key);
         return RspTemplate.success(Success.UPDATE_SCHEDULE_SUCCESS, Success.UPDATE_SCHEDULE_SUCCESS.getMessage());
     }
 
