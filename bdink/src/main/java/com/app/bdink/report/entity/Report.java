@@ -3,9 +3,12 @@ package com.app.bdink.report.entity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.qna.entity.Question;
+import com.app.bdink.report.domain.ReportCase;
+import com.app.bdink.report.domain.ReportReason;
 import com.app.bdink.review.domain.Review;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,19 +22,23 @@ public class Report extends BaseTimeEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Question question;
+    @Enumerated(EnumType.STRING)
+    private ReportCase reportCase;
+
+    @Enumerated(EnumType.STRING)
+    private ReportReason reportReason;
+
+    private Long reportId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Review review;
-
-    public Report(Question question, Member member, Review review) {
-        this.question = question;
+    @Builder
+    public Report(Member member, ReportCase reportCase, ReportReason reportReason, Long reportId) {
         this.member = member;
-        this.review = review;
+        this.reportCase = reportCase;
+        this.reportId = reportId;
+        this.reportReason = reportReason;
     }
 
 }
