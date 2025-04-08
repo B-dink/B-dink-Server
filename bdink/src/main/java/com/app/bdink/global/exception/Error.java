@@ -14,6 +14,8 @@ public enum Error {
      */
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다."),
     NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND, "찾을 수 없는 질문입니다."),
+    NOT_FOUND_REPORT_TYPE(HttpStatus.NOT_FOUND, "찾을 수 없는 신고유형입니다."),
+
     NOT_FOUND_ANSWER(HttpStatus.NOT_FOUND, "찾을 수 없는 답변입니다."),
     NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "찾을 수 없는 북마크입니다."),
     NOT_FOUND_SUGANG(HttpStatus.NOT_FOUND, "찾을 수 없는 수강입니다."),
