@@ -101,7 +101,7 @@ public class S3Service {
         return UUID.randomUUID().toString() + ".jpg";
     }
 
-    private String generateCdnImageKey(String key){
+    public String generateCdnImageKey(String key){
         return cdnName+key;
     }
 
