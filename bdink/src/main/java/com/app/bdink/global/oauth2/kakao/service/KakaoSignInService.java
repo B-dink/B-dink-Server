@@ -87,7 +87,7 @@ public class KakaoSignInService {
                             .kakaoId(kakaoId)
                             .socialType(SocialType.KAKAO)
                             .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
-                            .role(Role.ROLE_USER)
+                            .role(Role.SIGNUP_PROGRESS)
                             .build()));
         }
 
