@@ -75,7 +75,7 @@ public class SocialAuthController {
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         String image = s3Service.uploadImageOrMedia("image/", profileImage);
-        member = memberService.socialJoin(member, memberRequestDto, s3Service.generateCdnImageKey(image));
+        member = memberService.socialJoin(member, memberRequestDto, image);
         return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
     }
 
