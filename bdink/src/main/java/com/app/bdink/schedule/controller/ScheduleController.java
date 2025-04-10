@@ -41,7 +41,7 @@ public class ScheduleController {
         String key = null;
 
         if (image != null && !image.isEmpty()){
-            key = s3Service.uploadImageOrMedia("/competition", image);
+            key = s3Service.uploadImageOrMedia("image/", image);
         }
 
         return RspTemplate.success(Success.CREATE_SCHEDULE_SUCCESS, CreateIdDto.from(scheduleService.createSchedule(member, scheduleRequest, key)));
@@ -74,7 +74,7 @@ public class ScheduleController {
         String key = null;
 
         if (image != null && !image.isEmpty()){
-            key = s3Service.uploadImageOrMedia("/competition", image);
+            key = s3Service.uploadImageOrMedia("image/", image);
         }
 
         scheduleService.updateSchedule(member, scheduleId, scheduleRequest, key);
