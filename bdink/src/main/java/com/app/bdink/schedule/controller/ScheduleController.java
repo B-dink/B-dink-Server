@@ -56,7 +56,7 @@ public class ScheduleController {
     @Operation(method = "GET", description = "해당 날짜의 캘린더 일정들을 조회합니다.")
     @GetMapping("/date")
     public RspTemplate<?> getAllScheduleByDate(@RequestParam String date) {
-        return RspTemplate.success(Success.GET_ALL_SCHEDULE_SUCCESS, scheduleService.getScheduleByDate(date));
+        return RspTemplate.success(Success.GET_DATE_SCHEDULE_SUCCESS, scheduleService.getScheduleByDate(date));
     }
 
     @Operation(method = "GET", description = "카테고리 별 캘린더 일정을 조회합니다.")
