@@ -1,31 +1,18 @@
 package com.app.bdink.member.service;
 
-import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.global.oauth2.controller.request.PasswordValidDto;
-import com.app.bdink.global.oauth2.domain.DoubleCheckResponse;
-import com.app.bdink.global.oauth2.domain.EmailValidator;
-import com.app.bdink.global.oauth2.domain.PasswordValidator;
-import com.app.bdink.global.oauth2.domain.SocialType;
-import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
-import com.app.bdink.member.controller.dto.request.MemberRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.controller.dto.response.NameCheckDto;
-import com.app.bdink.member.controller.dto.response.MemberLoginRequestDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
-import com.app.bdink.member.exception.InvalidMemberException;
 import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Slf4j
 @Service

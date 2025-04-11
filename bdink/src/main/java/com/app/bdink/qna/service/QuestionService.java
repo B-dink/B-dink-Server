@@ -62,8 +62,13 @@ public class QuestionService {
     public void deleteQuestion(final Member member,Long questionId) {
         validateQuestion(member, questionId);
         Question question = getById(questionId);
-
         questionRepository.delete(question);
+    }
+
+    @Transactional
+    public void revokeUserDeleteQuestion(final Member member){
+        List<Question> questions = questionRepository.findByMember(member);
+        questionRepository.deleteAll(questions);
     }
 
     public Question getById(Long questionId) {
