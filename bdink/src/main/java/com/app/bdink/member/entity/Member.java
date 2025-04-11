@@ -3,7 +3,7 @@ package com.app.bdink.member.entity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.common.entity.BaseTimeEntity;
-import com.app.bdink.global.oauth2.domain.SocialType;
+import com.app.bdink.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -96,7 +96,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void delete(){
-        this.name = null;
+        this.role = Role.DELETE_USER;
         this.password = null;
         this.instructor = null;
         this.email = "";
@@ -105,5 +105,6 @@ public class Member extends BaseTimeEntity {
         this.kakaoId = null;
         this.pictureUrl = null;
         this.refreshToken =null;
+        this.eventAgree = false;
     }
 }
