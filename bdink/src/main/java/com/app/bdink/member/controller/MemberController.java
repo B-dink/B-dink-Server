@@ -1,8 +1,6 @@
 package com.app.bdink.member.controller;
 
 import com.app.bdink.global.exception.Success;
-import com.app.bdink.global.oauth2.controller.request.PasswordValidDto;
-import com.app.bdink.global.oauth2.domain.PasswordDto;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
@@ -11,7 +9,6 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

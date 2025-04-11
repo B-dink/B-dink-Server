@@ -2,7 +2,7 @@ package com.app.bdink.global.token;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.global.oauth2.domain.TokenDto;
+import com.app.bdink.oauth2.domain.TokenDto;
 import com.app.bdink.member.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
