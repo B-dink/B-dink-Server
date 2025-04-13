@@ -81,7 +81,8 @@ public class Schedule extends BaseTimeEntity {
     public String updateImage(String image) {
         if (image == null)
             return this.competitionImage;
-        return image;
+        this.competitionImage = image;
+        return this.competitionImage;
     }
     private CompetitionType updateCompetitionType(CompetitionType competitionType) {
         if (competitionType == null)

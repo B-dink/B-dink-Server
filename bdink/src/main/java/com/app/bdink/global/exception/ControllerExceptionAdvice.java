@@ -36,7 +36,6 @@ public class ControllerExceptionAdvice {
      */
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<RspTemplate> handleCustomException(CustomException e , WebRequest request) {
-        log.info("hi22");
         return ResponseEntity.status(e.getHttpStatus())
                 .body(RspTemplate.error(e.getError(), e.getMessage()));
     }
