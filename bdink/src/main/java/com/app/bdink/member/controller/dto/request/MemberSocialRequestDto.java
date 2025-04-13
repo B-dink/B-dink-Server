@@ -7,7 +7,7 @@ public record MemberSocialRequestDto(
         @NotBlank
         String phone,
         @NotBlank
-        @Pattern(regexp = "[A-Za-z0-9]{2,8}", message = "이름은 특수문자를 제외한 2~8글자여야 합니다.")
+        @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,8}$", message = "이름은 특수문자를 제외한 2~8글자여야 합니다.")
         String name
 ) {
 }

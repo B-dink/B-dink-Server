@@ -70,7 +70,7 @@ public class SocialAuthController {
     @Operation(method = "POST", description = "in-progress인 소셜 로그인 유저를 회원가입을 완료시킵니다.")
     public RspTemplate<?> signUpSocial(
             Principal principal,
-            @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
+        @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
             @RequestPart(value = "profile") MultipartFile profileImage
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
