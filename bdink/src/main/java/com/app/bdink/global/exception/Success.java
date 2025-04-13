@@ -70,6 +70,8 @@ public enum Success {
     UPDATE_ANSWER_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_QUESTION_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_MAKETING_SUCCESS(HttpStatus.OK, "마케팅 수신 수정 성공"),
+    UPDATE_NAME_SUCCESS(HttpStatus.OK, "이름 수정 성공"),
+    UPDATE_PICTUREURL_SUCCESS(HttpStatus.OK, "사진 수정 성공"),
 
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
