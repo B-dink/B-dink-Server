@@ -4,6 +4,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
+import com.app.bdink.member.controller.dto.request.MemberUpdateNameDto;
 import com.app.bdink.member.controller.dto.response.NameCheckDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
@@ -152,5 +153,15 @@ public class MemberService {
 //    public void updatePassword(final Member member, PasswordValidDto passwordValidDto){
 //        member.updatePassword(passwordEncoder.encode(passwordValidDto.password()));
 //    }
+
+    @Transactional
+    public void updateName(final Member member, MemberUpdateNameDto memberUpdateDto) {
+        member.updateName(memberUpdateDto.name());
+    }
+
+    @Transactional
+    public void updateProfile(final Member member, String pictureUrl) {
+        member.updatePictureUrl(pictureUrl);
+    }
 
 }
