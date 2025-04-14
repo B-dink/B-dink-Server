@@ -37,6 +37,13 @@ public class ReportService {
     public String report(Principal principal, Long id, String reportCase, ReportDto dto){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
+
+        if (ReportCase.QUESTION.name().equals(reportCase)){
+            questionService.findById(id);
+        }else{
+            reviewService.findById(id);
+        }
+
         Report report = Report.builder()
                 .reportId(id)
                 .reportCase(ReportCase.valueOf(reportCase))
