@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -79,7 +80,7 @@ public class SocialAuthController {
     @Operation(method = "POST", description = "in-progress인 소셜 로그인 유저를 회원가입을 완료시킵니다.")
     public RspTemplate<?> signUpSocial(
             Principal principal,
-            @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
+        @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
             @RequestPart(value = "profile") MultipartFile profileImage
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));

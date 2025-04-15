@@ -81,6 +81,10 @@ public class Member extends BaseTimeEntity {
         this.eventAgree = eventAgree;
     }
 
+    public void updateName(String name) { this.name = name; }
+
+    public void updatePictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+
     public Career getInterest(){
         if (this.instructor != null){
             return instructor.getCareer();
