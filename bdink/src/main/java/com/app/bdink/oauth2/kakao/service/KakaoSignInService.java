@@ -89,9 +89,10 @@ public class KakaoSignInService {
                             .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                             .role(Role.SIGNUP_PROGRESS)
                             .build()));
+            return new LoginResult(member.get(), true);
         }
 
-        return new LoginResult(member.get());
+        return new LoginResult(member.get(), false);
 
 
     }

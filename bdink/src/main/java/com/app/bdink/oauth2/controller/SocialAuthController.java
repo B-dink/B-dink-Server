@@ -7,12 +7,14 @@ import com.app.bdink.global.exception.Success;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.util.MemberUtilService;
+import com.app.bdink.oauth2.domain.LoginResult;
 import com.app.bdink.oauth2.domain.RefreshToken;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.oauth2.domain.TokenDto;
 import com.app.bdink.oauth2.service.AuthService;
 import com.app.bdink.qna.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +51,12 @@ public class SocialAuthController {
             @Parameter(description = "애플은 아이덴티티 토큰, 카카오는 인가코드", in = ParameterIn.QUERY) @RequestParam("code") String socialAccessToken,
             @Parameter(description = "애플은 APPLE, 카카오는 KAKAO", in = ParameterIn.QUERY) @RequestParam("provider") String provider
     ) {
-        return RspTemplate.success(Success.LOGIN_ACCEPTED, authService.signUpOrSignIn(provider, socialAccessToken));
+        LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
+        TokenDto tokenDto = tokenProvider.createToken(result.member());
+        if (result.isNewMember()){
+            return RspTemplate.success(Success.LOGIN_ACCEPTED, tokenDto);
+        }
+        return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenDto);
     }
 
     @DeleteMapping("/revoke")
