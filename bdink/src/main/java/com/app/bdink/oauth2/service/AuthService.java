@@ -30,7 +30,7 @@ public class AuthService {
 
 
     @Transactional
-    public TokenDto signUpOrSignIn(String socialType, String socialAccessToken) {
+    public LoginResult signUpOrSignIn(String socialType, String socialAccessToken) {
         LoginResult result = null;
 
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
@@ -44,9 +44,7 @@ public class AuthService {
             throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
         }
 
-        TokenDto tokenDto = tokenProvider.createToken(result.member());
-
-        return tokenDto;
+        return result;
     }
 
     @Transactional
