@@ -52,6 +52,12 @@ public class Member extends BaseTimeEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean eventAgree;
 
+    @Column(name = "user_key") //Todo: 콜러스에서 받아온 유저의 키 -> 추후에 다른 entity로 옮길수도..
+    private String userKey;
+
+    @Column(unique = true)
+    private String kollusClientUserId;
+
     @Builder
     public Member(String email, String password, String name, Role role, String phoneNumber, String pictureUrl,
                   String appleId, Long kakaoId, SocialType socialType, boolean eventAgree) {
