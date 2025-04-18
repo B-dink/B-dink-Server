@@ -99,6 +99,10 @@ public enum Success {
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
 
+    KOLLUS_UPLOAD_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 업로드 성공"),
+    KOLLUS_DELETE_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 삭제 성공"),
+    KOLLUS_LMS_SUCCESS(HttpStatus.OK, "Kollus lms 콜백 성공"),
+
     /**
      * 202 accepted
      */
