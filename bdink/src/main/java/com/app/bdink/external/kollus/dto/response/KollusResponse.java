@@ -1,7 +1,6 @@
 package com.app.bdink.external.kollus.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

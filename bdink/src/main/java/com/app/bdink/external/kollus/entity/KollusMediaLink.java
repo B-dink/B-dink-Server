@@ -18,5 +18,6 @@ public class KollusMediaLink {
 
     private String mediaContentKey;
 
+    @Column(length = 2048)
     private String accessToken;
 }
