@@ -9,7 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -21,10 +24,11 @@ public class KollusController {
     private final KollusService kollusService;
     
     @PostMapping("/userkey")
-    @Operation(method = "POST", description = "Kollus 유저 키 생성 API 입니다.")
-    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest kollusRequest) {
-
-        return RspTemplate.success(Success.KOLLUS_UPLOAD_SUCCESS);
+    @Operation(method = "POST", description = "Kollus 유저 키 생성 API 입니다. client_user_id는 kollusClientUserId 입니다.")
+    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
+        log.info("유저키 생성 api controller 시작");
+        kollusService.CreateKollusUserKey(userKeyDTO);
+        return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
     }
     
 
