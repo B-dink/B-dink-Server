@@ -1,5 +1,6 @@
 package com.app.bdink.global.token;
 
+import com.app.bdink.external.kollus.dto.KollusTokenDTO;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.oauth2.domain.TokenDto;
@@ -31,18 +32,28 @@ import java.util.stream.Collectors;
 public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
+    private final Key kollusKey; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
     private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
 
     private final long refreshTokenValidityTime; // 리프레시 토큰의 유효 시간 정의
 
+    private final long KollusAccessTokenValidityTime; // kollus쪽에 보낼 jwt 토믄의 유효 시간 정의
+
     @Autowired
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
+                         @Value("${kollus.SECRET_KEY}") String kollusSecretKey,
                          @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
+                         @Value("${jwt.kollus-access-token-validity-in-milliseconds}") long kollusAccessTokenValidityTime,
                          @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);    // secretKey를 Base64 디코딩
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        byte[] kollusKeyBytes = Decoders.BASE64.decode(kollusSecretKey); // kollusSecretKey를 Base64 디코딩
+
+        this.key = Keys.hmacShaKeyFor(keyBytes);                //일반 jwt 서명용 키
+        this.kollusKey = Keys.hmacShaKeyFor(kollusKeyBytes);    // Kollus 전용 서명용 키
+
         this.accessTokenValidityTime = accessTokenValidityTime;
         this.refreshTokenValidityTime = refreshTokenValidityTime;
+        this.KollusAccessTokenValidityTime = kollusAccessTokenValidityTime;
     }
 
     // 정보와 시크릿 키, 시간을 넣어 압축해 토큰 생성
@@ -71,6 +82,22 @@ public class TokenProvider {
         member.updateRefreshToken(refreshToken);
 
         return TokenDto.of(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public KollusTokenDTO createKollusJwtToken(String userkey, String mediacontentkey) {
+        long nowTime = (new Date()).getTime();
+
+        Date kollusAccessTokenValidityTime = new Date(nowTime + KollusAccessTokenValidityTime); // 만료 시간 계산
+
+        String kollusAccessToken = Jwts.builder()
+                .claim("user_key", userkey) // 사용자 유저키 정보 저장
+                .claim("media_content_key", mediacontentkey) // 동영상의 미디어 콘텐츠 키 저장
+                .setExpiration(kollusAccessTokenValidityTime) // 토큰의 만료 시간 설정
+                .signWith(kollusKey, SignatureAlgorithm.HS256) // 생성된 토큰에 서명
+                .compact(); // 토큰 생성
+
+        return KollusTokenDTO.of(kollusAccessToken);
     }
 
     // 토큰에서 인증 정보 추출
