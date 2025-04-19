@@ -37,6 +37,7 @@ public enum Error {
     BAD_REQUEST_PROVIDER(HttpStatus.BAD_REQUEST, "다른 유형 로그인으로 가입하셨습니다."),
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
     EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
+    EXIST_USERKEY(HttpStatus.BAD_REQUEST, "이미 유저키가 존재합니다."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
     BAD_REQUEST_FILE_SIZE(HttpStatus.BAD_REQUEST, "파일크기가 잘못된 것 같습니다. 최대 5MB"),

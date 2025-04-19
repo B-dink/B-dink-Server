@@ -6,6 +6,7 @@ import com.app.bdink.external.kollus.dto.response.KollusResponse;
 import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.exception.model.net.CustomJavaNetException;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +47,10 @@ public class KollusService {
 
         Optional<Member> memberOPT = memberRepository.findByKollusClientUserId(client_user_id);
         Member member = memberOPT.orElseThrow(() ->  new CustomException(com.app.bdink.global.exception.Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
+
+        if(!member.getUserKey().equals(null)){
+            throw new CustomJavaNetException(com.app.bdink.global.exception.Error.EXIST_USERKEY, Error.EXIST_USERKEY.getMessage());
+        }
         String payload = String.format(
                 "user_agent=%s&client_user_id=%s&remote_addr=%s&user_key_timeout=%d",
                 user_agent, client_user_id, remote_addr, user_key_timeout
