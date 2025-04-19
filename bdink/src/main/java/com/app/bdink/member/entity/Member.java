@@ -7,6 +7,8 @@ import com.app.bdink.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -52,7 +54,7 @@ public class Member extends BaseTimeEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean eventAgree;
 
-    @Column(name = "user_key") //Todo: 콜러스에서 받아온 유저의 키 -> 추후에 다른 entity로 옮길수도..
+    @Column(name = "user_key", length = 1000) //Todo: 콜러스에서 받아온 유저의 키 -> 추후에 다른 entity로 옮길수도..
     private String userKey;
 
     @Column(unique = true)
@@ -71,6 +73,8 @@ public class Member extends BaseTimeEntity {
         this.kakaoId = kakaoId;
         this.socialType = socialType;
         this.eventAgree = eventAgree;
+        this.userKey = null;
+        this.kollusClientUserId = socialType+"_"+UUID.randomUUID();
     }
 
     public void updatePhoneNumber(String phoneNumber) {
@@ -90,6 +94,8 @@ public class Member extends BaseTimeEntity {
     public void updateName(String name) { this.name = name; }
 
     public void updatePictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+
+    public void updateUserKey(String userKey){ this.userKey = userKey; }
 
     public Career getInterest(){
         if (this.instructor != null){
