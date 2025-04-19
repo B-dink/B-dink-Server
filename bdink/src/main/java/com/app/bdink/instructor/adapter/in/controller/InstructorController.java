@@ -94,10 +94,10 @@ public class InstructorController {
         return RspTemplate.success(Success.GET_CLASSROOM_CARRER_SUCCESS, instructorService.getInstructorInfoByCareer(career));
     }
 
-    @GetMapping("/classroom")
-    @Operation(method = "GET", description = "강사가 만든 클래스룸을 조회합니다.")
-    public RspTemplate<List<CareerClassroomDto>> getClassRoomByInstructor(Principal principal){
-        Instructor instructor = instructorUtilService.getInstructor(principal);
+    @GetMapping("/{id}/classroom")
+    @Operation(method = "GET", description = "강사별 클래스룸을 조회합니다.")
+    public RspTemplate<List<CareerClassroomDto>> getClassRoomByInstructor(@PathVariable Long id){
+        Instructor instructor = instructorService.findById(id);
         List<CareerClassroomDto> classRoomEntityList = classRoomService.getFilteredClassroomByInstructor(instructor);
         return RspTemplate.success(Success.GET_CLASSROOM_FILTERED_INSTURCTOR_SUCCESS, classRoomEntityList);
     }
