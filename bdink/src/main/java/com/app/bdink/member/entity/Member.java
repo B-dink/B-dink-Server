@@ -122,5 +122,7 @@ public class Member extends BaseTimeEntity {
         this.pictureUrl = null;
         this.refreshToken =null;
         this.eventAgree = false;
+        this.userKey = null;
+        this.kollusClientUserId = null;
     }
 }
