@@ -9,10 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @Slf4j
@@ -22,15 +22,21 @@ import java.io.IOException;
 public class KollusController {
 
     private final KollusService kollusService;
-    
+
     @PostMapping("/userkey")
     @Operation(method = "POST", description = "Kollus 유저 키 생성 API 입니다. client_user_id는 kollusClientUserId 입니다.")
     public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
         log.info("유저키 생성 api controller 시작");
-        kollusService.CreateKollusUserKey(userKeyDTO);
+        kollusService.createKollusUserKey(userKeyDTO);
         return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
     }
-    
+
+    @GetMapping("/{lectureId}/play-url")
+    @Operation(method = "GET", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다.")
+    public RspTemplate<?> playUrlCreate(@PathVariable Long lectureId, Principal principal) throws IOException {
+        return RspTemplate.success(Success.KOLLUS_GET_URL_SUCCESS, kollusService.createKollusURLService(principal, lectureId));
+    }
+
 
     @PostMapping("/upload")
     @Operation(method = "POST", description = "Kollus upload callback API 입니다.")
@@ -78,10 +84,4 @@ public class KollusController {
         log.info("------------------------------------------------------------");
         return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
     }
-
-//    @PostMapping("/lms")
-//    @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
-//    public RspTemplate<?> lmsCallback(@ModelAttribute CallbackRequest.UploadRequestDTO uploadRequestDTO) {
-//        return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
-//    }
 }
