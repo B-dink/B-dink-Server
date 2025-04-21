@@ -6,6 +6,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.util.InstructorUtilService;
+import com.app.bdink.member.controller.dto.response.NameCheckDto;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.oauth2.domain.LoginResult;
 import com.app.bdink.oauth2.domain.RefreshToken;
@@ -53,7 +54,7 @@ public class SocialAuthController {
     ) {
         LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
         TokenDto tokenDto = tokenProvider.createToken(result.member());
-        if (result.isNewMember()){
+        if (result.isNewMember()) {
             return RspTemplate.success(Success.LOGIN_ACCEPTED, tokenDto);
         }
         return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenDto);
@@ -64,13 +65,13 @@ public class SocialAuthController {
     public RspTemplate<?> revoke(@RequestParam String provider, Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         Instructor instructor = member.getInstructor();
-        if (instructor != null){ // 강사의 경우 막아야함.
+        if (instructor != null) { // 강사의 경우 막아야함.
             log.info("강사발생");
             throw new CustomException(Error.UNPROCESSABLE_ENTITY_DELETE_EXCEPTION, Error.UNPROCESSABLE_ENTITY_DELETE_EXCEPTION.getMessage());
         }
         questionService.revokeUserDeleteQuestion(member);
         authService.revoke(principal, provider);
-        return RspTemplate.success(Success.REVOKE_SUCCESS , Success.REVOKE_SUCCESS.getMessage());
+        return RspTemplate.success(Success.REVOKE_SUCCESS, Success.REVOKE_SUCCESS.getMessage());
     }
 
 //    @PostMapping("/internal/sign-up")
@@ -87,7 +88,7 @@ public class SocialAuthController {
     @Operation(method = "POST", description = "in-progress인 소셜 로그인 유저를 회원가입을 완료시킵니다.")
     public RspTemplate<?> signUpSocial(
             Principal principal,
-        @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
+            @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
             @RequestPart(value = "profile") MultipartFile profileImage
     ) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
@@ -95,7 +96,6 @@ public class SocialAuthController {
         member = memberService.socialJoin(member, memberRequestDto, image);
         return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
     }
-
 
 
 //    @PostMapping("/internal/sign-in")
@@ -110,7 +110,7 @@ public class SocialAuthController {
     @PostMapping("/token")
     @Operation(method = "POST", description = "리프레시토큰을 통해 엑세스, 리프레시토큰을 발급받습니다. 이 API에서 에러가 나오는 경우 리프레시도 만료된 케이스 이기 때문에 새로 로그인 하는 방식을 생각하고 있습니다.")
     public RspTemplate<?> reIssueToken(@RequestBody RefreshToken token) {
-        return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS ,authService.reIssueToken(token));
+        return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS, authService.reIssueToken(token));
     }
 
 //    @PostMapping("/password/double-check")
@@ -133,8 +133,14 @@ public class SocialAuthController {
 
     @GetMapping("/name")
     @Operation(method = "GET", description = "이름 검증 api")
-    public RspTemplate<?> checkName(@RequestParam String name){
-        return RspTemplate.success(Success.EMAIL_CHECK_SUCCESS, memberService.checkName(name));
+    public RspTemplate<?> checkName(@RequestParam String name) {
+
+        NameCheckDto result = memberService.checkName(name);
+
+        if (result.isCorrect()) {
+            return RspTemplate.success(Success.NAME_CHECK_SUCCESS, result);
+        } else
+            return RspTemplate.success(Success.NAME_CHECK_DUPLICATED, result);
     }
 
     @PostMapping("/sign-out")
