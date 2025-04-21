@@ -103,6 +103,7 @@ public enum Success {
     KOLLUS_DELETE_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 삭제 성공"),
     KOLLUS_LMS_SUCCESS(HttpStatus.OK, "Kollus lms 콜백 성공"),
     KOLLUS_USERKEY_SUCCESS(HttpStatus.OK, "userKey 생성 성공"),
+    KOLLUS_GET_URL_SUCCESS(HttpStatus.OK, "동영상 URL 생성 성공"),
 
     /**
      * 202 accepted
