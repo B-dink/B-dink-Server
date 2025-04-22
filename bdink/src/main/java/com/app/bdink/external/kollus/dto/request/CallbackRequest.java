@@ -18,6 +18,8 @@ public class CallbackRequest {
         String filename;                    // 업로드 된 파일명
         String upload_file_key;             // 업로드 파일 키
         String media_content_key;           // 미디어 컨텐츠 키
+        String channel_key;                  // 채널 키
+        String channel_name;                 // 채널 이름
     }
 
     @Builder

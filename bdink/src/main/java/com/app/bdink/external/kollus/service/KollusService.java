@@ -43,7 +43,34 @@ public class KollusService {
 
     @Transactional
     public void uploadCallbackService(CallbackRequest.uploadRequestDTO uploadRequestDTO) {
-        log.info(String.valueOf(uploadRequestDTO));
+        log.info("채널 업로드 서비스 시작");
+        log.info("content_provider_key is : {}", uploadRequestDTO.getContent_provider_key());
+
+        String mediaContentKey = uploadRequestDTO.getMedia_content_key();
+        Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
+
+        if(existingMedia.isPresent()) {
+            log.warn("이미 존재하는 미디어키 입니다. : {}", mediaContentKey);
+            return;
+        }
+
+        /**
+         * kollus족에서 똑바로 보낼거라 필요없을듯
+         */
+//        if(uploadRequestDTO.getFilename() == null || uploadRequestDTO.getFilename().isEmpty()) {
+//            throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
+//        }
+
+        KollusMedia kollusMedia = KollusMedia.builder()
+                .filename(uploadRequestDTO.getFilename())
+                .uploadFileKey(uploadRequestDTO.getUpload_file_key())
+                .mediaContentKey(mediaContentKey)
+                .channelKey(uploadRequestDTO.getChannel_key())
+                .channelName(uploadRequestDTO.getChannel_name())
+                .lecture(null)
+                .build();
+
+        kollusMediaRepository.save(kollusMedia);
     }
     
     //todo:콜러스쪽 jwt 토큰에 문제가 있어 추후에 추가하는 방식으로 전환(주석 처리 부분)
