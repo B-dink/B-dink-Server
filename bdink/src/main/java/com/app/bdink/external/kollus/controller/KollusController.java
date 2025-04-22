@@ -41,7 +41,6 @@ public class KollusController {
     @PostMapping("/upload")
     @Operation(method = "POST", description = "Kollus upload callback API 입니다.")
     public RspTemplate<?> uploadCallback(@ModelAttribute CallbackRequest.uploadRequestDTO uploadRequestDTO) {
-        //todo:kollus upload 콜백 service 계층의 비즈니스로직 추가 예정
         kollusService.uploadCallbackService(uploadRequestDTO);
         return RspTemplate.success(Success.KOLLUS_UPLOAD_SUCCESS);
     }
