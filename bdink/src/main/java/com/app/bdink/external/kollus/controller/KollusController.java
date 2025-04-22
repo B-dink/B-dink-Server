@@ -18,7 +18,7 @@ import java.security.Principal;
 @Slf4j
 @RequestMapping("/api/v1/kollus")
 @RequiredArgsConstructor
-@Tag(name = "Kollus API", description = "Kollus 관련 API들입니다.")
+@Tag(name = "Kollus API", description = "Kollus 관련 API들입니다. 콜백 api 같은 경우는 Kollus console 채널에서 콜백 redirect url을 설정해줘야 합니다.")
 public class KollusController {
 
     private final KollusService kollusService;
@@ -48,34 +48,27 @@ public class KollusController {
     @PostMapping("/delete")
     @Operation(method = "POST", description = "Kollus delete Callback API 입니다.")
     public RspTemplate<?> deleteCallback(@ModelAttribute CallbackRequest.deleteRequestDTO deleteRequestDTO) {
-        log.info("------------------------------------------------------------");
-        log.info(String.valueOf(deleteRequestDTO.getContent_provider_key()));
-        log.info(String.valueOf(deleteRequestDTO.getFull_filename()));
-        log.info(String.valueOf(deleteRequestDTO.getFilename()));
-        log.info(String.valueOf(deleteRequestDTO.getUpload_file_key()));
-        log.info(String.valueOf(deleteRequestDTO.getMedia_content_key()));
-        log.info(String.valueOf(deleteRequestDTO.getChannel_key()));
-        log.info(String.valueOf(deleteRequestDTO.getChannel_name()));
-        log.info(String.valueOf(deleteRequestDTO.getUpdate_type()));
         kollusService.deleteCallbackService(deleteRequestDTO);
-        log.info("------------------------------------------------------------");
         return RspTemplate.success(Success.KOLLUS_DELETE_SUCCESS);
     }
 
-    @PostMapping("/lms")
-    @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
-    public RspTemplate<?> lmsCallback(@ModelAttribute CallbackRequest.playRequestDTO playRequestDTO) {
-        log.info("------------------------------------------------------------");
-        log.info(String.valueOf(playRequestDTO.getContent_provider_key()));
-        log.info(String.valueOf(playRequestDTO.getMedia_content_key()));
-        log.info(String.valueOf(playRequestDTO.getMedia_profile_key()));
-        log.info(String.valueOf(playRequestDTO.getUser_key()));
-        log.info(String.valueOf(playRequestDTO.getLog_type()));
-        log.info(String.valueOf(playRequestDTO.getFull_filename()));
-        log.info(String.valueOf(playRequestDTO.getPlay_time()));
-        log.info(String.valueOf(playRequestDTO.getDuration()));
-        kollusService.playCallbackService(playRequestDTO);
-        log.info("------------------------------------------------------------");
-        return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
-    }
+    /**
+     *  todo:진행률 관련 callback api 생성 예정
+     */
+//    @PostMapping("/lms")
+//    @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
+//    public RspTemplate<?> lmsCallback(@ModelAttribute CallbackRequest.playRequestDTO playRequestDTO) {
+//        log.info("------------------------------------------------------------");
+//        log.info(String.valueOf(playRequestDTO.getContent_provider_key()));
+//        log.info(String.valueOf(playRequestDTO.getMedia_content_key()));
+//        log.info(String.valueOf(playRequestDTO.getMedia_profile_key()));
+//        log.info(String.valueOf(playRequestDTO.getUser_key()));
+//        log.info(String.valueOf(playRequestDTO.getLog_type()));
+//        log.info(String.valueOf(playRequestDTO.getFull_filename()));
+//        log.info(String.valueOf(playRequestDTO.getPlay_time()));
+//        log.info(String.valueOf(playRequestDTO.getDuration()));
+//        kollusService.playCallbackService(playRequestDTO);
+//        log.info("------------------------------------------------------------");
+//        return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
+//    }
 }

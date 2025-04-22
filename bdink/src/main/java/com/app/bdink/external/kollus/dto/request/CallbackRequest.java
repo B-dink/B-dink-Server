@@ -29,14 +29,7 @@ public class CallbackRequest {
     @AllArgsConstructor
     @Schema(title = "KOLLUS_REQ_02 : 삭제 콜백 DTO")
     public static class deleteRequestDTO {
-        String content_provider_key; // 고객사의 서비스 계정 키
-        String full_filename;       // 폴더를 포함한 업로드 된 파일명
-        String filename;            // 업로드 된 파일명
-        String upload_file_key;     // 업로드 파일 키
         String media_content_key;   // 미디어 컨텐츠 키
-        String channel_key;         // 콘텐츠가 할당된 채널 키
-        String channel_name;        // 콘텐츠가 할당된 채널의 이름
-        String update_type;         // 업데이트 종류
     }
 
     @Builder

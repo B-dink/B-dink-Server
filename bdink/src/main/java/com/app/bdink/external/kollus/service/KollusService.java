@@ -159,7 +159,13 @@ public class KollusService {
 
     @Transactional
     public void deleteCallbackService(CallbackRequest.deleteRequestDTO deleteRequestDTO) {
-        log.info(String.valueOf(deleteRequestDTO));
+        Optional<KollusMedia> deleteOPT = kollusMediaRepository.findByMediaContentKey(deleteRequestDTO.getMedia_content_key());
+        if (deleteOPT.isPresent()) {
+            kollusMediaRepository.delete(deleteOPT.get());
+        }else{
+            log.info("이미 kollusmedia가 삭제되었거나 요청이 제대로 들어오지 않았습니다.");
+            log.info("해당 미디어키 : {}", deleteRequestDTO.getMedia_content_key());
+        }
     }
 
     @Transactional
