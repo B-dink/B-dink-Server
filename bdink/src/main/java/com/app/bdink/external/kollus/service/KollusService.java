@@ -48,6 +48,11 @@ public class KollusService {
 
         String mediaContentKey = uploadRequestDTO.getMedia_content_key();
         Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
+        
+        if(uploadRequestDTO.getContent_provider_key() == null){
+            log.info("kollus 채널 callback api url 접속을 위한 api 요청");
+            return;
+        }
 
         if(existingMedia.isPresent()) {
             log.warn("이미 존재하는 미디어키 입니다. : {}", mediaContentKey);
@@ -77,14 +82,18 @@ public class KollusService {
     @Transactional
     public KollusApiResponse.KollusUrlResponse createKollusURLService(Principal principal, Long lectureId) {
         Long memberId = Long.valueOf(principal.getName());
-        Optional<Member> memberOPT = memberRepository.findById(memberId); //todo:예외처리 추가 예정
-        Member member = memberOPT.get();
+        Member member = memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
         String userKey = member.getUserKey();
+        log.info("유저키 가져오기 {}", userKey);
 
         LocalDateTime kollusCreatedAt = LocalDateTime.now();
 
-        Optional<KollusMedia> kollusMediaOPT = kollusMediaRepository.findByLectureId(lectureId); //todo:예외처리 추가 예정
-        KollusMedia kollusMedia = kollusMediaOPT.get();
+        KollusMedia kollusMedia = kollusMediaRepository
+                .findByLectureId(lectureId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
+
 //        Long kollusMediaId = kollusMedia.getId();
         String mediaContentKey = kollusMedia.getMediaContentKey();
 
