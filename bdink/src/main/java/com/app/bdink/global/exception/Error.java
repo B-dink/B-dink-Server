@@ -58,6 +58,12 @@ public enum Error {
     UN_AUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증을 안한 유저입니다."),
 
     /**
+     * 402 PAYMENT REQUIRED
+     */
+
+    INVALID_CODE_EXCEPTION(HttpStatus.UNAUTHORIZED, "인증 코드가 일치하지 않습니다."),
+
+    /**
      * 403 FORBIDDEN EXCEPTION
      */
     FORBIDDEN(HttpStatus.FORBIDDEN, "리소스에 대한 권한이 없습니다."),

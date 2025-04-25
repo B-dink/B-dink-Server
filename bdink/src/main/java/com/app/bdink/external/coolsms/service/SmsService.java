@@ -28,6 +28,11 @@ public class SmsService {
         if (verify.isEmpty()){
             throw new CustomException(Error.VERIFY_EXPIRED_EXCEPTION, Error.VERIFY_EXPIRED_EXCEPTION.getMessage());
         }
+        
+        // 402에러 분기처리 추가
+        if(!verify.get().getVerifyCode().equals(phoneRequest.code())){
+            throw new CustomException(Error.INVALID_CODE_EXCEPTION, Error.INVALID_CODE_EXCEPTION.getMessage());
+        }
 
         return verify.get().getVerifyCode().equals(phoneRequest.code());
     }
