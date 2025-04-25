@@ -61,7 +61,7 @@ public enum Error {
      * 402 PAYMENT REQUIRED
      */
 
-    INVALID_CODE_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 인증입니다. 재발송 해주세요."),
+    INVALID_CODE_EXCEPTION(HttpStatus.UNAUTHORIZED, "인증 코드가 일치하지 않습니다."),
 
     /**
      * 403 FORBIDDEN EXCEPTION
