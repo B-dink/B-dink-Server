@@ -11,8 +11,7 @@ import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.external.kollus.repository.KollusMediaRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.global.exception.model.net.CustomJavaNetException;
-import com.app.bdink.global.token.TokenProvider;
+import com.app.bdink.global.token.KollusTokenProvider;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +35,7 @@ public class KollusService {
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
     private final KollusMediaRepository kollusMediaRepository;
     private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
+    private final KollusTokenProvider kollusTokenProvider;
     @Value("${kollus.API_ACCESS_TOKEN}")
     private String apiAccessToken;
 
@@ -85,8 +84,9 @@ public class KollusService {
         Member member = memberRepository
                 .findById(memberId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
-        String userKey = member.getUserKey();
-        log.info("유저키 가져오기 {}", userKey);
+//        String userKey = member.getUserKey();
+//        log.info("유저키 가져오기 {}", userKey);
+        String clientUserId = member.getKollusClientUserId();
 
         LocalDateTime kollusCreatedAt = LocalDateTime.now();
 
@@ -94,19 +94,20 @@ public class KollusService {
                 .findByLectureId(lectureId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
 
-//        Long kollusMediaId = kollusMedia.getId();
+        Long kollusMediaId = kollusMedia.getId();
         String mediaContentKey = kollusMedia.getMediaContentKey();
 
-//        Optional<KollusMediaLink> kollusMediaLinkOPT = kollusMediaLinkRepository.findByMemberIdAndKollusMediaId(memberId, kollusMediaId); //todo:예외처리 추가 예정
-//        KollusMediaLink kollusMediaLink = kollusMediaLinkOPT.get();
+        Optional<KollusMediaLink> kollusMediaLinkOPT = kollusMediaLinkRepository.findByMemberIdAndKollusMediaId(memberId, kollusMediaId); //todo:예외처리 추가 예정
+        KollusMediaLink kollusMediaLink = kollusMediaLinkOPT.get();
         
-//        KollusTokenDTO kollusJwtToken = tokenProvider.createKollusJwtToken(userKey, mediaContentKey);
-//        kollusMediaLink.updateMediaToken(kollusJwtToken.kollusAccessToken(), kollusCreatedAt);
-//
-//        kollusMediaRepository.save(kollusMedia);
+        KollusTokenDTO kollusJwtToken = kollusTokenProvider.createKollusJwtToken(clientUserId, mediaContentKey);
+        kollusMediaLink.updateMediaToken(kollusJwtToken.kollusAccessToken(), kollusCreatedAt);
 
-        String url = "https://v.kr.kollus.com/" + mediaContentKey; //todo:임시 url 생성
+        kollusMediaRepository.save(kollusMedia);
+
+//        String url = "https://v.kr.kollus.com/" + mediaContentKey; //todo:임시 url 생성
 //        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken() + "&custom_key=" + userKey;
+        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken();
         log.info("생성된 kollus media 접속 url은 : {}", url);
 
         return KollusApiResponse.KollusUrlResponse.builder()

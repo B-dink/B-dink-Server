@@ -73,6 +73,7 @@ public enum Error {
     UNPROCESSABLE_INSTRUCTOR_DELETE_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "강사는 계약 양도 이후에 삭제할 수 있습니다."),
     UNPROCESSABLE_KAKAO_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
     UNPROCESSABLE_APPLE_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
+    UNPROCESSABLE_JWT_CREATE_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "서버에서 KOLLUS JWT토큰을 생성 중 오류가 발생했습니다."),
 
 
     /**

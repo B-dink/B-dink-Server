@@ -19,16 +19,11 @@ class TokenProviderTest {
     SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-    long accessTokenValidity = 1000 * 60 * 15; // 15분
     long kollusAccessTokenValidity = 1000 * 60 * 30; // 30분
-    long refreshTokenValidity = 1000 * 60 * 60 * 24 * 7; // 7일
 
-    private final TokenProvider tokenProvider = new TokenProvider(
+    private final KollusTokenProvider tokenProvider = new KollusTokenProvider(
             encodedKey,
-            encodedKey,
-            accessTokenValidity,
-            kollusAccessTokenValidity,
-            refreshTokenValidity
+            kollusAccessTokenValidity
     );
 
     @Test
