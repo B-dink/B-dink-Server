@@ -44,8 +44,8 @@ public class Lecture extends BaseTimeEntity {
     @OneToMany(mappedBy = "lecture")
     private List<Sugang> sugangs; // 수강 신청 목록
 
-    // 🔹 KollusMedia 연관관계 (Lecture 기준 1:1)
-    @OneToOne(mappedBy = "lecture", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // KollusMedia 연관관계 (Lecture 기준 1:1)
+    @OneToOne(mappedBy = "lecture")
     private KollusMedia kollusMedia;
 
     @Builder

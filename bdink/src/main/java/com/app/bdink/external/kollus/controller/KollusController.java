@@ -31,7 +31,7 @@ public class KollusController {
 //        return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
 //    }
 
-    @GetMapping("/{lectureId}/play-url")
+    @PostMapping("/{lectureId}/play-url")
     @Operation(method = "GET", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다. 사용자키와 멤버가 매핑되어야 사용가능합니다.")
     public RspTemplate<?> playUrlCreate(@PathVariable Long lectureId, Principal principal) throws IOException {
         return RspTemplate.success(Success.KOLLUS_GET_URL_SUCCESS, kollusService.createKollusURLService(principal, lectureId));
