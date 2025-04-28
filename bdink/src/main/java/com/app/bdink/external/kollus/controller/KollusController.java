@@ -23,20 +23,19 @@ public class KollusController {
 
     private final KollusService kollusService;
 
-    @PostMapping("/userkey")
-    @Operation(method = "POST", description = "Kollus 유저 키 생성 API 입니다. client_user_id는 kollusClientUserId 입니다.")
-    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
-        log.info("유저키 생성 api controller 시작");
-        kollusService.createKollusUserKey(userKeyDTO);
-        return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
-    }
+//    @PostMapping("/userkey")
+//    @Operation(method = "POST", description = "Kollus 유저 키 생성 API 입니다. client_user_id는 kollusClientUserId 입니다.")
+//    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
+//        log.info("유저키 생성 api controller 시작");
+//        kollusService.createKollusUserKeyApi(userKeyDTO);
+//        return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
+//    }
 
     @GetMapping("/{lectureId}/play-url")
-    @Operation(method = "GET", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다.")
+    @Operation(method = "GET", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다. 사용자키와 멤버가 매핑되어야 사용가능합니다.")
     public RspTemplate<?> playUrlCreate(@PathVariable Long lectureId, Principal principal) throws IOException {
         return RspTemplate.success(Success.KOLLUS_GET_URL_SUCCESS, kollusService.createKollusURLService(principal, lectureId));
     }
-
 
     @PostMapping("/upload")
     @Operation(method = "POST", description = "Kollus upload callback API 입니다.")
@@ -50,6 +49,14 @@ public class KollusController {
     public RspTemplate<?> deleteCallback(@ModelAttribute CallbackRequest.deleteRequestDTO deleteRequestDTO) {
         kollusService.deleteCallbackService(deleteRequestDTO);
         return RspTemplate.success(Success.KOLLUS_DELETE_SUCCESS);
+    }
+
+    @PostMapping("/userkey")
+    @Operation(method = "POST", description = "Kollus 사용자 키 생성 API 입니다. 사용자키를 입력해주세요.")
+    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
+        log.info("유저키 생성 api controller 시작");
+        kollusService.createKollusUserKey(userKeyDTO);
+        return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);
     }
 
     /**

@@ -4,25 +4,23 @@ import com.app.bdink.external.kollus.dto.KollusTokenDTO;
 import com.app.bdink.external.kollus.dto.request.CallbackRequest;
 import com.app.bdink.external.kollus.dto.request.KollusRequest;
 import com.app.bdink.external.kollus.dto.response.KollusApiResponse;
-import com.app.bdink.external.kollus.dto.response.KollusResponse;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.entity.KollusMediaLink;
+import com.app.bdink.external.kollus.entity.UserKey;
 import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.external.kollus.repository.KollusMediaRepository;
+import com.app.bdink.external.kollus.repository.UserKeyRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.token.KollusTokenProvider;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,6 +34,7 @@ public class KollusService {
     private final KollusMediaRepository kollusMediaRepository;
     private final MemberRepository memberRepository;
     private final KollusTokenProvider kollusTokenProvider;
+    private final UserKeyRepository userKeyRepository;
     @Value("${kollus.API_ACCESS_TOKEN}")
     private String apiAccessToken;
 
@@ -58,13 +57,6 @@ public class KollusService {
             return;
         }
 
-        /**
-         * kollus족에서 똑바로 보낼거라 필요없을듯
-         */
-//        if(uploadRequestDTO.getFilename() == null || uploadRequestDTO.getFilename().isEmpty()) {
-//            throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
-//        }
-
         KollusMedia kollusMedia = KollusMedia.builder()
                 .filename(uploadRequestDTO.getFilename())
                 .uploadFileKey(uploadRequestDTO.getUpload_file_key())
@@ -84,9 +76,11 @@ public class KollusService {
         Member member = memberRepository
                 .findById(memberId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
-//        String userKey = member.getUserKey();
-//        log.info("유저키 가져오기 {}", userKey);
         String clientUserId = member.getKollusClientUserId();
+
+        UserKey userKey = userKeyRepository
+                .findFirstByMemberIdAndIsRevokedFalseOrderByAssignedAtDesc(memberId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USERKEY, Error.NOT_FOUND_USERKEY.getMessage()));
 
         LocalDateTime kollusCreatedAt = LocalDateTime.now();
 
@@ -97,75 +91,80 @@ public class KollusService {
         Long kollusMediaId = kollusMedia.getId();
         String mediaContentKey = kollusMedia.getMediaContentKey();
 
-        Optional<KollusMediaLink> kollusMediaLinkOPT = kollusMediaLinkRepository.findByMemberIdAndKollusMediaId(memberId, kollusMediaId); //todo:예외처리 추가 예정
-        KollusMediaLink kollusMediaLink = kollusMediaLinkOPT.get();
-        
+        KollusMediaLink kollusMediaLink = kollusMediaLinkRepository
+                .findByMemberIdAndKollusMediaId(memberId, kollusMediaId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
+
         KollusTokenDTO kollusJwtToken = kollusTokenProvider.createKollusJwtToken(clientUserId, mediaContentKey);
         kollusMediaLink.updateMediaToken(kollusJwtToken.kollusAccessToken(), kollusCreatedAt);
 
         kollusMediaRepository.save(kollusMedia);
 
-//        String url = "https://v.kr.kollus.com/" + mediaContentKey; //todo:임시 url 생성
-//        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken() + "&custom_key=" + userKey;
-        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken();
+        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken() + "&custom_key=" + userKey.getUserKey();
         log.info("생성된 kollus media 접속 url은 : {}", url);
 
         return KollusApiResponse.KollusUrlResponse.builder()
-                .url(url) //todo:url 생성후 url 넣어주기
+                .url(url)
                 .build();
     }
 
     @Transactional
-    public void createKollusUserKey(KollusRequest.userKeyDTO userKeyDTO) throws IOException {
-
-        String API_ACCESS_TOKEN = apiAccessToken;
-        String user_agent = userKeyDTO.getUser_agent();
-        String client_user_id = userKeyDTO.getClient_user_id();
-        String remote_addr = userKeyDTO.getRemote_addr();
-        Long user_key_timeout = userKeyDTO.getUser_key_timeout();
-
-        Optional<Member> memberOPT = memberRepository.findByKollusClientUserId(client_user_id);
-        Member member = memberOPT.orElseThrow(() -> new CustomException(com.app.bdink.global.exception.Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
-
-        if (member.getUserKey() != null) {
-            log.warn("이미 존재하는 userKey 요청: {}", member.getEmail());
-            throw new CustomException(Error.EXIST_USERKEY, Error.EXIST_USERKEY.getMessage());
-        }
-
-        String payload = String.format(
-                "user_agent=%s&client_user_id=%s&remote_addr=%s&user_key_timeout=%d",
-                user_agent, client_user_id, remote_addr, user_key_timeout
-        );
-
-        String kollusUrl = String.format(
-                "https://c-api-kr.kollus.com/api/media/user-key?access_token=%s",
-                API_ACCESS_TOKEN
-        );
-
-        OkHttpClient client = new OkHttpClient();
-
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        RequestBody body = RequestBody.create(mediaType, payload);
-        Request request = new Request.Builder()
-                .url(kollusUrl)
-                .post(body)
-                .addHeader("accept", "application/json")
-                .addHeader("content-type", "application/x-www-form-urlencoded")
-                .build();
-
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            String responseBody = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            KollusResponse kollusResponse = objectMapper.readValue(responseBody, KollusResponse.class);
-            String userKey = kollusResponse.getData().getUser_key();
-
-            //UserKey save 로직
-            member.updateUserKey(userKey);
-            memberRepository.save(member);
-        }
+    public void createKollusUserKey(KollusRequest.userKeyDTO userKeyDTO){
+        UserKey userKey = UserKey.of(userKeyDTO.getUserKey());
+        userKeyRepository.save(userKey);
     }
+
+//    @Transactional
+//    public void createKollusUserKeyApi(KollusRequest.userKeyDTO userKeyDTO) throws IOException {
+//
+//        String API_ACCESS_TOKEN = apiAccessToken;
+//        String user_agent = userKeyDTO.getUser_agent();
+//        String client_user_id = userKeyDTO.getClient_user_id();
+//        String remote_addr = userKeyDTO.getRemote_addr();
+//        Long user_key_timeout = userKeyDTO.getUser_key_timeout();
+//
+//        Optional<Member> memberOPT = memberRepository.findByKollusClientUserId(client_user_id);
+//        Member member = memberOPT.orElseThrow(() -> new CustomException(com.app.bdink.global.exception.Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
+//
+//        if (member.getUserKey() != null) {
+//            log.warn("이미 존재하는 userKey 요청: {}", member.getEmail());
+//            throw new CustomException(Error.EXIST_USERKEY, Error.EXIST_USERKEY.getMessage());
+//        }
+//
+//        String payload = String.format(
+//                "user_agent=%s&client_user_id=%s&remote_addr=%s&user_key_timeout=%d",
+//                user_agent, client_user_id, remote_addr, user_key_timeout
+//        );
+//
+//        String kollusUrl = String.format(
+//                "https://c-api-kr.kollus.com/api/media/user-key?access_token=%s",
+//                API_ACCESS_TOKEN
+//        );
+//
+//        OkHttpClient client = new OkHttpClient();
+//
+//        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+//        RequestBody body = RequestBody.create(mediaType, payload);
+//        Request request = new Request.Builder()
+//                .url(kollusUrl)
+//                .post(body)
+//                .addHeader("accept", "application/json")
+//                .addHeader("content-type", "application/x-www-form-urlencoded")
+//                .build();
+//
+//        Response response = client.newCall(request).execute();
+//
+//        if (response.isSuccessful()) {
+//            String responseBody = response.body().string();
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            KollusResponse kollusResponse = objectMapper.readValue(responseBody, KollusResponse.class);
+//            String userKey = kollusResponse.getData().getUser_key();
+//
+//            //UserKey save 로직
+//            member.updateUserKey(userKey);
+//            memberRepository.save(member);
+//        }
+//    }
 
     @Transactional
     public void deleteCallbackService(CallbackRequest.deleteRequestDTO deleteRequestDTO) {

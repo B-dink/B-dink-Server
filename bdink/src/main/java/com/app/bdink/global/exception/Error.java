@@ -27,6 +27,7 @@ public enum Error {
     NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
     NOT_FOUND_INSTRUCTOR(HttpStatus.NOT_FOUND, "찾을 수 없는 강사입니다."),
+    NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
 
     /**
      * 400 BAD REQUEST EXCEPTION
@@ -38,6 +39,7 @@ public enum Error {
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
     EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
     EXIST_USERKEY(HttpStatus.BAD_REQUEST, "이미 유저키가 존재합니다."),
+    NOT_EXIST_USERKEY(HttpStatus.BAD_REQUEST, "남아있는 사용자 키가 없습니다. 사용자키를 새로 추가해주세요."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
     BAD_REQUEST_FILE_SIZE(HttpStatus.BAD_REQUEST, "파일크기가 잘못된 것 같습니다. 최대 5MB"),
