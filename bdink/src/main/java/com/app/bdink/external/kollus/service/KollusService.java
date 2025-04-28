@@ -45,7 +45,7 @@ public class KollusService {
         log.info("채널 업로드 서비스 시작");
         log.info("content_provider_key is : {}", uploadRequestDTO.content_provider_key());
 
-        String mediaContentKey = uploadRequestDTO.content_provider_key();
+        String mediaContentKey = uploadRequestDTO.media_content_key();
         Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
         
         if(uploadRequestDTO.content_provider_key() == null){
