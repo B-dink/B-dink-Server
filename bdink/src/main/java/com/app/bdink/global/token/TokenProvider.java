@@ -1,5 +1,6 @@
 package com.app.bdink.global.token;
 
+import com.app.bdink.external.kollus.dto.KollusTokenDTO;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.oauth2.domain.TokenDto;
@@ -19,10 +20,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // jwt를 사용하여 인증 토큰을 생성, 파싱, 검증하는 클래스
@@ -32,7 +32,6 @@ public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
     private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
-
     private final long refreshTokenValidityTime; // 리프레시 토큰의 유효 시간 정의
 
     @Autowired
@@ -40,7 +39,7 @@ public class TokenProvider {
                          @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
                          @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);    // secretKey를 Base64 디코딩
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.key = Keys.hmacShaKeyFor(keyBytes);                //일반 jwt 서명용 키
         this.accessTokenValidityTime = accessTokenValidityTime;
         this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
