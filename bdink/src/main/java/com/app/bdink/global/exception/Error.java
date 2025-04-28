@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Error {
@@ -105,6 +108,7 @@ public enum Error {
     REJECT_ACCOUNT_PAYMENT(HttpStatus.FORBIDDEN, "잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_PAYMENT(HttpStatus.FORBIDDEN, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_COMPANY(HttpStatus.FORBIDDEN, "결제 승인이 거절되었습니다."),
+    FORBIDDEN_REQUEST(HttpStatus.FORBIDDEN, "허용되지 않은 요청입니다."),
     REJECT_TOSSPAY_INVALID_ACCOUNT(HttpStatus.FORBIDDEN, "선택하신 출금 계좌가 출금이체 등록이 되어 있지 않아요. 계좌를 다시 등록해 주세요."),
     EXCEED_MAX_AUTH_COUNT(HttpStatus.FORBIDDEN, "최대 인증 횟수를 초과했습니다. 카드사로 문의해주세요."),
     EXCEED_MAX_ONE_DAY_AMOUNT(HttpStatus.FORBIDDEN, "일일 한도를 초과했습니다."),
@@ -136,6 +140,62 @@ public enum Error {
 
     public int getErrorCode() {
         return httpStatus.value();
+    }
+
+    private static final Map<String, Error> tossErrorMap = new HashMap<>();
+
+    static {
+        tossErrorMap.put("ALREADY_PROCESSED_PAYMENT", ALREADY_PROCESSED_PAYMENT);
+        tossErrorMap.put("PROVIDER_ERROR", PROVIDER_ERROR);
+        tossErrorMap.put("EXCEED_MAX_CARD_INSTALLMENT_PLAN", EXCEED_MAX_CARD_INSTALLMENT_PLAN);
+        tossErrorMap.put("INVALID_REQUEST", INVALID_REQUEST);
+        tossErrorMap.put("NOT_ALLOWED_POINT_USE", NOT_ALLOWED_POINT_USE);
+        tossErrorMap.put("INVALID_API_KEY", INVALID_API_KEY);
+        tossErrorMap.put("INVALID_REJECT_CARD", INVALID_REJECT_CARD);
+        tossErrorMap.put("BELOW_MINIMUM_AMOUNT", BELOW_MINIMUM_AMOUNT);
+        tossErrorMap.put("INVALID_CARD_EXPIRATION", INVALID_CARD_EXPIRATION);
+        tossErrorMap.put("INVALID_STOPPED_CARD", INVALID_STOPPED_CARD);
+        tossErrorMap.put("EXCEED_MAX_DAILY_PAYMENT_COUNT", EXCEED_MAX_DAILY_PAYMENT_COUNT);
+        tossErrorMap.put("NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT", NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT);
+        tossErrorMap.put("INVALID_CARD_INSTALLMENT_PLAN", INVALID_CARD_INSTALLMENT_PLAN);
+        tossErrorMap.put("NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN", NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN);
+        tossErrorMap.put("EXCEED_MAX_PAYMENT_AMOUNT", EXCEED_MAX_PAYMENT_AMOUNT);
+        tossErrorMap.put("NOT_FOUND_TERMINAL_ID", NOT_FOUND_TERMINAL_ID);
+        tossErrorMap.put("INVALID_AUTHORIZE_AUTH", INVALID_AUTHORIZE_AUTH);
+        tossErrorMap.put("INVALID_CARD_LOST_OR_STOLEN", INVALID_CARD_LOST_OR_STOLEN);
+        tossErrorMap.put("RESTRICTED_TRANSFER_ACCOUNT", RESTRICTED_TRANSFER_ACCOUNT);
+        tossErrorMap.put("INVALID_CARD_NUMBER", INVALID_CARD_NUMBER);
+        tossErrorMap.put("INVALID_UNREGISTERED_SUBMALL", INVALID_UNREGISTERED_SUBMALL);
+        tossErrorMap.put("NOT_REGISTERED_BUSINESS", NOT_REGISTERED_BUSINESS);
+        tossErrorMap.put("EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT", EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT);
+        tossErrorMap.put("EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT", EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT);
+        tossErrorMap.put("CARD_PROCESSING_ERROR", CARD_PROCESSING_ERROR);
+        tossErrorMap.put("EXCEED_MAX_AMOUNT", EXCEED_MAX_AMOUNT);
+        tossErrorMap.put("INVALID_ACCOUNT_INFO_RE_REGISTER", INVALID_ACCOUNT_INFO_RE_REGISTER);
+        tossErrorMap.put("NOT_AVAILABLE_PAYMENT", NOT_AVAILABLE_PAYMENT);
+        tossErrorMap.put("UNAPPROVED_ORDER_ID", UNAPPROVED_ORDER_ID);
+        tossErrorMap.put("EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT", EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT);
+        tossErrorMap.put("UNAUTHORIZED_KEY", UNAUTHORIZED_KEY);
+        tossErrorMap.put("REJECT_ACCOUNT_PAYMENT", REJECT_ACCOUNT_PAYMENT);
+        tossErrorMap.put("REJECT_CARD_PAYMENT", REJECT_CARD_PAYMENT);
+        tossErrorMap.put("REJECT_CARD_COMPANY", REJECT_CARD_COMPANY);
+        tossErrorMap.put("FORBIDDEN_REQUEST", FORBIDDEN_REQUEST);
+        tossErrorMap.put("REJECT_TOSSPAY_INVALID_ACCOUNT", REJECT_TOSSPAY_INVALID_ACCOUNT);
+        tossErrorMap.put("EXCEED_MAX_AUTH_COUNT", EXCEED_MAX_AUTH_COUNT);
+        tossErrorMap.put("EXCEED_MAX_ONE_DAY_AMOUNT", EXCEED_MAX_ONE_DAY_AMOUNT);
+        tossErrorMap.put("NOT_AVAILABLE_BANK", NOT_AVAILABLE_BANK);
+        tossErrorMap.put("INVALID_PASSWORD", INVALID_PASSWORD);
+        tossErrorMap.put("INCORRECT_BASIC_AUTH_FORMAT", INCORRECT_BASIC_AUTH_FORMAT);
+        tossErrorMap.put("FDS_ERROR", FDS_ERROR);
+        tossErrorMap.put("NOT_FOUND_PAYMENT", NOT_FOUND_PAYMENT);
+        tossErrorMap.put("NOT_FOUND_PAYMENT_SESSION", NOT_FOUND_PAYMENT_SESSION);
+        tossErrorMap.put("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING);
+        tossErrorMap.put("FAILED_INTERNAL_SYSTEM_PROCESSING", FAILED_INTERNAL_SYSTEM_PROCESSING);
+        tossErrorMap.put("UNKNOWN_PAYMENT_ERROR", UNKNOWN_PAYMENT_ERROR);
+    }
+
+    public static Error fromTossPaymentCode(String tossCode) {
+        return tossErrorMap.getOrDefault(tossCode, UNKNOWN_PAYMENT_ERROR);
     }
 }
 
