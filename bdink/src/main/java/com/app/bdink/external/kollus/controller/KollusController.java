@@ -1,7 +1,8 @@
 package com.app.bdink.external.kollus.controller;
 
-import com.app.bdink.external.kollus.dto.request.CallbackRequest;
-import com.app.bdink.external.kollus.dto.request.KollusRequest;
+import com.app.bdink.external.kollus.dto.request.UserKeyDTO;
+import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.service.KollusService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.security.Principal;
 
 @RestController
@@ -32,28 +32,28 @@ public class KollusController {
 //    }
 
     @PostMapping("/{lectureId}/play-url")
-    @Operation(method = "GET", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다. 사용자키와 멤버가 매핑되어야 사용가능합니다.")
-    public RspTemplate<?> playUrlCreate(@PathVariable Long lectureId, Principal principal) throws IOException {
+    @Operation(method = "POST", description = "Kollus 동영상 접근 url입니다. lectureId를 통해서 접근합니다. 사용자키와 멤버가 매핑되어야 사용가능합니다.")
+    public RspTemplate<?> playUrlCreate(@PathVariable Long lectureId, Principal principal) {
         return RspTemplate.success(Success.KOLLUS_GET_URL_SUCCESS, kollusService.createKollusURLService(principal, lectureId));
     }
 
     @PostMapping("/upload")
     @Operation(method = "POST", description = "Kollus upload callback API 입니다.")
-    public RspTemplate<?> uploadCallback(@ModelAttribute CallbackRequest.uploadRequestDTO uploadRequestDTO) {
+    public RspTemplate<?> uploadCallback(@ModelAttribute UploadRequestDTO uploadRequestDTO) {
         kollusService.uploadCallbackService(uploadRequestDTO);
         return RspTemplate.success(Success.KOLLUS_UPLOAD_SUCCESS);
     }
 
     @PostMapping("/delete")
     @Operation(method = "POST", description = "Kollus delete Callback API 입니다.")
-    public RspTemplate<?> deleteCallback(@ModelAttribute CallbackRequest.deleteRequestDTO deleteRequestDTO) {
+    public RspTemplate<?> deleteCallback(@ModelAttribute DeleteRequestDTO deleteRequestDTO) {
         kollusService.deleteCallbackService(deleteRequestDTO);
         return RspTemplate.success(Success.KOLLUS_DELETE_SUCCESS);
     }
 
     @PostMapping("/userkey")
     @Operation(method = "POST", description = "Kollus 사용자 키 생성 API 입니다. 사용자키를 입력해주세요.")
-    public RspTemplate<?> userKeyCreate(@RequestBody KollusRequest.userKeyDTO userKeyDTO) throws IOException {
+    public RspTemplate<?> userKeyCreate(@RequestBody UserKeyDTO userKeyDTO) {
         log.info("유저키 생성 api controller 시작");
         kollusService.createKollusUserKey(userKeyDTO);
         return RspTemplate.success(Success.KOLLUS_USERKEY_SUCCESS);

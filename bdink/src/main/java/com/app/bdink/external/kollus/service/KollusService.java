@@ -1,8 +1,10 @@
 package com.app.bdink.external.kollus.service;
 
 import com.app.bdink.external.kollus.dto.KollusTokenDTO;
-import com.app.bdink.external.kollus.dto.request.CallbackRequest;
-import com.app.bdink.external.kollus.dto.request.KollusRequest;
+import com.app.bdink.external.kollus.dto.request.UserKeyDTO;
+import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.dto.response.KollusApiResponse;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.entity.KollusMediaLink;
@@ -18,7 +20,6 @@ import com.app.bdink.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -35,19 +36,19 @@ public class KollusService {
     private final MemberRepository memberRepository;
     private final KollusTokenProvider kollusTokenProvider;
     private final UserKeyRepository userKeyRepository;
-    @Value("${kollus.API_ACCESS_TOKEN}")
-    private String apiAccessToken;
+//    @Value("${kollus.API_ACCESS_TOKEN}")
+//    private String apiAccessToken;
 
 
     @Transactional
-    public void uploadCallbackService(CallbackRequest.uploadRequestDTO uploadRequestDTO) {
+    public void uploadCallbackService(UploadRequestDTO uploadRequestDTO) {
         log.info("채널 업로드 서비스 시작");
-        log.info("content_provider_key is : {}", uploadRequestDTO.getContent_provider_key());
+        log.info("content_provider_key is : {}", uploadRequestDTO.content_provider_key());
 
-        String mediaContentKey = uploadRequestDTO.getMedia_content_key();
+        String mediaContentKey = uploadRequestDTO.content_provider_key();
         Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
         
-        if(uploadRequestDTO.getContent_provider_key() == null){
+        if(uploadRequestDTO.content_provider_key() == null){
             log.info("kollus 채널 callback api url 접속을 위한 api 요청");
             return;
         }
@@ -58,11 +59,11 @@ public class KollusService {
         }
 
         KollusMedia kollusMedia = KollusMedia.builder()
-                .filename(uploadRequestDTO.getFilename())
-                .uploadFileKey(uploadRequestDTO.getUpload_file_key())
+                .filename(uploadRequestDTO.filename())
+                .uploadFileKey(uploadRequestDTO.upload_file_key())
                 .mediaContentKey(mediaContentKey)
-                .channelKey(uploadRequestDTO.getChannel_key())
-                .channelName(uploadRequestDTO.getChannel_name())
+                .channelKey(uploadRequestDTO.channel_key())
+                .channelName(uploadRequestDTO.channel_name())
                 .lecture(null)
                 .build();
 
@@ -109,8 +110,8 @@ public class KollusService {
     }
 
     @Transactional
-    public void createKollusUserKey(KollusRequest.userKeyDTO userKeyDTO){
-        UserKey userKey = UserKey.of(userKeyDTO.getUserKey());
+    public void createKollusUserKey(UserKeyDTO userKeyDTO){
+        UserKey userKey = UserKey.of(userKeyDTO.userKey());
         userKeyRepository.save(userKey);
     }
 
@@ -167,18 +168,18 @@ public class KollusService {
 //    }
 
     @Transactional
-    public void deleteCallbackService(CallbackRequest.deleteRequestDTO deleteRequestDTO) {
-        Optional<KollusMedia> deleteOPT = kollusMediaRepository.findByMediaContentKey(deleteRequestDTO.getMedia_content_key());
+    public void deleteCallbackService(DeleteRequestDTO deleteRequestDTO) {
+        Optional<KollusMedia> deleteOPT = kollusMediaRepository.findByMediaContentKey(deleteRequestDTO.media_content_key());
         if (deleteOPT.isPresent()) {
             kollusMediaRepository.delete(deleteOPT.get());
         }else{
             log.info("이미 kollusmedia가 삭제되었거나 요청이 제대로 들어오지 않았습니다.");
-            log.info("해당 미디어키 : {}", deleteRequestDTO.getMedia_content_key());
+            log.info("해당 미디어키 : {}", deleteRequestDTO.media_content_key());
         }
     }
 
     @Transactional
-    public void playCallbackService(CallbackRequest.playRequestDTO playRequestDTO) {
+    public void playCallbackService(PlayRequestDTO playRequestDTO) {
         log.info(String.valueOf(playRequestDTO));
     }
 }
