@@ -1,6 +1,6 @@
 package com.app.bdink.payment.controller.dto;
 
-public record ConfirmResponse(
+public record PaymentResponse(
         String mId,
         String lastTransactionKey,
         String paymentKey,

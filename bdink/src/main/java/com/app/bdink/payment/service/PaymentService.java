@@ -3,10 +3,10 @@ package com.app.bdink.payment.service;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
-import com.app.bdink.payment.controller.dto.ConfirmResponse;
+import com.app.bdink.payment.controller.dto.PaymentResponse;
 import com.app.bdink.payment.repository.PaymentRepository;
-import com.app.bdink.payment.domain.PaymentConfirmResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +32,13 @@ public class PaymentService {
     private final View error;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private String tossUrl = "https://api.tosspayments.com/v1/payments";
-    private String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //TODO: 테스트에서 나중에 사업자등록된거로 받기.
+    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
-    public Mono<RspTemplate<ConfirmResponse>> confirm(
+    public Mono<RspTemplate<PaymentResponse>> confirm(
             ConfirmRequest confirmRequest) throws PaymentFailedException {
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
-        Mono<ConfirmResponse> responseMono = webClient.post()
+        Mono<PaymentResponse> responseMono = webClient.post()
                 .uri("/confirm")
                 .header("Authorization", authorizations)
                 .header("Content-Type", "application/json")
@@ -47,23 +46,17 @@ public class PaymentService {
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::isError,
-                        response -> handleErrorResponse(response, confirmRequest)
+                        this::handleErrorResponse
                 )
-                .bodyToMono(ConfirmResponse.class)
-                .doOnNext(response -> {
-                    if (response != null) {
-                        savePaymentSuccess(response);
-                    }
-                });
+                .bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.CREATE_PAYMENT_SUCCESS);
     }
 
-    public Mono<RspTemplate<PaymentConfirmResponse>> getPayment(String paymentKey) {
+    public Mono<RspTemplate<PaymentResponse>> getPaymentByPaymentKey(String paymentKey) {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
-
-        Mono<PaymentConfirmResponse> responseMono = webClient.get()
+        Mono<PaymentResponse> responseMono = webClient.get()
                 .uri("/{paymentKey}", paymentKey)
                 .header("Authorization", authorization)
                 .retrieve()
@@ -71,42 +64,50 @@ public class PaymentService {
                         HttpStatusCode::isError,
                         this::handleErrorResponse
                 )
-                .bodyToMono(PaymentConfirmResponse.class)
-                .doOnNext(response -> {
-                    if (response != null) {
-                        // 필요한 경우 결제 정보를 처리하는 로직
-                    }
-                });
+                .bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
-    private String getBasicAuthHeader() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
+    public Mono<RspTemplate<PaymentResponse>> getPaymentByOrderId(String orderId) {
+        String authorization = getBasicAuthHeader();
+        WebClient webClient = WebClient.create(tossUrl);
+        Mono<PaymentResponse> responseMono = webClient.get()
+                .uri("/{orderId}", orderId)
+                .header("Authorization", authorization)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        this::handleErrorResponse
+                )
+                .bodyToMono(PaymentResponse.class);
+
+        return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
-    private Mono<? extends Throwable> handleErrorResponse(
-            ClientResponse response, ConfirmRequest confirmRequest) throws RuntimeException {
-        return response.bodyToMono(String.class)
-                .flatMap(errorBody -> {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonNode errorJson = objectMapper.readTree(errorBody);
-                        String errorCode = errorJson.get("code").asText();
-                        String errorMessage = errorJson.get("message").asText();
+    public Mono<RspTemplate<PaymentResponse>> cancelPayment(
+            String paymentKey, CancelRequest cancelRequest) {
+        String authorization = getBasicAuthHeader();
+        WebClient webClient = WebClient.create(tossUrl);
+        Mono<PaymentResponse> responseMono = webClient.post()
+                .uri("/{paymentId}/cancel")
+                .header("Authorization", authorization)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        this::handleErrorResponse
+                )
+                .bodyToMono(PaymentResponse.class);
 
-                        // 결제 실패 정보 저장
-                        savePaymentFailure(confirmRequest, errorCode, errorMessage);
+        return toRspTemplate(responseMono, Success.CANCEL_TOSS_PAYMENT_SUCCESS);
+    }
 
-                        // 에러 코드에 기반한 적절한 예외 생성
-                        Error appError = Error.fromTossPaymentCode(errorCode);
-                        return Mono.error(new PaymentFailedException(appError, errorMessage));
-                    } catch (Exception e) {
-                        return Mono.error(new PaymentFailedException(Error.FAILED_PARSING_TOSSPAY_ERROR_RESPONSE, e.getMessage()));
-                    }
-                });
+    private String getBasicAuthHeader() {
+        Base64.Encoder encoder = Base64.getEncoder();
+        //TODO: 테스트에서 나중에 사업자등록된거로 받기.
+        String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encodedBytes);
     }
 
     private Mono<? extends Throwable> handleErrorResponse(ClientResponse response) {
@@ -133,9 +134,11 @@ public class PaymentService {
         ).onErrorResume(Mono::error);
     }
 
-    private void savePaymentSuccess(ConfirmResponse response) {
+    // 추후 구현 예정
+    private void savePaymentSuccess(PaymentResponse response) {
     }
 
+    // 추후 구현 예정
     private void savePaymentFailure(ConfirmRequest confirmRequest, String errorCode, String errorMessage) {
     }
 }
