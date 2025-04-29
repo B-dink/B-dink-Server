@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 
-@Table(name = "userkey")
+@Table(name = "Userkey")
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
