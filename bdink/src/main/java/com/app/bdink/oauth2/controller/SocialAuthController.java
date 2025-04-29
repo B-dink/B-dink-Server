@@ -71,7 +71,7 @@ public class SocialAuthController {
         }
         questionService.revokeUserDeleteQuestion(member);
         authService.revoke(principal, provider);
-        return RspTemplate.success(Success.REVOKE_SUCCESS, Success.REVOKE_SUCCESS.getMessage());
+        return RspTemplate.success(Success.REVOKE_SUCCESS);
     }
 
 //    @PostMapping("/internal/sign-up")
