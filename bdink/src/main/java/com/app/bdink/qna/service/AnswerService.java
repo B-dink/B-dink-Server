@@ -2,7 +2,6 @@ package com.app.bdink.qna.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.member.entity.Member;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.entity.Answer;
 import com.app.bdink.qna.entity.Question;
