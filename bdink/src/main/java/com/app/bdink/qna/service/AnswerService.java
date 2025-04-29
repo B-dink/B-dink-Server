@@ -6,7 +6,9 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.entity.Answer;
 import com.app.bdink.qna.entity.Question;
+import com.app.bdink.qna.entity.Status;
 import com.app.bdink.qna.repository.AnswerRepository;
+import com.app.bdink.qna.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
 
     public Answer getById(Long answerId) {
 
@@ -31,6 +34,9 @@ public class AnswerService {
             .question(question)
             .build();
 
+        question.updateStatus(Status.COMPLETE);
+        answerRepository.save(answer);
+
         return String.valueOf(answerRepository.save(answer).getId());
     }
 
@@ -43,6 +49,8 @@ public class AnswerService {
     @Transactional
     public void deleteAnswer(Long answerId) {
         Answer answer = getById(answerId);
+        answer.getQuestion().updateStatus(Status.IN_PROGRESS);
+        questionRepository.save(answer.getQuestion());
         answerRepository.delete(answer);
     }
 }
