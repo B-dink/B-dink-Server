@@ -26,6 +26,10 @@ public class Question extends BaseTimeEntity {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @ManyToOne
     private Member member;
 
@@ -44,6 +48,10 @@ public class Question extends BaseTimeEntity {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public void updateStatus(Status status) {
+        this.status = status;
     }
 
 }
