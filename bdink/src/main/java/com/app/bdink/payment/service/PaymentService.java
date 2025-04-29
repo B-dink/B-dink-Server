@@ -4,6 +4,7 @@ import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
+import com.app.bdink.payment.controller.dto.ConfirmResponse;
 import com.app.bdink.payment.repository.PaymentRepository;
 import com.app.bdink.payment.domain.PaymentConfirmResponse;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,12 +35,11 @@ public class PaymentService {
     private String tossUrl = "https://api.tosspayments.com/v1/payments";
     private String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //TODO: 테스트에서 나중에 사업자등록된거로 받기.
 
-    public Mono<RspTemplate<PaymentConfirmResponse>> confirm(
-            ConfirmRequest confirmRequest
-    ) throws PaymentFailedException {
+    public Mono<RspTemplate<ConfirmResponse>> confirm(
+            ConfirmRequest confirmRequest) throws PaymentFailedException {
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
-        Mono<PaymentConfirmResponse> responseMono = webClient.post()
+        Mono<ConfirmResponse> responseMono = webClient.post()
                 .uri("/confirm")
                 .header("Authorization", authorizations)
                 .header("Content-Type", "application/json")
@@ -49,14 +49,36 @@ public class PaymentService {
                         HttpStatusCode::isError,
                         response -> handleErrorResponse(response, confirmRequest)
                 )
-                .bodyToMono(PaymentConfirmResponse.class)
+                .bodyToMono(ConfirmResponse.class)
                 .doOnNext(response -> {
                     if (response != null) {
                         savePaymentSuccess(response);
                     }
                 });
 
-        return toRspTemplate(responseMono);
+        return toRspTemplate(responseMono, Success.CREATE_PAYMENT_SUCCESS);
+    }
+
+    public Mono<RspTemplate<PaymentConfirmResponse>> getPayment(String paymentKey) {
+        String authorization = getBasicAuthHeader();
+        WebClient webClient = WebClient.create(tossUrl);
+
+        Mono<PaymentConfirmResponse> responseMono = webClient.get()
+                .uri("/{paymentKey}", paymentKey)
+                .header("Authorization", authorization)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        this::handleErrorResponse
+                )
+                .bodyToMono(PaymentConfirmResponse.class)
+                .doOnNext(response -> {
+                    if (response != null) {
+                        // 필요한 경우 결제 정보를 처리하는 로직
+                    }
+                });
+
+        return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
     private String getBasicAuthHeader() {
@@ -66,8 +88,7 @@ public class PaymentService {
     }
 
     private Mono<? extends Throwable> handleErrorResponse(
-            ClientResponse response, ConfirmRequest confirmRequest
-    ) throws RuntimeException {
+            ClientResponse response, ConfirmRequest confirmRequest) throws RuntimeException {
         return response.bodyToMono(String.class)
                 .flatMap(errorBody -> {
                     try {
@@ -88,13 +109,31 @@ public class PaymentService {
                 });
     }
 
-    private Mono<RspTemplate<PaymentConfirmResponse>> toRspTemplate(Mono<PaymentConfirmResponse> responseMono) {
+    private Mono<? extends Throwable> handleErrorResponse(ClientResponse response) {
+        return response.bodyToMono(String.class)
+                .flatMap(errorBody -> {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JsonNode errorJson = objectMapper.readTree(errorBody);
+                        String errorCode = errorJson.get("code").asText();
+                        String errorMessage = errorJson.get("message").asText();
+
+                        Error appError = Error.fromTossPaymentCode(errorCode);
+                        return Mono.error(new PaymentFailedException(appError, errorMessage));
+                    } catch (Exception e) {
+                        return Mono.error(new PaymentFailedException(
+                                Error.FAILED_PARSING_TOSSPAY_ERROR_RESPONSE, e.getMessage()));
+                    }
+                });
+    }
+
+    private <T> Mono<RspTemplate<T>> toRspTemplate(Mono<T> responseMono, Success success) {
         return responseMono.map(response ->
-                RspTemplate.success(Success.CREATE_PAYMENT_SUCCESS, response)
+                RspTemplate.success(success, response)
         ).onErrorResume(Mono::error);
     }
 
-    private void savePaymentSuccess(PaymentConfirmResponse response) {
+    private void savePaymentSuccess(ConfirmResponse response) {
     }
 
     private void savePaymentFailure(ConfirmRequest confirmRequest, String errorCode, String errorMessage) {
