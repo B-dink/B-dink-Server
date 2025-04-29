@@ -40,6 +40,8 @@ public enum Success {
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
+    NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
+    NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
     GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
 
@@ -98,6 +100,12 @@ public enum Success {
 
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
+
+    KOLLUS_UPLOAD_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 업로드 성공"),
+    KOLLUS_DELETE_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 삭제 성공"),
+    KOLLUS_LMS_SUCCESS(HttpStatus.OK, "Kollus lms 콜백 성공"),
+    KOLLUS_USERKEY_SUCCESS(HttpStatus.OK, "사용자키 저장 성공"),
+    KOLLUS_GET_URL_SUCCESS(HttpStatus.OK, "동영상 URL 생성 성공"),
 
     /**
      * 202 accepted

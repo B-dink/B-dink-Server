@@ -1,5 +1,6 @@
 package com.app.bdink.member.service;
 
+import com.app.bdink.external.kollus.repository.UserKeyRepository;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final UserKeyRepository userKeyRepository;
 
     @Transactional(readOnly = true)
     public Member findById(Long id) {
@@ -87,6 +89,18 @@ public class MemberService {
     public Member socialJoin(final Member member, MemberSocialRequestDto memberSaveRequestDto, String image) {
         if (member.getRole().equals(Role.SIGNUP_PROGRESS)) {
             member.modifyingInSocialSignUp(memberSaveRequestDto.name(), image, memberSaveRequestDto.phone());
+            /**
+             * 여기가 회원가입 로직의 마지막일경우 사용자키와 사용자 매핑
+             * 근데이거 여유있는 사용자 키가 없으면 가입이 안됨. -> 로그만 찍고 넘어가야할수도. 
+             * 로그를 사용자이름하고 찍어놓으면 서버에서 확인은 가능
+             */
+//            UserKey userkey = userKeyRepository
+//                    .findFirstByMemberIsNull()
+//                    .orElseThrow(() -> new CustomException(Error.NOT_EXIST_USERKEY, Error.NOT_EXIST_USERKEY.getMessage()));
+//
+//            userkey.updateMember(member);
+//            userKeyRepository.save(userkey);
+
         }
         return member;
     }

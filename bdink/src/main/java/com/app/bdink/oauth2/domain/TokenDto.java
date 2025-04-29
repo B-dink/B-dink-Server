@@ -7,5 +7,4 @@ public record TokenDto(
     public static TokenDto of(final String accessToken, final String refreshToken) {
         return new TokenDto(accessToken, refreshToken);
     }
-
 }

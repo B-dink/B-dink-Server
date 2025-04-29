@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
 
+                        .requestMatchers("/api/v1/kollus/**").permitAll() //콜러스 콜백응답 허용
+
                         .requestMatchers("/api/v1/member/join").permitAll()
                         .requestMatchers("/api/v1/member/login").permitAll()
                         .requestMatchers("/api/v1/oauth2/**").permitAll()
