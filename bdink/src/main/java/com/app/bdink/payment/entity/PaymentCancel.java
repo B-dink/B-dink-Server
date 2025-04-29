@@ -1,16 +1,15 @@
 package com.app.bdink.payment.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@Table(name = "payment_cancels")
+@Getter
+@Setter
+@Table(name = "payment_cancel")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaymentCancel {
 
@@ -28,7 +27,7 @@ public class PaymentCancel {
     @Column(precision = 19, scale = 2)
     private BigDecimal taxFreeAmount;
 
-    @Column(precision = 19, scale = 2)
+    @Column(precision = 19, scale = 0)
     private BigDecimal taxExemptionAmount;
 
     @Column(precision = 19, scale = 2)
@@ -54,7 +53,27 @@ public class PaymentCancel {
     @Column(length = 64)
     private String cancelRequestId;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_key")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    @Builder
+    public PaymentCancel(BigDecimal cancelAmount, String cancelReason, BigDecimal taxFreeAmount,
+                         BigDecimal taxExemptionAmount, BigDecimal refundableAmount,
+                         BigDecimal transferDiscountAmount, BigDecimal easyPayDiscountAmount,
+                         LocalDateTime canceledAt, String transactionKey, String receiptKey,
+                         String cancelStatus, String cancelRequestId) {
+        this.cancelAmount = cancelAmount;
+        this.cancelReason = cancelReason;
+        this.taxFreeAmount = taxFreeAmount;
+        this.taxExemptionAmount = taxExemptionAmount;
+        this.refundableAmount = refundableAmount;
+        this.transferDiscountAmount = transferDiscountAmount;
+        this.easyPayDiscountAmount = easyPayDiscountAmount;
+        this.canceledAt = canceledAt;
+        this.transactionKey = transactionKey;
+        this.receiptKey = receiptKey;
+        this.cancelStatus = cancelStatus;
+        this.cancelRequestId = cancelRequestId;
+    }
 }

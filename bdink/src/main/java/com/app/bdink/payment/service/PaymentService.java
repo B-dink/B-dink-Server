@@ -9,6 +9,8 @@ import com.app.bdink.payment.domain.PaymentConfirmResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -27,8 +29,10 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final View error;
-    private String WIDGET_SECRET = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //TODO: 테스트에서 나중에 사업자등록된거로 받기.
-    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private String tossUrl = "https://api.tosspayments.com/v1/payments";
+    private String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //TODO: 테스트에서 나중에 사업자등록된거로 받기.
 
     public Mono<RspTemplate<PaymentConfirmResponse>> confirm(
             ConfirmRequest confirmRequest
@@ -57,7 +61,7 @@ public class PaymentService {
 
     private String getBasicAuthHeader() {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((WIDGET_SECRET + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }
 
@@ -84,15 +88,15 @@ public class PaymentService {
                 });
     }
 
-    private void savePaymentSuccess(PaymentConfirmResponse response) {
-    }
-
-    private void savePaymentFailure(ConfirmRequest confirmRequest, String errorCode, String errorMessage) {
-    }
-
     private Mono<RspTemplate<PaymentConfirmResponse>> toRspTemplate(Mono<PaymentConfirmResponse> responseMono) {
         return responseMono.map(response ->
                 RspTemplate.success(Success.CREATE_PAYMENT_SUCCESS, response)
         ).onErrorResume(Mono::error);
+    }
+
+    private void savePaymentSuccess(PaymentConfirmResponse response) {
+    }
+
+    private void savePaymentFailure(ConfirmRequest confirmRequest, String errorCode, String errorMessage) {
     }
 }

@@ -1,14 +1,13 @@
 package com.app.bdink.payment.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "card_info")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CardInfo {
@@ -53,7 +52,26 @@ public class CardInfo {
     @Column(length = 20)
     private String interestPayer;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_key")
     private Payment payment;
+
+    @Builder
+    public CardInfo(BigDecimal amount, String issuerCode, String acquirerCode, String number,
+                    Integer installmentPlanMonths, String approveNo, boolean useCardPoint,
+                    String cardType, String ownerType, String acquireStatus,
+                    boolean isInterestFree, String interestPayer) {
+        this.amount = amount;
+        this.issuerCode = issuerCode;
+        this.acquirerCode = acquirerCode;
+        this.number = number;
+        this.installmentPlanMonths = installmentPlanMonths;
+        this.approveNo = approveNo;
+        this.useCardPoint = useCardPoint;
+        this.cardType = cardType;
+        this.ownerType = ownerType;
+        this.acquireStatus = acquireStatus;
+        this.isInterestFree = isInterestFree;
+        this.interestPayer = interestPayer;
+    }
 }
