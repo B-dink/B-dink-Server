@@ -4,16 +4,16 @@ import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.qna.entity.Question;
 import com.app.bdink.qna.controller.dto.request.QnARequest;
+import com.app.bdink.qna.controller.dto.response.QnAAllResponse;
 import com.app.bdink.qna.controller.dto.response.QnAResponse;
-import com.app.bdink.qna.controller.dto.response.QuestionResponse;
+import com.app.bdink.qna.entity.Question;
 import com.app.bdink.qna.repository.QuestionRepository;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +37,10 @@ public class QuestionService {
         return String.valueOf(questionRepository.save(question).getId());
     }
 
-    public List<QuestionResponse> getAllQuestions(final ClassRoomEntity classRoomEntity) {
-        List<Question> questionList = questionRepository.findByClassRoom(classRoomEntity);
-        return questionList.stream()
-            .map(QuestionResponse::from)
-            .collect(Collectors.toList());
+    public List<QnAAllResponse> getAllQuestions(final ClassRoomEntity classRoomEntity) {
+        return questionRepository.findByClassRoom(classRoomEntity).stream()
+                .map(QnAAllResponse::from)
+                .collect(Collectors.toList());
     }
 
     public QnAResponse getQuestionAnswer(Long questionId) {
