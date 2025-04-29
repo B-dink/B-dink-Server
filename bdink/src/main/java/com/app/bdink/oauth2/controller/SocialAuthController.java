@@ -4,17 +4,16 @@ import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
+import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
-import com.app.bdink.instructor.util.InstructorUtilService;
+import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.controller.dto.response.NameCheckDto;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.oauth2.domain.LoginResult;
 import com.app.bdink.oauth2.domain.RefreshToken;
-import com.app.bdink.global.template.RspTemplate;
-import com.app.bdink.global.token.TokenProvider;
-import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.service.MemberService;
 import com.app.bdink.oauth2.domain.TokenDto;
 import com.app.bdink.oauth2.service.AuthService;
 import com.app.bdink.qna.service.QuestionService;
@@ -71,7 +70,7 @@ public class SocialAuthController {
         }
         questionService.revokeUserDeleteQuestion(member);
         authService.revoke(principal, provider);
-        return RspTemplate.success(Success.REVOKE_SUCCESS, Success.REVOKE_SUCCESS.getMessage());
+        return RspTemplate.success(Success.REVOKE_SUCCESS);
     }
 
 //    @PostMapping("/internal/sign-up")
