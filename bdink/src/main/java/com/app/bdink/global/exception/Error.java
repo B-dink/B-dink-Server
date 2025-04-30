@@ -38,6 +38,8 @@ public enum Error {
     UNKNOWN_PAYMENT_ERROR(HttpStatus.NOT_FOUND, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
     NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
 
+    NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보 입니다."),
+
     /**
      * 400 BAD REQUEST EXCEPTION
      */
@@ -91,6 +93,16 @@ public enum Error {
     UNAPPROVED_ORDER_ID(HttpStatus.BAD_REQUEST, "아직 승인되지 않은 주문번호입니다."),
     EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "당월 결제 가능금액인 1,000,000원을 초과 하셨습니다."),
 
+    ALREADY_CANCELED_PAYMENT(HttpStatus.BAD_REQUEST, "이미 취소된 결제 입니다."),
+    INVALID_REFUND_ACCOUNT_INFO(HttpStatus.BAD_REQUEST, "환불 계좌번호와 예금주명이 일치하지 않습니다."),
+    EXCEED_CANCEL_AMOUNT_DISCOUNT_AMOUNT(HttpStatus.BAD_REQUEST, "즉시할인금액보다 적은 금액은 부분취소가 불가능합니다."),
+    INVALID_REFUND_ACCOUNT_NUMBER(HttpStatus.BAD_REQUEST, "잘못된 환불 계좌번호입니다."),
+    REFUND_REJECTED(HttpStatus.BAD_REQUEST, "환불이 거절됐습니다. 결제사에 문의 부탁드립니다."),
+    ALREADY_REFUND_PAYMENT(HttpStatus.BAD_REQUEST, "이미 환불된 결제입니다."),
+    FORBIDDEN_BANK_REFUND_REQUEST(HttpStatus.BAD_REQUEST, "고객 계좌가 입금이 되지 않는 상태입니다."),
+    NOT_MATCHES_REFUNDABLE_AMOUNT(HttpStatus.BAD_REQUEST, "잔액 결과가 일치하지 않습니다."),
+
+    NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN_BELOW_AMOUNT(HttpStatus.BAD_REQUEST, "5만원 이하의 결제는 할부가 불가능해서 결제에 실패했습니다."),
 
     /**
      * 401 UNAUTHORIZED EXCEPTION
@@ -127,6 +139,14 @@ public enum Error {
     INCORRECT_BASIC_AUTH_FORMAT(HttpStatus.FORBIDDEN, "잘못된 요청입니다. ':' 를 포함해 인코딩해주세요."),
     FDS_ERROR(HttpStatus.FORBIDDEN, "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다. (고객센터: 1644-8051)"),
 
+    NOT_CANCELABLE_AMOUNT(HttpStatus.FORBIDDEN, "취소 할 수 없는 금액 입니다."),
+    FORBIDDEN_CONSECUTIVE_REQUEST(HttpStatus.FORBIDDEN, "반복적인 요청은 허용되지 않습니다. 잠시 후 다시 시도해주세요."),
+    NOT_CANCELABLE_PAYMENT(HttpStatus.FORBIDDEN, "취소 할 수 없는 결제 입니다."),
+    EXCEED_MAX_REFUND_DUE(HttpStatus.FORBIDDEN, "환불 가능한 기간이 지났습니다."),
+    NOT_ALLOWED_PARTIAL_REFUND_WAITING_DEPOSIT(HttpStatus.FORBIDDEN, "입금 대기중인 결제는 부분 환불이 불가합니다."),
+    NOT_ALLOWED_PARTIAL_REFUND(HttpStatus.FORBIDDEN, "에스크로 주문, 현금 카드 결제일 때는 부분 환불이 불가합니다. 이외 다른 결제 수단에서 부분 취소가 되지 않을 때는 토스페이먼츠에 문의해 주세요."),
+    NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER(HttpStatus.FORBIDDEN, "휴면 처리된 회원의 결제는 취소할 수 없습니다."),
+
     /**
      * 422 UNPROCESSABLE_ENTITY
      */
@@ -143,7 +163,13 @@ public enum Error {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 서버 에러가 발생했습니다"),
     INVALID_ENCRYPT_COMMUNICATION(HttpStatus.INTERNAL_SERVER_ERROR, "ios 통신 증명 과정 중 문제가 발생했습니다."),
     CREATE_PUBLIC_KEY_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "publickey 생성 과정 중 문제가 발생했습니다."),
-    FAILED_PARSING_TOSSPAY_ERROR_RESPONSE(HttpStatus.INTERNAL_SERVER_ERROR, "토스 결제 승인 API의 에러코드 파싱에 문제가 발생했습니다.")
+    FAILED_PARSING_TOSSPAY_ERROR_RESPONSE(HttpStatus.INTERNAL_SERVER_ERROR, "토스 결제 승인 API의 에러코드 파싱에 문제가 발생했습니다."),
+
+    FAILED_REFUND_PROCESS(HttpStatus.INTERNAL_SERVER_ERROR, "은행 응답시간 지연이나 일시적인 오류로 환불요청에 실패했습니다."),
+    FAILED_METHOD_HANDLING_CANCEL(HttpStatus.INTERNAL_SERVER_ERROR, "취소 중 결제 시 사용한 결제 수단 처리과정에서 일시적인 오류가 발생했습니다."),
+    FAILED_PARTIAL_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "은행 점검, 해약 계좌 등의 사유로 부분 환불이 실패했습니다."),
+    FAILED_CLOSED_ACCOUNT_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "해약된 계좌로 인해 환불이 실패했습니다."),
+    COMMON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
     ;
 
     private final HttpStatus httpStatus;
@@ -203,6 +229,30 @@ public enum Error {
         tossErrorMap.put("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING);
         tossErrorMap.put("FAILED_INTERNAL_SYSTEM_PROCESSING", FAILED_INTERNAL_SYSTEM_PROCESSING);
         tossErrorMap.put("UNKNOWN_PAYMENT_ERROR", UNKNOWN_PAYMENT_ERROR);
+
+        tossErrorMap.put("NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN_BELOW_AMOUNT", NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN_BELOW_AMOUNT);
+        tossErrorMap.put("NOT_FOUND", NOT_FOUND);
+
+        tossErrorMap.put("ALREADY_CANCELED_PAYMENT", ALREADY_CANCELED_PAYMENT);
+        tossErrorMap.put("INVALID_REFUND_ACCOUNT_INFO", INVALID_REFUND_ACCOUNT_INFO);
+        tossErrorMap.put("EXCEED_CANCEL_AMOUNT_DISCOUNT_AMOUNT", EXCEED_CANCEL_AMOUNT_DISCOUNT_AMOUNT);
+        tossErrorMap.put("INVALID_REFUND_ACCOUNT_NUMBER", INVALID_REFUND_ACCOUNT_NUMBER);
+        tossErrorMap.put("NOT_MATCHES_REFUNDABLE_AMOUNT", NOT_MATCHES_REFUNDABLE_AMOUNT);
+        tossErrorMap.put("REFUND_REJECTED", REFUND_REJECTED);
+        tossErrorMap.put("ALREADY_REFUND_PAYMENT", ALREADY_REFUND_PAYMENT);
+        tossErrorMap.put("FORBIDDEN_BANK_REFUND_REQUEST", FORBIDDEN_BANK_REFUND_REQUEST);
+        tossErrorMap.put("NOT_CANCELABLE_AMOUNT", NOT_CANCELABLE_AMOUNT);
+        tossErrorMap.put("FORBIDDEN_CONSECUTIVE_REQUEST", FORBIDDEN_CONSECUTIVE_REQUEST);
+        tossErrorMap.put("NOT_CANCELABLE_PAYMENT", NOT_CANCELABLE_PAYMENT);
+        tossErrorMap.put("EXCEED_MAX_REFUND_DUE", EXCEED_MAX_REFUND_DUE);
+        tossErrorMap.put("NOT_ALLOWED_PARTIAL_REFUND_WAITING_DEPOSIT", NOT_ALLOWED_PARTIAL_REFUND_WAITING_DEPOSIT);
+        tossErrorMap.put("NOT_ALLOWED_PARTIAL_REFUND", NOT_ALLOWED_PARTIAL_REFUND);
+        tossErrorMap.put("NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER", NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER);
+        tossErrorMap.put("FAILED_REFUND_PROCESS", FAILED_REFUND_PROCESS);
+        tossErrorMap.put("FAILED_METHOD_HANDLING_CANCEL", FAILED_METHOD_HANDLING_CANCEL);
+        tossErrorMap.put("FAILED_PARTIAL_REFUND", FAILED_PARTIAL_REFUND);
+        tossErrorMap.put("COMMON_ERROR", COMMON_ERROR);
+        tossErrorMap.put("FAILED_CLOSED_ACCOUNT_REFUND", FAILED_CLOSED_ACCOUNT_REFUND);
     }
 
     public static Error fromTossPaymentCode(String tossCode) {
