@@ -25,6 +25,8 @@ public enum Error {
     NOT_FOUND_CLASSROOM(HttpStatus.NOT_FOUND, "찾을 수 없는 강의실입니다."),
     NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
     NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
+    NOT_FOUND_KOLLUSMEDIA(HttpStatus.NOT_FOUND, "찾을 수 없는 미디어입니다."),
+    NOT_FOUND_KOLLUSMEDIALINK(HttpStatus.NOT_FOUND, "찾을 수 없는 시청기록 입니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
     NOT_FOUND_INSTRUCTOR(HttpStatus.NOT_FOUND, "찾을 수 없는 강사입니다."),
     NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
@@ -50,6 +52,7 @@ public enum Error {
     REQUEST_METHOD_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "메소드가 틀립니다."),
     EXIST_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크한 강의입니다."),
     EXIST_REVIEW(HttpStatus.BAD_REQUEST, "이미 리뷰한 강의입니다."),
+    EXIST_KOLLUSMEDIALINK(HttpStatus.BAD_REQUEST, "이미 생성된 시청기록입니다."),
 
     /**
      * 401 UNAUTHORIZED EXCEPTION
