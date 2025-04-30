@@ -40,10 +40,11 @@ public class Question extends BaseTimeEntity {
     private List<Answer> answers = new ArrayList<>();
 
     @Builder
-    public Question(String content, Member member, ClassRoomEntity classRoom) {
+    public Question(String content, Member member, ClassRoomEntity classRoom, Status status) {
         this.content = content;
         this.member = member;
         this.classRoom = classRoom;
+        this.status = status;
     }
 
     public void update(String content) {

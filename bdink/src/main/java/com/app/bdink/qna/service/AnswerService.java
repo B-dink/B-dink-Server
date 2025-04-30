@@ -48,8 +48,12 @@ public class AnswerService {
     @Transactional
     public void deleteAnswer(Long answerId) {
         Answer answer = getById(answerId);
-        answer.getQuestion().updateStatus(Status.IN_PROGRESS);
-        questionRepository.save(answer.getQuestion());
+
+        //question status -> IN_PROGRESS
+        Question question = answer.getQuestion();
+        question.updateStatus(Status.IN_PROGRESS);
+        questionRepository.save(question);
+
         answerRepository.delete(answer);
     }
 }
