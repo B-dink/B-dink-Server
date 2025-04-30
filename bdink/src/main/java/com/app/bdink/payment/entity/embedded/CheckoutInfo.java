@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CheckoutInfo {
 
-    @Column(length = 255)
+    @Column(name = "checkout_url", length = 255)
     private String url;
 }

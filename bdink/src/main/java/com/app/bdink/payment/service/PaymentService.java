@@ -90,8 +90,9 @@ public class PaymentService {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
-                .uri("/{paymentId}/cancel")
+                .uri("/{paymentKey}/cancel", paymentKey)
                 .header("Authorization", authorization)
+                .bodyValue(cancelRequest)
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::isError,

@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReceiptInfo {
 
-    @Column(length = 255)
+    @Column(name = "receipt_url", length = 255)
     private String url;
 }
