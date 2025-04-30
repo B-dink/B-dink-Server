@@ -27,7 +27,7 @@ public enum Success {
 
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
-
+    CONNECT_KOLLUSMEDIA_SUCCESS(HttpStatus.CREATED, "미디어와 강의의 연결 성공"),
     /**
      * 200 OK
      */
@@ -44,6 +44,8 @@ public enum Success {
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
     GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
+
+    GET_KOLLUSMEDIA_SUCCESS(HttpStatus.OK,"개별 시청 기록 조회 성공"),
 
 
 
@@ -101,11 +103,13 @@ public enum Success {
     SIGNOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
     UPLOAD_SUCCESS(HttpStatus.OK, "업로드 성공"),
 
-    KOLLUS_UPLOAD_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 업로드 성공"),
-    KOLLUS_DELETE_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 삭제 성공"),
+    KOLLUS_CONTENT_UPLOAD_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 업로드 성공"),
+    KOLLUS_CONTENT_DELETE_SUCCESS(HttpStatus.OK, "Kollus 채널 콘텐츠 삭제 성공"),
     KOLLUS_LMS_SUCCESS(HttpStatus.OK, "Kollus lms 콜백 성공"),
     KOLLUS_USERKEY_SUCCESS(HttpStatus.OK, "사용자키 저장 성공"),
     KOLLUS_GET_URL_SUCCESS(HttpStatus.OK, "동영상 URL 생성 성공"),
+    KOLLUS_MEDIALINK_SAVE_SUCCESS(HttpStatus.OK, "Kollus 미디어 시청 기록 생성 성공"),
+    KOLLUS_MEDIALINK_DELETE_SUCCESS(HttpStatus.OK, "Kollus 미디어 시청 기록 삭제 성공"),
 
     /**
      * 202 accepted
