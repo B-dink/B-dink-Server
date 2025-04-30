@@ -33,6 +33,8 @@ public class PaymentService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
+    //TODO: 테스트에서 나중에 사업자등록된거로 받기.
+    private final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     public Mono<RspTemplate<PaymentResponse>> confirm(
             ConfirmRequest confirmRequest) throws PaymentFailedException {
@@ -105,8 +107,6 @@ public class PaymentService {
 
     private String getBasicAuthHeader() {
         Base64.Encoder encoder = Base64.getEncoder();
-        //TODO: 테스트에서 나중에 사업자등록된거로 받기.
-        String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }

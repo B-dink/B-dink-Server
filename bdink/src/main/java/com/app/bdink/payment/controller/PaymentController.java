@@ -47,7 +47,7 @@ public class PaymentController {
     @Operation(summary = "결제 취소",
             description = "승인된 결제를 paymentKey로 취소합니다. 취소 이유를 cancelReason에 추가해야 합니다. " +
                     "결제 금액의 일부만 부분 취소하려면 cancelAmount에 취소할 금액을 추가해서 API를 요청합니다. " +
-                    "cancelAmount에 값을 넣지 않으면 전액 취소됩니다.")
+                    "cancelAmount에 값을 넣지 않으면 전액 취소됩니다. cancelAmout에 빈문자열을 넣으면 전액 취소됩니다.")
     public Mono<RspTemplate<PaymentResponse>> cancelPayment(
             @PathVariable String paymentKey, @RequestBody CancelRequest cancelRequest) {
         return paymentService.cancelPayment(paymentKey, cancelRequest);
