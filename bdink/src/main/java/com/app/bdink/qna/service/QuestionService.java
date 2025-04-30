@@ -8,10 +8,12 @@ import com.app.bdink.qna.controller.dto.request.QnARequest;
 import com.app.bdink.qna.controller.dto.response.QnAAllResponse;
 import com.app.bdink.qna.controller.dto.response.QnAResponse;
 import com.app.bdink.qna.entity.Question;
+import com.app.bdink.qna.entity.Status;
 import com.app.bdink.qna.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
-    public Question findById(Long id){
+    public Question findById(Long id) {
         return questionRepository.findById(id).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_QUESTION, Error.NOT_FOUND_QUESTION.getMessage())
         );
@@ -30,10 +32,11 @@ public class QuestionService {
     @Transactional
     public String createQuestion(final Member member, final ClassRoomEntity classRoom, QnARequest qnARequest) {
         Question question = Question.builder()
-            .member(member)
-            .classRoom(classRoom)
-            .content(qnARequest.content())
-            .build();
+                .member(member)
+                .classRoom(classRoom)
+                .content(qnARequest.content())
+                .status(Status.IN_PROGRESS)
+                .build();
         return String.valueOf(questionRepository.save(question).getId());
     }
 
@@ -50,7 +53,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public void updateQuestion(final Member member,Long questionId, QnARequest qnARequest) {
+    public void updateQuestion(final Member member, Long questionId, QnARequest qnARequest) {
         validateQuestion(member, questionId);
         Question question = getById(questionId);
 
@@ -58,21 +61,21 @@ public class QuestionService {
     }
 
     @Transactional
-    public void deleteQuestion(final Member member,Long questionId) {
+    public void deleteQuestion(final Member member, Long questionId) {
         validateQuestion(member, questionId);
         Question question = getById(questionId);
         questionRepository.delete(question);
     }
 
     @Transactional
-    public void revokeUserDeleteQuestion(final Member member){
+    public void revokeUserDeleteQuestion(final Member member) {
         List<Question> questions = questionRepository.findByMember(member);
         questionRepository.deleteAll(questions);
     }
 
     public Question getById(Long questionId) {
         return questionRepository.findById(questionId).orElseThrow(
-            () -> new CustomException(Error.NOT_FOUND_QUESTION, Error.NOT_FOUND_QUESTION.getMessage())
+                () -> new CustomException(Error.NOT_FOUND_QUESTION, Error.NOT_FOUND_QUESTION.getMessage())
         );
     }
 
