@@ -1,28 +1,34 @@
 package com.app.bdink.lecture.service;
 
+import com.app.bdink.chapter.entity.Chapter;
+import com.app.bdink.chapter.repository.ChapterRepository;
+import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
-import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.sugang.repository.SugangRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LectureService {
 
     private final LectureRepository lectureRepository;
     private final SugangRepository sugangRepository;
+    private final ChapterRepository chapterRepository;
+    private final ChapterService chapterService;
 
     public Lecture findById(Long id){
         return lectureRepository.findById(id).orElseThrow(
@@ -32,16 +38,23 @@ public class LectureService {
 
     //chapter에 강좌 추가
     @Transactional
-    public String createLecture(final Chapter chapter,
-                                final LectureDto lectureDto, final String uploadUrl){
+    public String createLecture(final Long chapterId,
+                                final LectureDto lectureDto, final KollusMedia kollusMedia){
+        String mediaContentKey = kollusMedia.getMediaContentKey(); //todo:kollus id를 가져올 필요가 없을것 같음.
+
+        Chapter chapter = chapterService.findWithClassRoomById(chapterId);
+
+        ClassRoomEntity classRoom = chapter.getClassRoom();
+
+        log.info("클래스룸 id는 값 : {}", classRoom.getId());
 
         Lecture lecture = lectureRepository.save(
                 Lecture.builder()
-                        .classRoom(chapter.getClassRoom())
+                        .classRoom(classRoom)
                         .chapter(chapter) //강좌를 만들때 챕터는 무조건 있어야한다.
                         .title(lectureDto.title())
                         .time(lectureDto.convertToLocalTime())
-                        .mediaLink(uploadUrl)
+                        .mediaLink(mediaContentKey)
                         .build());
 
         chapter.addLectures(lecture);
