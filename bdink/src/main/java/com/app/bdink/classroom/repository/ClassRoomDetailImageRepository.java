@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ClassRoomDetailImageRepository extends JpaRepository<ClassRoomDetailImage, Long> {
-    List<ClassRoomDetailImage> findByClassRoom(ClassRoomEntity classRoom);
+    List<ClassRoomDetailImage> findByClassRoomOrderBySortOrderAsc(ClassRoomEntity classRoom);
 }

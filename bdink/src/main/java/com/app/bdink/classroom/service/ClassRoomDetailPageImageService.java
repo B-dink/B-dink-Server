@@ -18,6 +18,12 @@ public class ClassRoomDetailPageImageService {
     private final ClassRoomRepository classRoomRepository;
     private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
 
+    public ClassRoomDetailImage findById(Long id) {
+        return classRoomDetailImageRepository.findById(id).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_CLASSROOM_DETAILPAGE, Error.NOT_FOUND_CLASSROOM_DETAILPAGE.getMessage())
+        );
+    }
+
     @Transactional
     public void saveImages(Long classRoomId, List<String> imageUrls) {
 

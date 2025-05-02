@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ClassRoomDetailImage {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String imageUrl;
@@ -21,6 +21,7 @@ public class ClassRoomDetailImage {
     @ManyToOne(fetch = FetchType.LAZY)
     private ClassRoomEntity classRoom;
 
+    @Column(name = "sort_order")
     private int sortOrder; // 이미지 순서
 
     @Builder

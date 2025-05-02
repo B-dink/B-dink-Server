@@ -23,6 +23,7 @@ public enum Error {
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
     NOT_FOUND_CLASSROOM(HttpStatus.NOT_FOUND, "찾을 수 없는 강의실입니다."),
+    NOT_FOUND_CLASSROOM_DETAILPAGE(HttpStatus.NOT_FOUND, "강의실에 디테일 페이지가 없습니다."),
     NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
     NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
