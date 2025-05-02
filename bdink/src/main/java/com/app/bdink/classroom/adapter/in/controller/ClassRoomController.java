@@ -1,14 +1,14 @@
 package com.app.bdink.classroom.adapter.in.controller;
 
 import com.app.bdink.bookmark.service.BookmarkService;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.domain.Career;
+import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.port.in.ClassRoomUseCase;
+import com.app.bdink.classroom.service.ClassRoomDetailPageImageService;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
-import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.aws.service.S3Service;
@@ -16,6 +16,7 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,21 +44,27 @@ public class ClassRoomController {
     private final InstructorUtilService instructorUtilService;
     private final MemberService memberService;
     private final BookmarkService bookmarkService;
+    private final ClassRoomDetailPageImageService classRoomDetailPageImageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
     RspTemplate<?> createClassRoom(Principal memberId,
                                    @RequestPart(value = "thumbnail") MultipartFile thumbnail,
-                                   @RequestPart(value = "detailPageImage") MultipartFile detailPageImage,
+                                   @RequestPart(value = "detailPageImage") List<MultipartFile> detailPageImages,
                                    @RequestPart(value = "intro-video") MultipartFile video,
                                    @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
+
+        List<String> detailPageImageUrls = detailPageImages.stream()
+                .map(file -> s3Service.uploadImageOrMedia("image/", file))
+                .toList();
+
 
         // create Command
         CreateClassRoomCommand command = CreateClassRoomCommand.of(
                 instructorUtilService.getInstructor(memberId),
                 s3Service.uploadImageOrMedia("image/", thumbnail),
-                s3Service.uploadImageOrMedia("image/", detailPageImage),
                 s3Service.uploadImageOrMedia("media/", video),
+                detailPageImageUrls,
                 classRoomDto
         );
 
@@ -67,7 +74,7 @@ public class ClassRoomController {
         //흠.. 밑에 애도 이런식으로 바꿔야하는데.
         mediaService.createMedia(Long.parseLong(id), command.mediaKey(), null, command.thumbnailKey());
 
-
+        classRoomDetailPageImageService.saveImages(Long.parseLong(id), command.detailImageKey());
 
         return RspTemplate.success(Success.CREATE_CLASSROOM_SUCCESS, CreateIdDto.from(id));
     }

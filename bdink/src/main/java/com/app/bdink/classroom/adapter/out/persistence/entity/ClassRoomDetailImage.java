@@ -2,6 +2,7 @@ package com.app.bdink.classroom.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,12 @@ public class ClassRoomDetailImage {
     private ClassRoomEntity classRoom;
 
     private int sortOrder; // 이미지 순서
+
+    @Builder
+    public ClassRoomDetailImage(String imageUrl, ClassRoomEntity classRoomEntity, int sortOrder) {
+        this.imageUrl = imageUrl;
+        this.classRoom = classRoomEntity;
+        this.sortOrder = sortOrder;
+
+    }
 }
