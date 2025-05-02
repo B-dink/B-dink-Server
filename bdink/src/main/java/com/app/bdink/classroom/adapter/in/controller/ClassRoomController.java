@@ -48,6 +48,7 @@ public class ClassRoomController {
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
     RspTemplate<?> createClassRoom(Principal memberId,
                                    @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+                                   @RequestPart(value = "detailPageImage") MultipartFile detailPageImage,
                                    @RequestPart(value = "intro-video") MultipartFile video,
                                    @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
 
@@ -55,6 +56,7 @@ public class ClassRoomController {
         CreateClassRoomCommand command = CreateClassRoomCommand.of(
                 instructorUtilService.getInstructor(memberId),
                 s3Service.uploadImageOrMedia("image/", thumbnail),
+                s3Service.uploadImageOrMedia("image/", detailPageImage),
                 s3Service.uploadImageOrMedia("media/", video),
                 classRoomDto
         );
@@ -64,6 +66,8 @@ public class ClassRoomController {
 
         //흠.. 밑에 애도 이런식으로 바꿔야하는데.
         mediaService.createMedia(Long.parseLong(id), command.mediaKey(), null, command.thumbnailKey());
+
+
 
         return RspTemplate.success(Success.CREATE_CLASSROOM_SUCCESS, CreateIdDto.from(id));
     }
