@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.domain;
 
+import com.app.bdink.price.domain.PriceDetail;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
