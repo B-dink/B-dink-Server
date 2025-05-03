@@ -55,6 +55,9 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Embedded
     private PriceDetail priceDetail;
 
+    @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClassRoomDetailImage> detailPageImages = new ArrayList<>();
+
 
     @Builder
     public ClassRoomEntity(final String title, final String introduction,

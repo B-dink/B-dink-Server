@@ -3,6 +3,8 @@ package com.app.bdink.classroom.adapter.in.controller.dto.response;
 import com.app.bdink.classroom.domain.Level;
 import com.app.bdink.price.domain.PriceDetail;
 
+import java.util.List;
+
 public record ClassRoomDetailResponse(
         String title,
         String introduction,
@@ -13,6 +15,8 @@ public record ClassRoomDetailResponse(
 
         String thumbnail,
         PriceDetail priceDetail,
-        Level level
+        Level level,
+
+        List<String> detailPageImageUrls
 ) {
 }
