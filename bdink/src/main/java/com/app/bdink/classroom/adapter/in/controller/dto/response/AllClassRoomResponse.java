@@ -8,6 +8,7 @@ public record AllClassRoomResponse(
         Long id,
         String title,
         String instructor,
+        String instructorProfile,
         Career career,
         int totalLectureCount
 ) {
@@ -16,6 +17,7 @@ public record AllClassRoomResponse(
                 classRoomEntity.getId(),
                 classRoomEntity.getTitle(),
                 classRoomEntity.getInstructor().getMember().getName(),
+                classRoomEntity.getInstructor().getMember().getPictureUrl(),
                 classRoomEntity.getCareer(),
                 chapterSummary.getTotalLectureCount()
         );
