@@ -4,8 +4,10 @@ import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.ClassRoomRepositoryAdapter;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomDetailImage;
 import com.app.bdink.classroom.domain.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.repository.ClassRoomDetailImageRepository;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.classroom.mapper.ClassRoomMapper;
 import com.app.bdink.instructor.mapper.InstructorMapper;
@@ -43,6 +45,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final InstructorMapper instructorMapper;
     private final ClassRoomRepositoryAdapter classRoomRepositoryAdapter;
     private final ReviewService reviewService;
+    private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -153,6 +156,13 @@ public class ClassRoomService implements ClassRoomUseCase {
     public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount) {
         ClassRoomEntity classRoomEntity = findById(id);
 
+        //클래스룸 엔티티로 디테일이미지 리스트를 가져옴.
+        List<ClassRoomDetailImage> byClassRoom = classRoomDetailImageRepository.findByClassRoomOrderBySortOrderAsc(classRoomEntity);
+
+        List<String> imageUrls = byClassRoom.stream()
+                .map(ClassRoomDetailImage::getImageUrl)
+                .toList();
+
         return new ClassRoomDetailResponse(
                 classRoomEntity.getTitle(),
                 classRoomEntity.getIntroduction(),
@@ -161,7 +171,8 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getInstructor().getMember().getPictureUrl(),
                 classRoomEntity.getThumbnail(),
                 classRoomEntity.getPriceDetail(),
-                classRoomEntity.getLevel()
+                classRoomEntity.getLevel(),
+                imageUrls
         );
     }
 

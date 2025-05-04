@@ -111,6 +111,9 @@ public enum Success {
     KOLLUS_MEDIALINK_SAVE_SUCCESS(HttpStatus.OK, "Kollus 미디어 시청 기록 생성 성공"),
     KOLLUS_MEDIALINK_DELETE_SUCCESS(HttpStatus.OK, "Kollus 미디어 시청 기록 삭제 성공"),
 
+    GET_TOSS_PAYMENT_SUCCESS(HttpStatus.OK, "승인된 결제를 조회 성공"),
+    CANCEL_TOSS_PAYMENT_SUCCESS(HttpStatus.OK, "승인된 결제를 취소 성공"),
+
     /**
      * 202 accepted
      */
@@ -129,7 +132,6 @@ public enum Success {
     DELETE_ANSWER_SUCCESS(HttpStatus.NO_CONTENT, "답변 삭제 성공"),
     DELETE_QUESTION_SUCCESS(HttpStatus.NO_CONTENT, "질문 삭제 성공"),
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
-
 
 
     ;
