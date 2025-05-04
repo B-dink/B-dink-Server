@@ -88,25 +88,19 @@ public class KollusController {
     }
 
     @GetMapping("/media-link/{memberId}")
-    @Operation(method = "GET", description = "특정 사용자의 개별 시청 기록을 확인합니다.")
+    @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
     public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
         return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
     }
 
     @PostMapping("/media-link")
     @Operation(method = "POST", description = "콜러스 미디어 시청 기록 생성")
-    public RspTemplate<?> saveMediaLink(Principal principal, @RequestParam Long kollusMediaId){
+    public RspTemplate<?> saveMediaLink(Principal principal, @RequestParam Long lectureId){
         Member member = memberService.findById(Long.valueOf(principal.getName()));
 
-        KollusMedia kollusMedia = kollusService.findById(kollusMediaId);
+        KollusMedia kollusMedia = kollusService.findByLectureId(lectureId);
 
-        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS, CreateIdDto.from(kollusService.saveMediaLink(member, kollusMedia)));
-    }
-
-    @DeleteMapping("/media-link")
-    @Operation(method = "DELETE", description = "콜러스 미디어 시청 기록 삭제, 삭제는 soft delete 형식으로 진행됩니다.")
-    public RspTemplate<?> deleteMediaLink(){
-        return RspTemplate.success(Success.KOLLUS_MEDIALINK_DELETE_SUCCESS);
+        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS, CreateIdDto.from(kollusService.saveMediaLink(member, kollusMedia, lectureId)));
     }
 
     /**

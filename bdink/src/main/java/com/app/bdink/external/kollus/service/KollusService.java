@@ -41,9 +41,15 @@ public class KollusService {
 //    @Value("${kollus.API_ACCESS_TOKEN}")
 //    private String apiAccessToken;
 
-    public KollusMedia findById(Long id){
+    public KollusMedia findById(Long id) {
         return kollusMediaRepository.findById(id).orElseThrow(
-                ()-> new CustomException(Error.NOT_FOUND_KOLLUSMEDIA, Error.NOT_FOUND_KOLLUSMEDIA.getMessage())
+                () -> new CustomException(Error.NOT_FOUND_KOLLUSMEDIA, Error.NOT_FOUND_KOLLUSMEDIA.getMessage())
+        );
+    }
+
+    public KollusMedia findByLectureId(Long lectureId) {
+        return kollusMediaRepository.findByLectureId(lectureId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage())
         );
     }
 
@@ -55,13 +61,13 @@ public class KollusService {
 
         String mediaContentKey = uploadRequestDTO.media_content_key();
         Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
-        
-        if(uploadRequestDTO.content_provider_key() == null){
+
+        if (uploadRequestDTO.content_provider_key() == null) {
             log.info("kollus 채널 callback api url 접속을 위한 api 요청");
             return;
         }
 
-        if(existingMedia.isPresent()) {
+        if (existingMedia.isPresent()) {
             log.warn("이미 존재하는 미디어키 입니다. : {}", mediaContentKey);
             return;
         }
@@ -126,7 +132,7 @@ public class KollusService {
     }
 
     @Transactional
-    public void createKollusUserKey(UserKeyDTO userKeyDTO){
+    public void createKollusUserKey(UserKeyDTO userKeyDTO) {
         UserKey userKey = UserKey.of(userKeyDTO.userKey());
         userKeyRepository.save(userKey);
     }
@@ -198,15 +204,15 @@ public class KollusService {
         Optional<KollusMedia> deleteOPT = kollusMediaRepository.findByMediaContentKey(deleteRequestDTO.media_content_key());
         if (deleteOPT.isPresent()) {
             kollusMediaRepository.delete(deleteOPT.get());
-        }else{
+        } else {
             log.info("이미 kollusmedia가 삭제되었거나 요청이 제대로 들어오지 않았습니다.");
             log.info("해당 미디어키 : {}", deleteRequestDTO.media_content_key());
         }
     }
 
     @Transactional
-    public String saveMediaLink(final Member member, final KollusMedia kollusMedia){
-        if(kollusMediaLinkRepository.existsByMemberAndKollusMedia(member, kollusMedia)){
+    public String saveMediaLink(final Member member, final KollusMedia kollusMedia, final Long lectureId) {
+        if (kollusMediaLinkRepository.existsByMemberAndKollusMedia(member, kollusMedia)) {
             throw new CustomException(Error.EXIST_KOLLUSMEDIALINK, Error.EXIST_KOLLUSMEDIALINK.getMessage());
         }
         log.info("여기까지옴");
@@ -214,7 +220,7 @@ public class KollusService {
         KollusMediaLink kollusMediaLink = KollusMediaLink.builder()
                 .member(member)
                 .kollusMedia(kollusMedia)
-                //todo: 여기에 필요한값 있는지 다시보기
+                .lectureId(lectureId)
                 .build();
         kollusMediaLinkRepository.save(kollusMediaLink);
         return String.valueOf(kollusMediaLink.getId());
