@@ -1,6 +1,8 @@
 package com.app.bdink.member.service;
 
+import com.app.bdink.external.kollus.entity.UserKey;
 import com.app.bdink.external.kollus.repository.UserKeyRepository;
+import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
@@ -94,12 +96,12 @@ public class MemberService {
              * 근데이거 여유있는 사용자 키가 없으면 가입이 안됨. -> 로그만 찍고 넘어가야할수도. 
              * 로그를 사용자이름하고 찍어놓으면 서버에서 확인은 가능
              */
-//            UserKey userkey = userKeyRepository
-//                    .findFirstByMemberIsNull()
-//                    .orElseThrow(() -> new CustomException(Error.NOT_EXIST_USERKEY, Error.NOT_EXIST_USERKEY.getMessage()));
-//
-//            userkey.updateMember(member);
-//            userKeyRepository.save(userkey);
+            UserKey userkey = userKeyRepository
+                    .findFirstByMemberIsNull()
+                    .orElseThrow(() -> new CustomException(Error.NOT_EXIST_USERKEY, Error.NOT_EXIST_USERKEY.getMessage()));
+
+            userkey.updateMember(member);
+            userKeyRepository.save(userkey);
 
         }
         return member;

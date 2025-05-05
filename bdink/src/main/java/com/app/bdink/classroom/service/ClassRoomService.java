@@ -125,7 +125,6 @@ public class ClassRoomService implements ClassRoomUseCase {
             List<CareerClassroomDto> classroomsByCareer = getClassRoomByCareer(career);
             result.add(CategorizedClassroomDto.from(classroomsByCareer));
         }
-
         return CareerListDto.of(dtos, result);
     }
 

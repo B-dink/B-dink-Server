@@ -20,6 +20,12 @@ public class ChapterService {
         );
     }
 
+    public Chapter findWithClassRoomById(Long id){
+        return chapterRepository.findWithClassRoomById(id).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_CHAPTER, Error.NOT_FOUND_CHAPTER.getMessage())
+        );
+    }
+
 
 
     public String createChapter(final ClassRoomEntity classRoomEntity, final String title){

@@ -15,8 +15,9 @@ import com.app.bdink.external.kollus.repository.UserKeyRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.token.KollusTokenProvider;
+import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.repository.MemberRepository;
+import com.app.bdink.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,24 @@ public class KollusService {
 
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
     private final KollusMediaRepository kollusMediaRepository;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final KollusTokenProvider kollusTokenProvider;
     private final UserKeyRepository userKeyRepository;
+
 //    @Value("${kollus.API_ACCESS_TOKEN}")
 //    private String apiAccessToken;
+
+    public KollusMedia findById(Long id) {
+        return kollusMediaRepository.findById(id).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_KOLLUSMEDIA, Error.NOT_FOUND_KOLLUSMEDIA.getMessage())
+        );
+    }
+
+    public KollusMedia findByLectureId(Long lectureId) {
+        return kollusMediaRepository.findByLectureId(lectureId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage())
+        );
+    }
 
 
     @Transactional
@@ -47,13 +61,13 @@ public class KollusService {
 
         String mediaContentKey = uploadRequestDTO.media_content_key();
         Optional<KollusMedia> existingMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey);
-        
-        if(uploadRequestDTO.content_provider_key() == null){
+
+        if (uploadRequestDTO.content_provider_key() == null) {
             log.info("kollus 채널 callback api url 접속을 위한 api 요청");
             return;
         }
 
-        if(existingMedia.isPresent()) {
+        if (existingMedia.isPresent()) {
             log.warn("이미 존재하는 미디어키 입니다. : {}", mediaContentKey);
             return;
         }
@@ -69,22 +83,30 @@ public class KollusService {
 
         kollusMediaRepository.save(kollusMedia);
     }
-    
-    //todo:콜러스쪽 jwt 토큰에 문제가 있어 추후에 추가하는 방식으로 전환(주석 처리 부분)
+
     @Transactional
     public KollusApiResponse.KollusUrlResponse createKollusURLService(Principal principal, Long lectureId) {
         Long memberId = Long.valueOf(principal.getName());
-        Member member = memberRepository
-                .findById(memberId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage()));
+        Member member = memberService.findById(memberId);
+
         String clientUserId = member.getKollusClientUserId();
 
+        log.info("유저 번호 : {}", memberId);
+
         UserKey userKey = userKeyRepository
-                .findFirstByMemberIdAndIsRevokedFalseOrderByAssignedAtDesc(memberId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USERKEY, Error.NOT_FOUND_USERKEY.getMessage()));
+                .findByMember(member)
+                .orElseThrow(
+                        () -> new CustomException(Error.NOT_FOUND_USERKEY, Error.NOT_FOUND_USERKEY.getMessage())
+                );
+
+//        UserKey userKey = userKeyRepository
+//                .findFirstByMemberIdAndIsRevokedFalseOrderByAssignedAtDesc(memberId)
+//                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USERKEY, Error.NOT_FOUND_USERKEY.getMessage()));
 
         LocalDateTime kollusCreatedAt = LocalDateTime.now();
 
+
+        //TODO: KOLLUS 채널 업로드키 LECTURE에서 들고와도 될것 같기도. -> 사이드이펙트 고려해서 생각 확장해보기.
         KollusMedia kollusMedia = kollusMediaRepository
                 .findByLectureId(lectureId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
@@ -110,9 +132,19 @@ public class KollusService {
     }
 
     @Transactional
-    public void createKollusUserKey(UserKeyDTO userKeyDTO){
+    public void createKollusUserKey(UserKeyDTO userKeyDTO) {
         UserKey userKey = UserKey.of(userKeyDTO.userKey());
         userKeyRepository.save(userKey);
+    }
+
+    @Transactional
+    public String connectKollusAndLecture(final Lecture lecture, final KollusMedia kollusMedia) {
+
+        kollusMedia.updateLecture(lecture);
+
+        kollusMediaRepository.save(kollusMedia);
+
+        return String.valueOf(kollusMedia.getId());
     }
 
 //    @Transactional
@@ -172,10 +204,26 @@ public class KollusService {
         Optional<KollusMedia> deleteOPT = kollusMediaRepository.findByMediaContentKey(deleteRequestDTO.media_content_key());
         if (deleteOPT.isPresent()) {
             kollusMediaRepository.delete(deleteOPT.get());
-        }else{
+        } else {
             log.info("이미 kollusmedia가 삭제되었거나 요청이 제대로 들어오지 않았습니다.");
             log.info("해당 미디어키 : {}", deleteRequestDTO.media_content_key());
         }
+    }
+
+    @Transactional
+    public String saveMediaLink(final Member member, final KollusMedia kollusMedia, final Long lectureId) {
+        if (kollusMediaLinkRepository.existsByMemberAndKollusMedia(member, kollusMedia)) {
+            throw new CustomException(Error.EXIST_KOLLUSMEDIALINK, Error.EXIST_KOLLUSMEDIALINK.getMessage());
+        }
+        log.info("여기까지옴");
+        //TODO: 시청기록 생성, 시청기록은 처음 한번만 호출할지? 아니면 이렇게 유지할지 생각
+        KollusMediaLink kollusMediaLink = KollusMediaLink.builder()
+                .member(member)
+                .kollusMedia(kollusMedia)
+                .lectureId(lectureId)
+                .build();
+        kollusMediaLinkRepository.save(kollusMediaLink);
+        return String.valueOf(kollusMediaLink.getId());
     }
 
     @Transactional
