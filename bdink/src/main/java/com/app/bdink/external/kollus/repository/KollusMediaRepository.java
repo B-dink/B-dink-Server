@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface KollusMediaRepository extends JpaRepository<KollusMedia, Long> {
+    Optional<KollusMedia> findById(Long id);
     Optional<KollusMedia> findByLectureId (Long lectureId);
     Optional<KollusMedia> findByMediaContentKey(String mediaContentKey);
 }

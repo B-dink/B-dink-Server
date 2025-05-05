@@ -32,6 +32,8 @@ public class KollusMediaLink {
 
     private LocalDateTime tokenCreatedAt;
 
+    private Long lectureId;
+
     private double watchProgress;
 
     private boolean completed;

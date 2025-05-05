@@ -1,24 +1,23 @@
 package com.app.bdink.lecture.controller;
 
 
-import com.app.bdink.instructor.util.InstructorUtilService;
+import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
+import com.app.bdink.external.kollus.entity.KollusMedia;
+import com.app.bdink.external.kollus.service.KollusService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
-import com.app.bdink.chapter.entity.Chapter;
-import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.lecture.service.LectureService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -31,6 +30,7 @@ public class LectureController {
     private final LectureService lectureService;
     private final InstructorUtilService instructorUtilService;
     private final ChapterService chapterService;
+    private final KollusService kollusService;
     private final S3Service s3Service;
 
     //TODO: 강사인지 확인하는 로직이 필요하다.
@@ -40,24 +40,28 @@ public class LectureController {
                                            Principal principal,
                                            @RequestParam Long classRoomId,
                                            @RequestParam Long chapterId,
-                                           @RequestPart(value = "lectureDto") LectureDto lectureDto,
-                                           @RequestPart(value = "media") MultipartFile file) {
+                                           @RequestParam Long kollusMediaId,
+                                           @RequestBody LectureDto lectureDto) {
 
         if (!instructorUtilService.validateClassRoomOwner(principal, classRoomId)){
             throw new CustomException(Error.NO_INSTRUCTOR, Error.NO_INSTRUCTOR.getMessage());
         }
 
-        Chapter chapter = chapterService.findById(chapterId);
+        KollusMedia kollusMedia = kollusService.findById(kollusMediaId);
 
-        String uploadUrlKey = null;
 
-        if (!file.isEmpty()){
-            uploadUrlKey = s3Service.uploadMedia("media/", file); //TODO: 이미지인지 동영상인지 구분 + s3에서 validation하도록 구현
-        }
 
-        String uploadUrl = s3Service.generateOriginalLink(uploadUrlKey);
+//        String uploadUrlKey = null;
 
-        return RspTemplate.success(Success.CREATE_LECTURE_SUCCESS, CreateIdDto.from(lectureService.createLecture(chapter, lectureDto, uploadUrl)));
+//        if (!file.isEmpty()){
+//            uploadUrlKey = s3Service.uploadMedia("media/", file); //TODO: 이미지인지 동영상인지 구분 + s3에서 validation하도록 구현
+//        }
+
+//        String uploadUrl = s3Service.generateOriginalLink(uploadUrlKey);
+
+        //todo:kollus 미디어 링크나 미디어를 연결하는 로직을 생성 기존에 생각했던건 미디어를 강좌와 연결
+
+        return RspTemplate.success(Success.CREATE_LECTURE_SUCCESS, CreateIdDto.from(lectureService.createLecture(chapterId, lectureDto, kollusMedia)));
     }
 
     @GetMapping
