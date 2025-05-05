@@ -42,4 +42,8 @@ public class KollusMedia {
     public void updateTotalLength(double totalLength) {
         this.totalLength = totalLength;
     }
+
+    public void updateLecture(Lecture lecture) {
+        this.lecture = lecture;
+    }
 }
