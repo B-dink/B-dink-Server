@@ -24,6 +24,7 @@ public enum Success {
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
     CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
     CREATE_PAYMENT_SUCCESS(HttpStatus.CREATED, "결제 성공"),
+    CREATE_YOUTUBEVIDEO_SUCCESS(HttpStatus.CREATED, "유튜브 비디오 생성 성공"),
 
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
@@ -39,6 +40,7 @@ public enum Success {
     GET_REVIEW_COUNT_SUCCESS(HttpStatus.OK, "리뷰 개수 조회 성공"),
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
+    GET_YOUTUBE_VIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
     NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
@@ -66,6 +68,7 @@ public enum Success {
 
     UPDATE_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 수정 성공"),
     UPDATE_REVIEW_SUCCESS(HttpStatus.OK, "리뷰 수정 성공"),
+    UPDATE_YOUTUBEVIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 수정 성공"),
     UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
     UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
 
@@ -132,6 +135,7 @@ public enum Success {
     DELETE_ANSWER_SUCCESS(HttpStatus.NO_CONTENT, "답변 삭제 성공"),
     DELETE_QUESTION_SUCCESS(HttpStatus.NO_CONTENT, "질문 삭제 성공"),
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
+    DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
 
 
     ;
