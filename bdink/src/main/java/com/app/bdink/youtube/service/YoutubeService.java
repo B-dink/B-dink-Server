@@ -3,10 +3,13 @@ package com.app.bdink.youtube.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.youtube.domain.YoutubeInfoDto;
+import com.app.bdink.youtube.domain.YoutubeType;
 import com.app.bdink.youtube.entity.Youtube;
 import com.app.bdink.youtube.repository.YoutubeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +22,19 @@ public class YoutubeService {
         );
     }
 
-    public YoutubeInfoDto getYoutubeInfoDto(Long youtubeId) {
-        Youtube youtubeVideo = findById(youtubeId);
-        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink());
+    public List<Youtube> findByYoutubeType(YoutubeType youtubeType) {
+        return youtubeRepository.findByYoutubeType(youtubeType);
     }
 
-    public String saveYoutubeVideo(String youtubeVideoUrl) {
+    public YoutubeInfoDto getYoutubeInfoDto(Long youtubeId) {
+        Youtube youtubeVideo = findById(youtubeId);
+        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType());
+    }
+
+    public String saveYoutubeVideo(YoutubeInfoDto youtubeInfoDto) {
         Youtube youtube = Youtube.builder()
-                .youtubeVideoLink(youtubeVideoUrl)
+                .youtubeVideoLink(youtubeInfoDto.youtubeVideoUrl())
+                .youtubeType(youtubeInfoDto.youtubeType())
                 .build();
         youtubeRepository.save(youtube);
         return String.valueOf(youtube.getId());

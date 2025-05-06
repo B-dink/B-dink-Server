@@ -3,6 +3,8 @@ package com.app.bdink.youtube.controller;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.youtube.domain.YoutubeInfoDto;
+import com.app.bdink.youtube.domain.YoutubeType;
 import com.app.bdink.youtube.entity.Youtube;
 import com.app.bdink.youtube.service.YoutubeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,15 +20,21 @@ public class YoutubeController {
     private final YoutubeService youtubeService;
 
     @GetMapping
-    @Operation(method = "GET", description = "유튜브 비디오 조회 API")
+    @Operation(method = "GET", description = "유튜브 비디오 개별 조회 API")
     public RspTemplate<?> getYoutubeVideo(@RequestParam Long youtubeId) {
         return RspTemplate.success(Success.GET_YOUTUBE_VIDEO_SUCCESS, youtubeService.getYoutubeInfoDto(youtubeId));
     }
 
+    @GetMapping("/type")
+    @Operation(method = "GET", description = "유튜브 비디오 카테고리별 조회 API")
+    public RspTemplate<?> getListYoutubeVideo(@RequestParam YoutubeType youtubeType) {
+        return RspTemplate.success(Success.GET_YOUTUBE_VIDEO_SUCCESS, youtubeService.findByYoutubeType(youtubeType));
+    }
+
     @PostMapping
     @Operation(method = "POST", description = "유튜브 비디오 생성 API")
-    public RspTemplate<?> createYoutubeVideo(@RequestParam String youtubeVideoUrl) {
-        return RspTemplate.success(Success.CREATE_YOUTUBEVIDEO_SUCCESS, CreateIdDto.from(youtubeService.saveYoutubeVideo(youtubeVideoUrl)));
+    public RspTemplate<?> createYoutubeVideo(@RequestBody YoutubeInfoDto youtubeInfoDto) {
+        return RspTemplate.success(Success.CREATE_YOUTUBEVIDEO_SUCCESS, CreateIdDto.from(youtubeService.saveYoutubeVideo(youtubeInfoDto)));
     }
 
     @PutMapping
