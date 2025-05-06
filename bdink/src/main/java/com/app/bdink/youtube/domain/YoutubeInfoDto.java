@@ -1,9 +1,10 @@
 package com.app.bdink.youtube.domain;
 
 public record YoutubeInfoDto(
-        String youtubeVideoUrl
+        String youtubeVideoUrl,
+        YoutubeType youtubeType
 ) {
-    public static YoutubeInfoDto of(final String youtubeVideoUrl) {
-        return new YoutubeInfoDto(youtubeVideoUrl);
+    public static YoutubeInfoDto of(final String youtubeVideoUrl, final YoutubeType youtubeType) {
+        return new YoutubeInfoDto(youtubeVideoUrl, youtubeType);
     }
 }

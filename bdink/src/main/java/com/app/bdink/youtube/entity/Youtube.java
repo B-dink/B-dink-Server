@@ -1,5 +1,6 @@
 package com.app.bdink.youtube.entity;
 
+import com.app.bdink.youtube.domain.YoutubeType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,9 +19,13 @@ public class Youtube {
 
     private String youtubeVideoLink;
 
+    @Enumerated(EnumType.STRING)
+    private YoutubeType youtubeType;
+
     @Builder
-    public Youtube(String youtubeVideoLink) {
+    public Youtube(String youtubeVideoLink, YoutubeType youtubeType) {
         this.youtubeVideoLink = youtubeVideoLink;
+        this.youtubeType = youtubeType;
     }
 
     public void updateYoutubeVideoLink(String youtubeVideoLink) {
