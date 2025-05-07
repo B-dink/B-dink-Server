@@ -83,13 +83,13 @@ public class ClassRoomController {
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
     RspTemplate<?> getClassRoomInfo(@RequestParam Long id) {
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
-        return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS ,classRoomDto);
+        return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS, classRoomDto);
     }
 
     @GetMapping("/chapter")
     @Operation(method = "GET", description = "해당 클래스룸의 챕터 정보를 조회합니다.")
     RspTemplate<?> getChapterInfo(@RequestParam Long id) {
-        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS ,classRoomService.getChapterInfo(id));
+        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS, classRoomService.getChapterInfo(id));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -101,7 +101,7 @@ public class ClassRoomController {
             @RequestPart(value = "thumbnail") MultipartFile thumbnail,
             @RequestPart(value = "intro-video") MultipartFile video) {
 
-        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)) {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
@@ -123,7 +123,7 @@ public class ClassRoomController {
             Principal principal,
             @RequestParam Long id) {
 
-        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)) {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
@@ -172,6 +172,4 @@ public class ClassRoomController {
 
         return RspTemplate.success(Success.GET_CLASSROOM_PROGRESS_SUCCESS, progressWithStatus);
     }
-
-
 }
