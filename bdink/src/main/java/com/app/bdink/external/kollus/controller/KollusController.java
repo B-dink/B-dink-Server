@@ -91,6 +91,7 @@ public class KollusController {
     @GetMapping("/media-link/{memberId}")
     @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
     public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
+
         return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
     }
 

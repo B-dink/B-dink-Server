@@ -17,4 +17,8 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
     List<KollusMediaLink> findAllByMemberId(Long memberId);
 
     boolean existsByMemberAndKollusMedia(Member member, KollusMedia kollusMedia);
+
+    long countByMemberIdAndLectureIdInAndCompletedTrue(Long memberId, List<Long> lectureIds);
+
+    long countByMemberIdAndLectureIdIn(Long memberId, List<Long> lectureIds);
 }

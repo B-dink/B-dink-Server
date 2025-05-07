@@ -1,6 +1,5 @@
 package com.app.bdink.external.kollus.entity;
 
-import com.app.bdink.external.aws.lambda.domain.Media;
 import com.app.bdink.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
