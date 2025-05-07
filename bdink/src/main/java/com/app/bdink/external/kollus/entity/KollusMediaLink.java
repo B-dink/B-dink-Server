@@ -38,10 +38,24 @@ public class KollusMediaLink {
 
     private boolean completed;
 
+    private int playtimePercent;
+
     // 토큰 갱신용 메서드
     public void updateMediaToken(String accessToken, LocalDateTime tokenCreatedAt) {
         this.accessToken = accessToken;
         this.tokenCreatedAt = tokenCreatedAt;
+    }
+
+    public void updateWatchProgress(double watchProgress){
+        this.watchProgress = watchProgress;
+    }
+
+    public void updatePlaytimePercent(int playtimePercent){
+        this.playtimePercent = playtimePercent;
+    }
+
+    public void updateCompleted(boolean completed){
+        this.completed = completed;
     }
 }
 

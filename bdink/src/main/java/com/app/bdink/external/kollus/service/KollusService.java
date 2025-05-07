@@ -91,8 +91,6 @@ public class KollusService {
 
         String clientUserId = member.getKollusClientUserId();
 
-        log.info("유저 번호 : {}", memberId);
-
         UserKey userKey = userKeyRepository
                 .findByMember(member)
                 .orElseThrow(
@@ -228,6 +226,30 @@ public class KollusService {
 
     @Transactional
     public void playCallbackService(PlayRequestDTO playRequestDTO) {
-        log.info(String.valueOf(playRequestDTO));
+        String mediaContentKey = playRequestDTO.media_content_key();
+        int playtime = Integer.parseInt(playRequestDTO.play_time());
+        int duration = Integer.parseInt(playRequestDTO.duration());
+        int playTimePercent = Integer.parseInt(playRequestDTO.playtime_percent());
+        String kollusId = playRequestDTO.client_user_id();
+
+        Member member = memberService.findByKollusClientUserId(kollusId);
+        KollusMedia kollusMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey).orElse(null);
+
+        KollusMediaLink kollusMediaLink = kollusMediaLinkRepository.findByMemberIdAndKollusMediaId(member.getId(), kollusMedia.getId()).
+                orElse(null);
+
+        if(playtime > kollusMediaLink.getWatchProgress() && playtime <= duration) {
+            kollusMediaLink.updateWatchProgress(playtime);
+        }
+
+        if(playTimePercent > kollusMediaLink.getPlaytimePercent() && playTimePercent <= 100) {
+            kollusMediaLink.updatePlaytimePercent(playTimePercent);
+
+            if(playTimePercent >= 90){
+                kollusMediaLink.updateCompleted(true);
+            }
+
+            kollusMediaLinkRepository.save(kollusMediaLink);
+        }
     }
 }

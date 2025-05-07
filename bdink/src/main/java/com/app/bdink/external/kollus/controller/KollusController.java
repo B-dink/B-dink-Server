@@ -3,6 +3,7 @@ package com.app.bdink.external.kollus.controller;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.kollus.dto.request.UserKeyDTO;
 import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.service.KollusService;
@@ -106,20 +107,10 @@ public class KollusController {
     /**
      *  todo:진행률 관련 callback api 생성 예정
      */
-//    @PostMapping("/lms")
-//    @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
-//    public RspTemplate<?> lmsCallback(@ModelAttribute CallbackRequest.playRequestDTO playRequestDTO) {
-//        log.info("------------------------------------------------------------");
-//        log.info(String.valueOf(playRequestDTO.getContent_provider_key()));
-//        log.info(String.valueOf(playRequestDTO.getMedia_content_key()));
-//        log.info(String.valueOf(playRequestDTO.getMedia_profile_key()));
-//        log.info(String.valueOf(playRequestDTO.getUser_key()));
-//        log.info(String.valueOf(playRequestDTO.getLog_type()));
-//        log.info(String.valueOf(playRequestDTO.getFull_filename()));
-//        log.info(String.valueOf(playRequestDTO.getPlay_time()));
-//        log.info(String.valueOf(playRequestDTO.getDuration()));
-//        kollusService.playCallbackService(playRequestDTO);
-//        log.info("------------------------------------------------------------");
-//        return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
-//    }
+    @PostMapping("/lms")
+    @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
+    public RspTemplate<?> lmsCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
+        kollusService.playCallbackService(playRequestDTO);
+        return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
+    }
 }
