@@ -13,12 +13,10 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
     // 특정 사용자가 어떤 미디어 콘텐츠의 accessToken을 요청
     Optional<KollusMediaLink> findByMemberIdAndKollusMediaId(Long memberId, Long kollusMediaId);
 
+    Optional<KollusMediaLink> findByMemberIdAndLectureId(Long memberId, Long lectureId);
+
     // 사용자별 등록된 영상 리스트 가져오기
     List<KollusMediaLink> findAllByMemberId(Long memberId);
 
     boolean existsByMemberAndKollusMedia(Member member, KollusMedia kollusMedia);
-
-    long countByMemberIdAndLectureIdInAndCompletedTrue(Long memberId, List<Long> lectureIds);
-
-    long countByMemberIdAndLectureIdIn(Long memberId, List<Long> lectureIds);
 }
