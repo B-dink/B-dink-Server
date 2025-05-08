@@ -1,6 +1,6 @@
 package com.app.bdink.external.kollus.entity;
 
-import com.app.bdink.external.aws.lambda.domain.Media;
+import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,16 +32,32 @@ public class KollusMediaLink {
 
     private LocalDateTime tokenCreatedAt;
 
-    private Long lectureId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id", insertable = false, updatable = false)
+    private Lecture lecture;
 
     private double watchProgress;
 
     private boolean completed;
 
+    private int playtimePercent;
+
     // 토큰 갱신용 메서드
     public void updateMediaToken(String accessToken, LocalDateTime tokenCreatedAt) {
         this.accessToken = accessToken;
         this.tokenCreatedAt = tokenCreatedAt;
+    }
+
+    public void updateWatchProgress(double watchProgress){
+        this.watchProgress = watchProgress;
+    }
+
+    public void updatePlaytimePercent(int playtimePercent){
+        this.playtimePercent = playtimePercent;
+    }
+
+    public void updateCompleted(boolean completed){
+        this.completed = completed;
     }
 }
 

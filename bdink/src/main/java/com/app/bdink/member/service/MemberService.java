@@ -34,6 +34,13 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
+    public Member findByKollusClientUserId(String kollusClientUserId) {
+        return memberRepository.findByKollusClientUserId(kollusClientUserId).orElseThrow(
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
+        );
+    }
+
+    @Transactional(readOnly = true)
     public Member findByPhone(String phone) {
         return memberRepository.findByPhoneNumber(phone).orElseThrow(
                 () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")

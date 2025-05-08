@@ -8,6 +8,7 @@ import com.app.bdink.youtube.entity.Youtube;
 import com.app.bdink.youtube.repository.YoutubeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,11 +27,13 @@ public class YoutubeService {
         return youtubeRepository.findByYoutubeType(youtubeType);
     }
 
+    @Transactional(readOnly = true)
     public YoutubeInfoDto getYoutubeInfoDto(Long youtubeId) {
         Youtube youtubeVideo = findById(youtubeId);
         return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType());
     }
 
+    @Transactional
     public String saveYoutubeVideo(YoutubeInfoDto youtubeInfoDto) {
         Youtube youtube = Youtube.builder()
                 .youtubeVideoLink(youtubeInfoDto.youtubeVideoUrl())

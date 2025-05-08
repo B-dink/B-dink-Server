@@ -11,14 +11,10 @@ import com.app.bdink.lecture.controller.dto.LectureDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.sugang.repository.SugangRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -26,7 +22,6 @@ import java.util.List;
 public class LectureService {
 
     private final LectureRepository lectureRepository;
-    private final SugangRepository sugangRepository;
     private final ChapterRepository chapterRepository;
     private final ChapterService chapterService;
 
@@ -91,19 +86,4 @@ public class LectureService {
                 .mapToInt(lecture -> lecture.getTime().getHour() * 60 + lecture.getTime().getMinute())
                 .sum();
     }
-
-    @Transactional(readOnly = true)
-    public int lectureProgress(Member member, ClassRoomEntity classRoom) {
-        List<Lecture> lectures = lectureRepository.findAllByClassRoom(classRoom);
-        int totalLectures = lectures.size();
-
-        // 특정 강의에 대해 수강 완료된 강의의 개수를 구하는 방식으로 변경
-        int completedLectures = lectures.stream()
-                .mapToInt(lecture -> sugangRepository.countByMemberAndLectureAndCompleted(member, lecture, true))
-                .sum();
-
-        if (totalLectures == 0) return 0; // 강의가 없는 경우 진행률 0%
-        return (completedLectures * 100) / totalLectures;
-    }
-
 }

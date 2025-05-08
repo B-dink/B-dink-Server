@@ -1,14 +1,14 @@
 package com.app.bdink.classroom.adapter.out.persistence.entity;
 
+import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.domain.Level;
-import com.app.bdink.price.domain.PriceDetail;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
-import com.app.bdink.chapter.entity.Chapter;
+import com.app.bdink.price.domain.PriceDetail;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -58,7 +58,6 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassRoomDetailImage> detailPageImages = new ArrayList<>();
 
-
     @Builder
     public ClassRoomEntity(final String title, final String introduction,
                            final String thumbnail, final String introLink,
@@ -76,7 +75,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     //TODO: 도메인 로직꺼 호출하고 아래 싹 지우기.
 
-    public void modifyClassRoom(final ClassRoomDto classRoomDto, final String thumbnailKey, final String videoKey){
+    public void modifyClassRoom(final ClassRoomDto classRoomDto, final String thumbnailKey, final String videoKey) {
         this.title = updateTitle(classRoomDto.title());
         this.introduction = updateIntroduction(classRoomDto.introduction());
         this.priceDetail = updatePriceDetail(classRoomDto.priceDto().toPriceDetail());
@@ -87,7 +86,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
     }
 
     public String updateTitle(final String title) {
-        if (title.isBlank() || title == null){
+        if (title.isBlank() || title == null) {
             return this.title; //필드가 비어있으면 수정하지 않음.
         }
         this.title = title;
@@ -95,7 +94,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
     }
 
     public String updateIntroduction(final String introduction) {
-        if (introduction.isBlank() || introduction == null){
+        if (introduction.isBlank() || introduction == null) {
             return this.introduction;
         }
         this.introduction = introduction;
@@ -103,7 +102,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
     }
 
     public PriceDetail updatePriceDetail(final PriceDetail priceDetail) {
-        if (priceDetail == null){
+        if (priceDetail == null) {
             return this.priceDetail;
         }
         this.priceDetail = priceDetail;
@@ -126,26 +125,26 @@ public class ClassRoomEntity extends BaseTimeEntity {
         return this.career;
     }
 
-    public boolean isOwner(final Instructor instructor){
+    public boolean isOwner(final Instructor instructor) {
         return this.instructor.equals(instructor);
     }
 
-    public void addChapter(final Chapter chapter){
-        if (chapter == null){
+    public void addChapter(final Chapter chapter) {
+        if (chapter == null) {
             throw new CustomException(Error.NOT_FOUND_CHAPTER, Error.NOT_FOUND_CHAPTER.getMessage());
         }
         this.chapters.add(chapter);
     }
 
-    public void updateCDNLink(String cdnLink){
+    public void updateCDNLink(String cdnLink) {
         this.introLink = cdnLink;
     }
 
-    public boolean isEmptyThumbnail(){
+    public boolean isEmptyThumbnail() {
         return this.thumbnail == null || this.thumbnail.isBlank();
     }
 
-    public Void softDeleteInstructor(){
+    public Void softDeleteInstructor() {
         this.instructor = null;
         return null;
     }

@@ -14,6 +14,9 @@ public record ClassRoomDetailResponse(
         String instructorProfile,
 
         String thumbnail,
+
+        Boolean payment,
+
         PriceDetail priceDetail,
         Level level,
 
