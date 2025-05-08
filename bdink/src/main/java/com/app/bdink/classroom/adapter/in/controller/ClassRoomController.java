@@ -83,13 +83,13 @@ public class ClassRoomController {
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
     RspTemplate<?> getClassRoomInfo(@RequestParam Long id) {
         ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
-        return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS ,classRoomDto);
+        return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS, classRoomDto);
     }
 
     @GetMapping("/chapter")
     @Operation(method = "GET", description = "해당 클래스룸의 챕터 정보를 조회합니다.")
     RspTemplate<?> getChapterInfo(@RequestParam Long id) {
-        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS ,classRoomService.getChapterInfo(id));
+        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS, classRoomService.getChapterInfo(id));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -101,7 +101,7 @@ public class ClassRoomController {
             @RequestPart(value = "thumbnail") MultipartFile thumbnail,
             @RequestPart(value = "intro-video") MultipartFile video) {
 
-        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)) {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
@@ -123,7 +123,7 @@ public class ClassRoomController {
             Principal principal,
             @RequestParam Long id) {
 
-        if (!instructorUtilService.validateClassRoomOwner(principal, id)){
+        if (!instructorUtilService.validateClassRoomOwner(principal, id)) {
             throw new CustomException(Error.UNAUTHORIZED_ACCESS, Error.UNAUTHORIZED_ACCESS.getMessage());
         }
 
@@ -148,10 +148,12 @@ public class ClassRoomController {
 
     @GetMapping("/class-detail/{id}")
     @Operation(method = "GET", description = "클래스 디테일 페이지를 조회합니다.")
-    public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id) {
+    public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id, Principal principal) {
+        Long memberId = Long.parseLong((principal.getName()));
+        Member member = memberService.findById(memberId);
         ClassRoomEntity classRoom = classRoomService.findById(id);
         long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
-        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount);
+        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount, member);
         return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
 
@@ -172,6 +174,4 @@ public class ClassRoomController {
 
         return RspTemplate.success(Success.GET_CLASSROOM_PROGRESS_SUCCESS, progressWithStatus);
     }
-
-
 }

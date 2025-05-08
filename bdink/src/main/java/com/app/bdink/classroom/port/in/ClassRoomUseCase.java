@@ -6,6 +6,7 @@ import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
+import com.app.bdink.member.entity.Member;
 
 import java.util.List;
 
@@ -31,6 +32,6 @@ public interface ClassRoomUseCase {
 
     List<CareerClassroomDto> getClassRoomByCareer(Career career);
 
-    ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount);
+    ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member);
     ChapterSummary getChapterSummary(Long id);
 }
