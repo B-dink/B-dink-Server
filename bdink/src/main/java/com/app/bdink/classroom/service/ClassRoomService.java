@@ -27,9 +27,12 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.price.domain.PriceDetail;
 import com.app.bdink.price.mapper.PriceDetailMapper;
 import com.app.bdink.review.service.ReviewService;
+import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
+import com.app.bdink.sugang.service.SugangService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ClassRoomService implements ClassRoomUseCase {
 
@@ -55,6 +59,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
     private final SugangRepository sugangRepository;
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
+    private final SugangService sugangService;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -161,8 +166,21 @@ public class ClassRoomService implements ClassRoomUseCase {
 
 
     @Transactional(readOnly = true)
-    public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount) {
+    public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member) {
         ClassRoomEntity classRoomEntity = findById(id);
+
+        Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
+
+        Boolean payment = false;
+
+        if(sugangOpt.isPresent()){
+            Sugang sugang = sugangOpt.get();
+            if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
+                log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
+                payment = true;
+            }
+        }
+
 
         //클래스룸 엔티티로 디테일이미지 리스트를 가져옴.
         List<ClassRoomDetailImage> byClassRoom = classRoomDetailImageRepository.findByClassRoomOrderBySortOrderAsc(classRoomEntity);
@@ -178,6 +196,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getInstructor().getMember().getName(),
                 classRoomEntity.getInstructor().getMember().getPictureUrl(),
                 classRoomEntity.getThumbnail(),
+                payment,
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
                 imageUrls
@@ -192,21 +211,6 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         return new ChapterSummary(totalChapterCount, totalLectureCount, totalLectureTime);
     }
-
-//    @Transactional(readOnly = true)
-//    public List<ClassRoomProgressResponse> getLectureProgress(Member member, Long classRoomId) {
-//        ClassRoomEntity classRoom = findById(classRoomId);
-//        int progress = lectureService.lectureProgress(member, classRoom);
-//
-//        return classRoom.getChapters().stream()
-//                .flatMap(chapter -> chapter.getLectures().stream())
-//                .map(lecture -> new ClassRoomProgressResponse(
-//                        lecture.getTitle(),
-//                        classRoom.getInstructor().getMember().getName(),
-//                        progress + "%"
-//                ))
-//                .collect(Collectors.toList());
-//    }
 
     @Transactional(readOnly = true)
     public List<ClassRoomProgressResponse> getLectureProgress(Member member, Long classRoomId) {

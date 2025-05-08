@@ -148,10 +148,12 @@ public class ClassRoomController {
 
     @GetMapping("/class-detail/{id}")
     @Operation(method = "GET", description = "클래스 디테일 페이지를 조회합니다.")
-    public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id) {
+    public RspTemplate<ClassRoomDetailResponse> getClassRoomDetail(@PathVariable Long id, Principal principal) {
+        Long memberId = Long.parseLong((principal.getName()));
+        Member member = memberService.findById(memberId);
         ClassRoomEntity classRoom = classRoomService.findById(id);
         long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
-        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount);
+        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount, member);
         return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
 

@@ -36,6 +36,11 @@ public class SugangService {
         return sugangRepository.findAllByMember(member);
     }
 
+    public Sugang findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity){
+        return sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
+    }
+
     @Transactional(readOnly = true)
     public List<SugangInfoDto> getSugangLecture(Member member){
         //todo: 환불일경우 status complete만 다시 필터하는 기능
