@@ -1,10 +1,13 @@
 package com.app.bdink.sugang.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
+import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
@@ -21,6 +24,8 @@ import java.util.List;
 public class SugangService {
 
     private final SugangRepository sugangRepository;
+    private final LectureRepository lectureRepository;
+    private final KollusMediaLinkRepository kollusMediaLinkRepository;
 
     public Sugang findById(Long id){
         return sugangRepository.findById(id)
@@ -51,6 +56,47 @@ public class SugangService {
 
         sugang = sugangRepository.save(sugang);
         return SugangInfoDto.of(sugang);
+    }
+
+    @Transactional
+    public List<SugangClassRoomInfo> getSugangClassRoomInfo(Member member){
+        updateAllSugangProgress(member);
+        List<Sugang> sugangs = sugangRepository.findByMemberAndSugangStatus(member, SugangStatus.PAYMENT_COMPLETED);
+
+        return sugangs.stream()
+                .map(SugangClassRoomInfo::of)
+                .toList();
+    }
+    @Transactional
+    public void updateAllSugangProgress(Member member){
+        List<Sugang> sugangs = sugangRepository.findByMemberAndSugangStatus(member, SugangStatus.PAYMENT_COMPLETED);
+
+        for(Sugang sugang : sugangs){
+            updateSugangProgress(sugang);
+        }
+    }
+    @Transactional
+    public void updateSugangProgress(Sugang sugang){
+        Member member = sugang.getMember();
+        ClassRoomEntity classRoomEntity = sugang.getClassRoomEntity();
+
+        int totalLectureCount = lectureRepository.countByClassRoom(classRoomEntity);
+        log.info("totalLectureCount : {}", totalLectureCount);
+        if(totalLectureCount == 0) {
+            sugang.updateProgressPercent(0);
+            sugangRepository.save(sugang);
+            return;
+        }
+
+        int completedLectureCount = kollusMediaLinkRepository.countByMemberAndLecture_ClassRoomAndPlaytimePercentGreaterThanEqual(member,
+                classRoomEntity, 90);
+
+        double progress = ((double) completedLectureCount / totalLectureCount) * 100;
+        log.info("progress1 : {}", progress);
+        sugang.updateProgressPercent(progress);
+        log.info("progress2 : {}", sugang.getProgressPercent());
+        sugangRepository.save(sugang);
+        log.info("progress3 : {}", sugang.getProgressPercent());
     }
 
 }

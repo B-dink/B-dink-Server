@@ -27,29 +27,19 @@ public class Sugang {
     @Enumerated(EnumType.STRING)
     private SugangStatus sugangStatus;
 
+    @Column(nullable = false)
+    private double progressPercent; // 수강한 클래스룸 전체 진행률
+
     @Builder
     public Sugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
         this.classRoomEntity = classRoomEntity;
         this.member = member;
         this.sugangStatus = sugangStatus;
+        this.progressPercent = 0;
     }
 
-//    public double updateProgress(){
-//        if (this.progress > 100){
-//            this.progress = 100;
-//            completed = true;
-//            return 100;
-//        }
-//        double totalSize = media.getTotalLength();
-//        double presentSize = (double) totalSize / 10;
-//        this.progress += presentSize *100;
-//
-//        if (this.progress > 100){
-//            this.progress=100;
-//            completed = true;
-//        }
-//
-//        return this.progress;
-//    }
+    public void updateProgressPercent(double progressPercent) {
+        this.progressPercent = progressPercent;
+    }
 
 }

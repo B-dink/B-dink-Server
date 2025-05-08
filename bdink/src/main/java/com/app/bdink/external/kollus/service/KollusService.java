@@ -16,6 +16,7 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.token.KollusTokenProvider;
 import com.app.bdink.lecture.entity.Lecture;
+import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import jakarta.transaction.Transactional;
@@ -37,6 +38,7 @@ public class KollusService {
     private final MemberService memberService;
     private final KollusTokenProvider kollusTokenProvider;
     private final UserKeyRepository userKeyRepository;
+    private final LectureService lectureService;
 
 //    @Value("${kollus.API_ACCESS_TOKEN}")
 //    private String apiAccessToken;
@@ -213,12 +215,14 @@ public class KollusService {
         if (kollusMediaLinkRepository.existsByMemberAndKollusMedia(member, kollusMedia)) {
             throw new CustomException(Error.EXIST_KOLLUSMEDIALINK, Error.EXIST_KOLLUSMEDIALINK.getMessage());
         }
-        log.info("여기까지옴");
         //TODO: 시청기록 생성, 시청기록은 처음 한번만 호출할지? 아니면 이렇게 유지할지 생각
+
+        Lecture lecture = lectureService.findById(lectureId);
+
         KollusMediaLink kollusMediaLink = KollusMediaLink.builder()
                 .member(member)
                 .kollusMedia(kollusMedia)
-                .lectureId(lectureId)
+                .lecture(lecture)
                 .build();
         kollusMediaLinkRepository.save(kollusMediaLink);
         return String.valueOf(kollusMediaLink.getId());

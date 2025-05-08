@@ -1,5 +1,7 @@
 package com.app.bdink.external.kollus.repository;
 
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.domain.ClassRoom;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.member.entity.Member;
@@ -19,4 +21,8 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
     List<KollusMediaLink> findAllByMemberId(Long memberId);
 
     boolean existsByMemberAndKollusMedia(Member member, KollusMedia kollusMedia);
+
+    int countByMemberAndLecture_ClassRoomAndPlaytimePercentGreaterThanEqual(Member member,
+                                                                                 ClassRoomEntity classRoomEntity,
+                                                                                 int progressPercent);
 }

@@ -2,6 +2,7 @@ package com.app.bdink.sugang.repository;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,4 +13,6 @@ public interface SugangRepository extends JpaRepository<Sugang, Long> {
     List<Sugang> findAllByMember(Member member);
 
     Optional<Sugang> findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity);
+    
+    List<Sugang> findByMemberAndSugangStatus(Member member, SugangStatus sugangStatus);
 }

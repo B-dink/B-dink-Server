@@ -1,5 +1,6 @@
 package com.app.bdink.external.kollus.entity;
 
+import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,7 +32,9 @@ public class KollusMediaLink {
 
     private LocalDateTime tokenCreatedAt;
 
-    private Long lectureId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id", insertable = false, updatable = false)
+    private Lecture lecture;
 
     private double watchProgress;
 
