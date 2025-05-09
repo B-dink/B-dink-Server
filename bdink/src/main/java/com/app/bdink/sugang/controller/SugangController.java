@@ -55,6 +55,6 @@ public class SugangController {
         Long memberId = memberUtilService.getMemberId(principal);
         Member member = memberService.findById(memberId);
 
-        return RspTemplate.success(Success.CREATE_SUGANG_SUCCESS, sugangService.getSugangClassRoomInfo(member));
+        return RspTemplate.success(Success.GET_SUGANG_CLASSROOM_SUCCESS, sugangService.getSugangClassRoomInfo(member));
     }
 }
