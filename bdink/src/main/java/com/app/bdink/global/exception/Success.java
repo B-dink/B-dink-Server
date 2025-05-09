@@ -48,6 +48,7 @@ public enum Success {
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
 
     GET_KOLLUSMEDIA_SUCCESS(HttpStatus.OK,"개별 시청 기록 조회 성공"),
+    GET_SUGANG_CLASSROOM_SUCCESS(HttpStatus.OK,"수강신청 클래스룸 목록 조회 성공"),
 
 
 
