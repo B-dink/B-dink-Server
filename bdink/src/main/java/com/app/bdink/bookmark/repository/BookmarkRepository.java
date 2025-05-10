@@ -10,4 +10,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findByMember(Member member);
     int countByClassRoom(ClassRoomEntity classRoomEntity);
     boolean existsByClassRoomAndMember(ClassRoomEntity classRoomEntity, Member member);
+    void deleteByMemberAndClassRoom(Member member, ClassRoomEntity classRoomEntity);
 }

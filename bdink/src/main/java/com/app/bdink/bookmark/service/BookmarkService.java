@@ -48,8 +48,12 @@ public class BookmarkService {
         bookmarkRepository.deleteById(bookmarkId);
     }
 
+    @Transactional
+    public void deleteBookmarkByClassRoomId(Member member, ClassRoomEntity classRoomEntity) {
+        bookmarkRepository.deleteByMemberAndClassRoom(member, classRoomEntity);
+    }
+
     public long getBookmarkCountForClassRoom(ClassRoomEntity classRoomEntity) {
         return bookmarkRepository.countByClassRoom(classRoomEntity);
     }
-
 }
