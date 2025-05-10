@@ -8,6 +8,8 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,13 @@ public class BookmarkService {
 
     @Transactional
     public void deleteBookmarkByClassRoomId(Member member, ClassRoomEntity classRoomEntity) {
-        bookmarkRepository.deleteByMemberAndClassRoom(member, classRoomEntity);
+        Optional<Bookmark> bookmark = bookmarkRepository.findByClassRoomAndMember(classRoomEntity, member);
+        if (bookmark.isEmpty()) {
+            throw new CustomException(Error.NOT_FOUND_BOOKMARK, Error.NOT_FOUND_BOOKMARK.getMessage());
+        } else if (!bookmark.get().getMember().equals(member)) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
+        bookmark.ifPresent(value -> bookmarkRepository.deleteById(value.getId()));
     }
 
     public long getBookmarkCountForClassRoom(ClassRoomEntity classRoomEntity) {
