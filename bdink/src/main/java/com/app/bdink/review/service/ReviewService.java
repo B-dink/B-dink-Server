@@ -1,5 +1,6 @@
 package com.app.bdink.review.service;
 
+import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.review.adapter.in.controller.dto.request.ReviewRequest;
 import com.app.bdink.review.adapter.in.controller.dto.response.ReviewResponse;
 import com.app.bdink.review.domain.Review;
@@ -9,9 +10,13 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final MemberRepository memberRepository;
 
     public Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(
@@ -43,9 +49,17 @@ public class ReviewService {
 
     public List<ReviewResponse> getAllReview(final ClassRoomEntity classRoomEntity, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findAllByClassRoom(classRoomEntity, pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        Member currentMember = memberRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
         return reviews.stream()
-            .map(ReviewResponse::from)
-            .toList();
+                .map(review -> {
+                    // 현재 로그인한 사용자가 리뷰 작성자인지 확인
+                    boolean isAuthor = review.getMember().getId().equals(currentMember.getId());
+                    return ReviewResponse.from(review, isAuthor);
+                })
+                .toList();
     }
 
     @Transactional
