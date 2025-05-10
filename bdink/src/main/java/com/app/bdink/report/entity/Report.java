@@ -25,8 +25,7 @@ public class Report extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ReportCase reportCase;
 
-    @Enumerated(EnumType.STRING)
-    private ReportReason reportReason;
+    private String reportReason;
 
     private Long reportId;
 
@@ -34,7 +33,7 @@ public class Report extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Report(Member member, ReportCase reportCase, ReportReason reportReason, Long reportId) {
+    public Report(Member member, ReportCase reportCase, String reportReason, Long reportId) {
         this.member = member;
         this.reportCase = reportCase;
         this.reportId = reportId;

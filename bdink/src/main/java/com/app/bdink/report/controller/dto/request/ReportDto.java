@@ -8,12 +8,4 @@ public record ReportDto(
 
         String reportReason
 ) {
-    public ReportReason toDomain(){
-        for(ReportReason a : ReportReason.values()){
-            if (a.equals(ReportReason.valueOf(reportReason))){
-                return a;
-            }
-        }
-        throw new CustomException(Error.NOT_FOUND_REPORT_TYPE, Error.NOT_FOUND_REPORT_TYPE.getMessage());
-    }
 }
