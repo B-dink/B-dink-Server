@@ -49,14 +49,11 @@ public class ReviewService {
         return String.valueOf(reviewRepository.save(review).getId());
     }
 
-    public List<ReviewResponse> getAllReview(final ClassRoomEntity classRoomEntity, Pageable pageable) {
+    public List<ReviewResponse> getAllReview(final ClassRoomEntity classRoomEntity, final Member member, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findAllByClassRoom(classRoomEntity, pageable);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
-        Member currentMember = memberService.findById(Long.valueOf(userId));
         return reviews.stream()
                 .map(review -> {
-                    boolean isAuthor = review.getMember().getId().equals(currentMember.getId());
+                    boolean isAuthor = review.getMember().getId().equals(member.getId());
                     return ReviewResponse.from(review, isAuthor);
                 })
                 .toList();

@@ -15,12 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,11 +44,20 @@ public class BookmarkController {
         return RspTemplate.success(Success.GET_BOOKMARK_SUCCESS,bookmarkService.getBookmarkClassRoom(member));
     }
 
-    @DeleteMapping
-    @Operation(method = "DELETE", description = "북마크를 삭제합니다.")
-    public RspTemplate<?> deleteBookmark(Principal principal, @RequestParam Long bookmarkId) {
+    @DeleteMapping("/{bookmarkId}")
+    @Operation(method = "DELETE", description = "북마크를 북마크 ID로 삭제합니다.")
+    public RspTemplate<?> deleteBookmark(Principal principal, @PathVariable Long bookmarkId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         bookmarkService.deleteBookmark(member, bookmarkId);
+        return RspTemplate.success(Success.DELETE_BOOKMARK_SUCCESS,Success.DELETE_BOOKMARK_SUCCESS.getMessage());
+    }
+
+    @DeleteMapping("/classroom/{classRoomId}")
+    @Operation(method = "DELETE", description = "북마크를 클래스 ID로 삭제합니다.")
+    public RspTemplate<?> deleteBookmarkByClassRoomId(Principal principal, @PathVariable Long classRoomId) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
+        bookmarkService.deleteBookmarkByClassRoomId(member, classRoomEntity);
         return RspTemplate.success(Success.DELETE_BOOKMARK_SUCCESS,Success.DELETE_BOOKMARK_SUCCESS.getMessage());
     }
 }

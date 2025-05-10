@@ -1,5 +1,6 @@
 package com.app.bdink.review.adapter.in.controller;
 
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.review.adapter.in.controller.dto.request.ReviewRequest;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
@@ -37,6 +38,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final MemberService memberService;
     private final ClassRoomService classRoomService;
+    private final MemberUtilService memberUtilService;
 
     @Operation(method = "POST", description = "리뷰를 등록합니다.")
     @PostMapping
@@ -51,9 +53,10 @@ public class ReviewController {
 
     @Operation(method = "GET", description = "모든 리뷰를 조회합니다.")
     @GetMapping
-    public RspTemplate<List<ReviewResponse>> getAllReview(@RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
+    public RspTemplate<List<ReviewResponse>> getAllReview(Principal principal, @RequestParam Long classRoomId, @PageableDefault(size = 8) Pageable pageable) {
         ClassRoomEntity classRoomEntity = classRoomService.findById(classRoomId);
-        return RspTemplate.success(Success.GET_REVIEW_SUCCESS, reviewService.getAllReview(classRoomEntity, pageable));
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        return RspTemplate.success(Success.GET_REVIEW_SUCCESS, reviewService.getAllReview(classRoomEntity, member, pageable));
     }
 
     @Operation(method = "PUT", description = "리뷰를 수정합니다.")
