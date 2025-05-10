@@ -6,6 +6,7 @@ import com.app.bdink.report.controller.dto.request.ReportDto;
 import com.app.bdink.report.controller.dto.response.ReportResponse;
 import com.app.bdink.report.domain.ReportCase;
 import com.app.bdink.report.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,9 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping
+    @Operation(
+            description = "reportCase에는 REVIEW 또는 QUESTION 중에 하나를 넣어야 합니다."
+    )
     public RspTemplate<?> report(Principal principal,
                                  @RequestParam String reportCase,
                                  @RequestParam Long reportId,

@@ -12,7 +12,7 @@ public record ReportResponse(
         return new ReportResponse(
                 report.getReportId(),
                 report.getReportCase().name(),
-                report.getReportReason().name()
+                report.getReportReason()
         );
     }
 }

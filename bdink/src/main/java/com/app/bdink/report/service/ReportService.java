@@ -47,7 +47,7 @@ public class ReportService {
         Report report = Report.builder()
                 .reportId(id)
                 .reportCase(ReportCase.valueOf(reportCase))
-                .reportReason(dto.toDomain())
+                .reportReason(dto.reportReason())
                 .member(member)
                 .build();
 
