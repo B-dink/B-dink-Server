@@ -11,14 +11,10 @@ import com.app.bdink.payment.repository.EssentialPaymentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.View;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -32,8 +28,6 @@ import reactor.core.scheduler.Schedulers;
 public class PaymentService {
 
     private final EssentialPaymentRepository essentialPaymentRepository;
-    private final View error;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
     //TODO: 테스트에서 나중에 사업자등록된거로 받기.
