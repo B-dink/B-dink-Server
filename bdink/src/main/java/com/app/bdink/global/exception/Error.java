@@ -174,7 +174,8 @@ public enum Error {
     FAILED_METHOD_HANDLING_CANCEL(HttpStatus.INTERNAL_SERVER_ERROR, "취소 중 결제 시 사용한 결제 수단 처리과정에서 일시적인 오류가 발생했습니다."),
     FAILED_PARTIAL_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "은행 점검, 해약 계좌 등의 사유로 부분 환불이 실패했습니다."),
     FAILED_CLOSED_ACCOUNT_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "해약된 계좌로 인해 환불이 실패했습니다."),
-    COMMON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
+    COMMON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+    PAYMENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제는 성공적으로 처리되었으나, 시스템에 주문 정보를 저장하는 과정에서 오류가 발생했습니다.")
     ;
 
     private final HttpStatus httpStatus;

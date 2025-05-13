@@ -6,31 +6,28 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
-import com.app.bdink.payment.repository.PaymentRepository;
+import com.app.bdink.payment.entity.EssentialPayment;
+import com.app.bdink.payment.repository.EssentialPaymentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.View;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.app.bdink.global.exception.Error;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final View error;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final EssentialPaymentRepository essentialPaymentRepository;
 
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
     //TODO: 테스트에서 나중에 사업자등록된거로 받기.
@@ -50,7 +47,14 @@ public class PaymentService {
                         HttpStatusCode::isError,
                         this::handleErrorResponse
                 )
-                .bodyToMono(PaymentResponse.class);
+                .bodyToMono(PaymentResponse.class)
+                .flatMap(response -> Mono.fromCallable(() -> {
+                            EssentialPayment payment = EssentialPayment.from(response);
+                            return essentialPaymentRepository.save(payment);
+                })
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .thenReturn(response))
+                .onErrorResume(ex -> Mono.error(new PaymentFailedException(Error.PAYMENT_SAVE_FAILED, ex.getMessage())));
 
         return toRspTemplate(responseMono, Success.CREATE_PAYMENT_SUCCESS);
     }
