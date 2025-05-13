@@ -1,8 +1,10 @@
 package com.app.bdink.payment.service;
 
+import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
@@ -15,7 +17,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Base64;
 
 import com.app.bdink.global.exception.Error;
@@ -32,9 +33,11 @@ public class PaymentService {
 
     private final TransactionalPaymentService transactionalPaymentService;
 
-    public Mono<RspTemplate<PaymentResponse>> confirm(
-            Long memberId,
-            ConfirmRequest confirmRequest) throws PaymentFailedException {
+    public Mono<RspTemplate<PaymentResponse>> confirm(Long memberId, ConfirmRequest confirmRequest) throws CustomException {
+        if (memberId == null) {
+            return Mono.error(new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다."));
+        }
+
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
@@ -90,8 +93,7 @@ public class PaymentService {
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
-    public Mono<RspTemplate<PaymentResponse>> cancelPayment(
-            String paymentKey, CancelRequest cancelRequest) {
+    public Mono<RspTemplate<PaymentResponse>> cancelPayment(String paymentKey, CancelRequest cancelRequest) {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
