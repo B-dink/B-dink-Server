@@ -3,6 +3,10 @@ package com.app.bdink.payment.service;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.exception.NotFoundMemberException;
+import com.app.bdink.member.repository.MemberRepository;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
@@ -17,6 +21,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Base64;
 
 import com.app.bdink.global.exception.Error;
@@ -27,13 +32,16 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final EssentialPaymentRepository essentialPaymentRepository;
-
-    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
     //TODO: 테스트에서 나중에 사업자등록된거로 받기.
     private final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
+
+    private final EssentialPaymentRepository essentialPaymentRepository;
+    private final MemberUtilService memberUtilService;
+    private final MemberRepository memberRepository;
 
     public Mono<RspTemplate<PaymentResponse>> confirm(
+            Principal principal,
             ConfirmRequest confirmRequest) throws PaymentFailedException {
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
@@ -49,11 +57,9 @@ public class PaymentService {
                 )
                 .bodyToMono(PaymentResponse.class)
                 .flatMap(response -> Mono.fromCallable(() -> {
-                            EssentialPayment payment = EssentialPayment.from(response);
-                            return essentialPaymentRepository.save(payment);
-                })
-                        .subscribeOn(Schedulers.boundedElastic())
-                        .thenReturn(response))
+                    EssentialPayment payment = EssentialPayment.from(findMemberByPrinciple(principal), response);
+                    return essentialPaymentRepository.save(payment);
+                }).subscribeOn(Schedulers.boundedElastic()).thenReturn(response))
                 .onErrorResume(ex -> Mono.error(new PaymentFailedException(Error.PAYMENT_SAVE_FAILED, ex.getMessage())));
 
         return toRspTemplate(responseMono, Success.CREATE_PAYMENT_SUCCESS);
@@ -69,8 +75,7 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -85,8 +90,7 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -103,8 +107,7 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.CANCEL_TOSS_PAYMENT_SUCCESS);
     }
@@ -137,5 +140,12 @@ public class PaymentService {
         return responseMono.map(response ->
                 RspTemplate.success(success, response)
         ).onErrorResume(Mono::error);
+    }
+
+    private Member findMemberByPrinciple(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        return memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
+        );
     }
 }

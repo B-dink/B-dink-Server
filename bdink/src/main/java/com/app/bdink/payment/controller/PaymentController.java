@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
@@ -22,8 +24,9 @@ public class PaymentController {
     @PostMapping("/confirm")
     @Operation(summary = "결제 승인", description = "토스페이먼츠 결제 승인을 처리합니다")
     public Mono<RspTemplate<PaymentResponse>> confirmPayment(
+            Principal principal,
             @RequestBody ConfirmRequest confirmRequest) {
-        return paymentService.confirm(confirmRequest);
+        return paymentService.confirm(principal, confirmRequest);
     }
 
     @GetMapping("/{paymentKey}")

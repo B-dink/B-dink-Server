@@ -1,5 +1,6 @@
 package com.app.bdink.payment.entity;
 
+import com.app.bdink.member.entity.Member;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -27,6 +28,10 @@ public class EssentialPayment {
 
     private Integer totalAmount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private String version;
 
     private String mId;
@@ -38,7 +43,7 @@ public class EssentialPayment {
     @Column(length = 64)
     private String lastTransactionKey;
 
-    public static EssentialPayment from(PaymentResponse response) {
+    public static EssentialPayment from(Member member, PaymentResponse response) {
         EssentialPayment payment = new EssentialPayment();
         payment.setPaymentKey(response.paymentKey());
         payment.setOrderId(response.orderId());
@@ -48,6 +53,7 @@ public class EssentialPayment {
         payment.setRequestedAt(response.requestedAt());
         payment.setApprovedAt(response.approvedAt());
         payment.setLastTransactionKey(response.lastTransactionKey());
+        payment.setMember(member);
         return payment;
     }
 }
