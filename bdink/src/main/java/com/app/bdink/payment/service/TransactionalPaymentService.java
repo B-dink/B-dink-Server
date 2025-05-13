@@ -12,28 +12,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
-
 @Service
 @RequiredArgsConstructor
 public class TransactionalPaymentService {
 
     private final EssentialPaymentRepository essentialPaymentRepository;
-    private final MemberUtilService memberUtilService;
     private final MemberRepository memberRepository;
 
     @Transactional
-    public EssentialPayment savePaymentTransactional(Principal principal, PaymentResponse response) {
-        Member member = findMemberByPrinciple(principal);
-        EssentialPayment payment = EssentialPayment.from(member, response);
-        return essentialPaymentRepository.save(payment);
-    }
-
-    @Transactional(readOnly = true)
-    public Member findMemberByPrinciple(Principal principal) {
-        Long memberId = memberUtilService.getMemberId(principal);
-        return memberRepository.findById(memberId).orElseThrow(
+    public EssentialPayment savePaymentTransactional(Long memberId, PaymentResponse response) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
         );
+        EssentialPayment payment = EssentialPayment.from(member, response);
+        return essentialPaymentRepository.save(payment);
     }
 }

@@ -33,7 +33,7 @@ public class PaymentService {
     private final TransactionalPaymentService transactionalPaymentService;
 
     public Mono<RspTemplate<PaymentResponse>> confirm(
-            Principal principal,
+            Long memberId,
             ConfirmRequest confirmRequest) throws PaymentFailedException {
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
@@ -50,7 +50,7 @@ public class PaymentService {
                 .bodyToMono(PaymentResponse.class)
                 .flatMap(response ->
                         Mono.fromCallable(() ->
-                                        transactionalPaymentService.savePaymentTransactional(principal, response)
+                                        transactionalPaymentService.savePaymentTransactional(memberId, response)
                                 )
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenReturn(response)
