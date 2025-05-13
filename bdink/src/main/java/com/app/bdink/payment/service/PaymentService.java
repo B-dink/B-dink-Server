@@ -136,19 +136,4 @@ public class PaymentService {
                 RspTemplate.success(success, response)
         ).onErrorResume(Mono::error);
     }
-
-//    // 별도 메소드로 트랜잭션 처리 분리
-//    @Transactional
-//    public EssentialPayment savePaymentTransactionally(Principal principal, PaymentResponse response) {
-//        Member member = findMemberByPrinciple(principal);
-//        EssentialPayment payment = EssentialPayment.from(member, response);
-//        return essentialPaymentRepository.save(payment);
-//    }
-//
-//    private Member findMemberByPrinciple(Principal principal) {
-//        Long memberId = memberUtilService.getMemberId(principal);
-//        return memberRepository.findById(memberId).orElseThrow(
-//                () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다.")
-//        );
-//    }
 }
