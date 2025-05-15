@@ -1,6 +1,7 @@
 package com.app.bdink.payment.controller;
 
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
@@ -18,12 +21,14 @@ import reactor.core.publisher.Mono;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final MemberUtilService memberUtilService;
 
     @PostMapping("/confirm")
     @Operation(summary = "결제 승인", description = "토스페이먼츠 결제 승인을 처리합니다")
     public Mono<RspTemplate<PaymentResponse>> confirmPayment(
+            Principal principal,
             @RequestBody ConfirmRequest confirmRequest) {
-        return paymentService.confirm(confirmRequest);
+        return paymentService.confirm(memberUtilService.getMemberId(principal), confirmRequest);
     }
 
     @GetMapping("/{paymentKey}")

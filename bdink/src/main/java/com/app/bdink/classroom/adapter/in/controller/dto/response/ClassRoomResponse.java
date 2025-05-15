@@ -14,9 +14,10 @@ public record ClassRoomResponse(
         String introLink,
 
         PriceDetail priceDetail,
-        ClassRoomSummeryDto classRoomSummeryDto // 수정 X
+        ClassRoomSummeryDto classRoomSummeryDto, // 수정 X
+        Boolean isBookmarked
 ) {
-    public static ClassRoomResponse of(final ClassRoomEntity classRoomEntity, final ClassRoomSummeryDto classRoomSummeryDto) {
+    public static ClassRoomResponse of(final ClassRoomEntity classRoomEntity, final ClassRoomSummeryDto classRoomSummeryDto, Boolean isBookmarked) {
         return ClassRoomResponse.builder()
             .id(classRoomEntity.getId())
             .title(classRoomEntity.getTitle())
@@ -25,6 +26,7 @@ public record ClassRoomResponse(
             .introLink(classRoomEntity.getIntroLink())
             .priceDetail(classRoomEntity.getPriceDetail())
             .classRoomSummeryDto(classRoomSummeryDto)
+            .isBookmarked(isBookmarked)
             .build();
     }
 }

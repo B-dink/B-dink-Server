@@ -1,43 +1,43 @@
 package com.app.bdink.payment.service;
 
+import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.payment.controller.dto.CancelRequest;
 import com.app.bdink.payment.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.controller.dto.PaymentResponse;
-import com.app.bdink.payment.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.View;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.app.bdink.global.exception.Error;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final View error;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
     //TODO: 테스트에서 나중에 사업자등록된거로 받기.
     private final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
-    public Mono<RspTemplate<PaymentResponse>> confirm(
-            ConfirmRequest confirmRequest) throws PaymentFailedException {
+    private final TransactionalPaymentService transactionalPaymentService;
+
+    public Mono<RspTemplate<PaymentResponse>> confirm(Long memberId, ConfirmRequest confirmRequest) throws CustomException {
+        if (memberId == null) {
+            return Mono.error(new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다."));
+        }
+
         String authorizations = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
@@ -50,7 +50,15 @@ public class PaymentService {
                         HttpStatusCode::isError,
                         this::handleErrorResponse
                 )
-                .bodyToMono(PaymentResponse.class);
+                .bodyToMono(PaymentResponse.class)
+                .flatMap(response ->
+                        Mono.fromCallable(() ->
+                                        transactionalPaymentService.savePaymentTransactional(memberId, response)
+                                )
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .thenReturn(response)
+                )
+                .onErrorResume(ex -> Mono.error(new PaymentFailedException(Error.PAYMENT_SAVE_FAILED, ex.getMessage())));
 
         return toRspTemplate(responseMono, Success.CREATE_PAYMENT_SUCCESS);
     }
@@ -65,8 +73,7 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -81,14 +88,12 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
-    public Mono<RspTemplate<PaymentResponse>> cancelPayment(
-            String paymentKey, CancelRequest cancelRequest) {
+    public Mono<RspTemplate<PaymentResponse>> cancelPayment(String paymentKey, CancelRequest cancelRequest) {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
@@ -99,8 +104,7 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                )
-                .bodyToMono(PaymentResponse.class);
+                ).bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.CANCEL_TOSS_PAYMENT_SUCCESS);
     }

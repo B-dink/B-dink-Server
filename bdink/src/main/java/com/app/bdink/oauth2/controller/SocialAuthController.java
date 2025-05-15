@@ -12,6 +12,7 @@ import com.app.bdink.member.controller.dto.response.NameCheckDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
+import com.app.bdink.oauth2.controller.response.SignUpDto;
 import com.app.bdink.oauth2.domain.LoginResult;
 import com.app.bdink.oauth2.domain.RefreshToken;
 import com.app.bdink.oauth2.domain.TokenDto;
@@ -53,10 +54,11 @@ public class SocialAuthController {
     ) {
         LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
         TokenDto tokenDto = tokenProvider.createToken(result.member());
+        SignUpDto signUpDto = new SignUpDto(tokenDto, result.member().getId());
         if (result.isNewMember()) {
-            return RspTemplate.success(Success.LOGIN_ACCEPTED, tokenDto);
+            return RspTemplate.success(Success.LOGIN_ACCEPTED, signUpDto);
         }
-        return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenDto);
+        return RspTemplate.success(Success.SIGNUP_SUCCESS, signUpDto);
     }
 
     @DeleteMapping("/revoke")
