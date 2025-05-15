@@ -71,8 +71,8 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public ClassRoomResponse getClassRoomInfo(final Long id) {
-        ClassRoomEntity classRoomEntity = findById(id);
+    public ClassRoomResponse getClassRoomInfo(Member member, final Long classRoomId) {
+        ClassRoomEntity classRoomEntity = findById(classRoomId);
 
         ClassRoomSummeryDto classRoomSummeryDto = ClassRoomSummeryDto.of(
                 chapterRepository.countByClassRoom(classRoomEntity),

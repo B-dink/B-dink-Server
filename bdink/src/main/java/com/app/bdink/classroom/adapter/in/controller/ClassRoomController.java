@@ -85,7 +85,7 @@ public class ClassRoomController {
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
     RspTemplate<?> getClassRoomInfo(Principal principal, @RequestParam Long id) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
+        ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(member, id);
         return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS, classRoomDto);
     }
 
