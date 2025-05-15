@@ -19,6 +19,7 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.member.util.MemberUtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class ClassRoomController {
     private final MemberService memberService;
     private final BookmarkService bookmarkService;
     private final ClassRoomDetailPageImageService classRoomDetailPageImageService;
+    private final MemberUtilService memberUtilService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
@@ -81,8 +83,9 @@ public class ClassRoomController {
 
     @GetMapping
     @Operation(method = "GET", description = "해당 클래스룸 정보를 조회합니다.")
-    RspTemplate<?> getClassRoomInfo(@RequestParam Long id) {
-        ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(id);
+    RspTemplate<?> getClassRoomInfo(Principal principal, @RequestParam Long id) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        ClassRoomResponse classRoomDto = classRoomService.getClassRoomInfo(member, id);
         return RspTemplate.success(Success.GET_CLASSROOM_SUCCESS, classRoomDto);
     }
 
