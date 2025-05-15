@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.service;
 
+import com.app.bdink.bookmark.repository.BookmarkRepository;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.chapter.repository.ChapterRepository;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
@@ -36,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +62,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final SugangRepository sugangRepository;
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
     private final SugangService sugangService;
+    private final BookmarkRepository bookmarkRepository;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -250,5 +253,10 @@ public class ClassRoomService implements ClassRoomUseCase {
         }
 
         return progressList;
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean isClassRoomBookmarked(Member member, ClassRoomEntity classRoom) {
+        return bookmarkRepository.existsByClassRoomAndMember(classRoom, member);
     }
 }
