@@ -71,7 +71,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public ClassRoomResponse getClassRoomInfo(Member member, final Long classRoomId) {
+    public ClassRoomResponse getClassRoomInfo(final Member member, final Long classRoomId) {
         ClassRoomEntity classRoomEntity = findById(classRoomId);
 
         ClassRoomSummeryDto classRoomSummeryDto = ClassRoomSummeryDto.of(
@@ -80,7 +80,9 @@ public class ClassRoomService implements ClassRoomUseCase {
                 lectureService.getTotalLectureTime(classRoomEntity)
         );
 
-        return ClassRoomResponse.of(classRoomEntity, classRoomSummeryDto);
+        Boolean isBookmarked = isClassRoomBookmarked(member, classRoomEntity);
+
+        return ClassRoomResponse.of(classRoomEntity, classRoomSummeryDto, isBookmarked);
     }
 
     @Transactional(readOnly = true)
