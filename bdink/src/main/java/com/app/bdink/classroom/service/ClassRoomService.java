@@ -19,6 +19,7 @@ import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.mapper.InstructorMapper;
 import com.app.bdink.lecture.entity.Lecture;
@@ -163,9 +164,9 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<CareerClassroomDto> getFilteredClassroomByInstructor(final Instructor instructor) {
+    public List<InstructorClassroomDto> getFilteredClassroomByInstructor(Member member, final Instructor instructor) {
         return classRoomRepository.findAllByInstructor(instructor).stream()
-                .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                .map(classRoom -> InstructorClassroomDto.of(classRoom, member, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
                 .toList();
     }
 
