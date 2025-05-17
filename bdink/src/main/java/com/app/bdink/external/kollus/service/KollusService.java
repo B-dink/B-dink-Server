@@ -3,6 +3,7 @@ package com.app.bdink.external.kollus.service;
 import com.app.bdink.external.kollus.dto.KollusTokenDTO;
 import com.app.bdink.external.kollus.dto.request.UserKeyDTO;
 import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.dto.response.KollusApiResponse;
@@ -18,14 +19,19 @@ import com.app.bdink.global.token.KollusTokenProvider;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.member.service.MemberService;
 import jakarta.transaction.Transactional;
+import kotlinx.serialization.descriptors.StructureKind;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -39,6 +45,7 @@ public class KollusService {
     private final KollusTokenProvider kollusTokenProvider;
     private final UserKeyRepository userKeyRepository;
     private final LectureService lectureService;
+    private final MemberRepository memberRepository;
 
 //    @Value("${kollus.API_ACCESS_TOKEN}")
 //    private String apiAccessToken;
@@ -229,12 +236,12 @@ public class KollusService {
     }
 
     @Transactional
-    public void playCallbackService(PlayRequestDTO playRequestDTO) {
-        String mediaContentKey = playRequestDTO.media_content_key();
-        int playtime = Integer.parseInt(playRequestDTO.play_time());
-        int duration = Integer.parseInt(playRequestDTO.duration());
-        int playTimePercent = Integer.parseInt(playRequestDTO.playtime_percent());
-        String kollusId = playRequestDTO.client_user_id();
+    public void lmsCallbackService(LmsRequestDTO lmsRequestDTO) {
+        String mediaContentKey = lmsRequestDTO.media_content_key();
+        int playtime = Integer.parseInt(lmsRequestDTO.play_time());
+        int duration = Integer.parseInt(lmsRequestDTO.duration());
+        int playTimePercent = Integer.parseInt(lmsRequestDTO.playtime_percent());
+        String kollusId = lmsRequestDTO.client_user_id();
 
         Member member = memberService.findByKollusClientUserId(kollusId);
         KollusMedia kollusMedia = kollusMediaRepository.findByMediaContentKey(mediaContentKey).orElse(null);
@@ -242,18 +249,46 @@ public class KollusService {
         KollusMediaLink kollusMediaLink = kollusMediaLinkRepository.findByMemberIdAndKollusMediaId(member.getId(), kollusMedia.getId()).
                 orElse(null);
 
-        if(playtime > kollusMediaLink.getWatchProgress() && playtime <= duration) {
+        if (playtime > kollusMediaLink.getWatchProgress() && playtime <= duration) {
             kollusMediaLink.updateWatchProgress(playtime);
         }
 
-        if(playTimePercent > kollusMediaLink.getPlaytimePercent() && playTimePercent <= 100) {
+        if (playTimePercent > kollusMediaLink.getPlaytimePercent() && playTimePercent <= 100) {
             kollusMediaLink.updatePlaytimePercent(playTimePercent);
 
-            if(playTimePercent >= 90){
+            if (playTimePercent >= 90) {
                 kollusMediaLink.updateCompleted(true);
             }
 
             kollusMediaLinkRepository.save(kollusMediaLink);
         }
     }
+    
+    //todo: 잘 돌아가는지 테스트 해보기 그전에 콜러스 콜백 설정하기
+    @Transactional
+    public ResponseEntity<Map<String, Object>> playCallbackService(PlayRequestDTO playRequestDTO) {
+        //todo: kollus 쪽에서 넘어오는 데이터를 통해 kind 3 과 관련된 로직을 짜서 넘겨주면 될것 같음.
+
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+
+        Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.clientUserId());
+
+        if (memberOpt.isPresent()) {
+            data.put("content_expired", 0); // 재생 허용
+            data.put("result", 1);
+        } else {
+            data.put("content_expired", 1); // 재생 차단
+            data.put("result", 0);
+            data.put("message", "유효하지 않은 사용자입니다.");
+        }
+
+        result.put("data", data);
+        result.put("exp", 3600000); // optional
+
+        //todo: 예를들어 client_userId로 멤버가 있으면 kind3로 유효값보내면 될듯.
+
+        return ResponseEntity.ok(result);
+    }
+
 }

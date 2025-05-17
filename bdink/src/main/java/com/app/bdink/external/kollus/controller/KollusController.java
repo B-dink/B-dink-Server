@@ -3,6 +3,7 @@ package com.app.bdink.external.kollus.controller;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.kollus.dto.request.UserKeyDTO;
 import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
+import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
@@ -20,9 +21,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -105,13 +108,16 @@ public class KollusController {
         return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS, CreateIdDto.from(kollusService.saveMediaLink(member, kollusMedia, lectureId)));
     }
 
-    /**
-     *  todo:진행률 관련 callback api 생성 예정
-     */
     @PostMapping("/lms")
     @Operation(method = "POST", description = "Kollus LMS Callback API 입니다.")
-    public RspTemplate<?> lmsCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
-        kollusService.playCallbackService(playRequestDTO);
+    public RspTemplate<?> lmsCallback(@ModelAttribute LmsRequestDTO lmsRequestDTO) {
+        kollusService.lmsCallbackService(lmsRequestDTO);
         return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
+    }
+
+    @PostMapping("/play")
+    @Operation(method = "POST", description = "Kollus Play Callback API 입니다.")
+    public ResponseEntity<Map<String, Object>> playCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
+        return kollusService.playCallbackService(playRequestDTO);
     }
 }
