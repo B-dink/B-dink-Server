@@ -30,7 +30,7 @@ public class YoutubeService {
     @Transactional(readOnly = true)
     public YoutubeInfoDto getYoutubeInfoDto(Long youtubeId) {
         Youtube youtubeVideo = findById(youtubeId);
-        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType());
+        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType(), youtubeVideo.getInstructor().getId());
     }
 
     @Transactional
