@@ -27,7 +27,7 @@ public class Youtube {
     private Instructor instructor;
 
     @Builder
-    public Youtube(String youtubeVideoLink, YoutubeType youtubeType) {
+    public Youtube(String youtubeVideoLink, YoutubeType youtubeType, Instructor instructor) {
         this.youtubeVideoLink = youtubeVideoLink;
         this.youtubeType = youtubeType;
     }
