@@ -1,13 +1,25 @@
 package com.app.bdink.external.kollus.dto.request.callback;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Schema(title = "KOLLUS_REQ_03 : Kollus play callback DTO")
+import java.util.Map;
+
 public record PlayRequestDTO (
-        String media_content_key,
-        String play_time,
-        String duration,
-        String playtime_percent,
-        String client_user_id
+        Integer kind,
+
+        @JsonProperty("client_user_id")
+        String clientUserId,
+
+        @JsonProperty("player_id")
+        String playerId,
+
+        @JsonProperty("device_name")
+        String deviceName,
+
+        @JsonProperty("media_content_key")
+        String mediaContentKey,
+
+        Map<String, String> uservalues
 )
-{ }
+{
+}
