@@ -1,5 +1,6 @@
 package com.app.bdink.youtube.entity;
 
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.youtube.domain.YoutubeType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,6 +22,9 @@ public class Youtube {
 
     @Enumerated(EnumType.STRING)
     private YoutubeType youtubeType;
+
+    @OneToOne
+    private Instructor instructor;
 
     @Builder
     public Youtube(String youtubeVideoLink, YoutubeType youtubeType) {
