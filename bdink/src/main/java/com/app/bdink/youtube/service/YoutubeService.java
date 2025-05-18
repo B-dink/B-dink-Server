@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,16 @@ public class YoutubeService {
         );
     }
 
-    public List<Youtube> findByYoutubeType(YoutubeType youtubeType) {
-        return youtubeRepository.findByYoutubeType(youtubeType);
+    public List<YoutubeInfoDto> findByYoutubeType(YoutubeType youtubeType) {
+        List<Youtube> youtubeVideos = youtubeRepository.findByYoutubeType(youtubeType);
+        return youtubeVideos.stream()
+                .map(youtube -> {
+                    Long instructorId = Optional.ofNullable(youtube.getInstructor())
+                            .map(Instructor::getId)
+                            .orElse(null);
+                    return YoutubeInfoDto.of(youtube.getYoutubeVideoLink(), youtube.getYoutubeType(), instructorId);
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
