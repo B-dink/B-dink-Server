@@ -7,6 +7,7 @@ import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberUpdateNameDto;
 import com.app.bdink.member.controller.dto.response.SocialTypeDto;
+import com.app.bdink.member.controller.dto.response.UpdateProfileDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,6 +81,6 @@ public class MemberController {
             @RequestPart(value = "profile") MultipartFile img) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         memberService.updateProfile(member, s3Service.uploadImageOrMedia("image/", img));
-        return RspTemplate.success(Success.UPDATE_PICTUREURL_SUCCESS, Success.UPDATE_PICTUREURL_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_PICTUREURL_SUCCESS, UpdateProfileDto.from(Success.UPDATE_PICTUREURL_SUCCESS.getMessage()));
     }
 }
