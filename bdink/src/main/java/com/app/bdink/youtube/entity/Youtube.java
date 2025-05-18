@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Youtube")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Youtube {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,13 +24,14 @@ public class Youtube {
     @Enumerated(EnumType.STRING)
     private YoutubeType youtubeType;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Instructor instructor;
 
     @Builder
     public Youtube(String youtubeVideoLink, YoutubeType youtubeType, Instructor instructor) {
         this.youtubeVideoLink = youtubeVideoLink;
         this.youtubeType = youtubeType;
+        this.instructor = instructor;
     }
 
     public void updateYoutubeVideoLink(String youtubeVideoLink) {

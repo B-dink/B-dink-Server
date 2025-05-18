@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,10 @@ public class YoutubeService {
     @Transactional(readOnly = true)
     public YoutubeInfoDto getYoutubeInfoDto(Long youtubeId) {
         Youtube youtubeVideo = findById(youtubeId);
-        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType(), youtubeVideo.getInstructor().getId());
+        Long instructorId = Optional.ofNullable(youtubeVideo.getInstructor())
+                .map(Instructor::getId)
+                .orElse(null);
+        return YoutubeInfoDto.of(youtubeVideo.getYoutubeVideoLink(), youtubeVideo.getYoutubeType(), instructorId);
     }
 
     @Transactional
