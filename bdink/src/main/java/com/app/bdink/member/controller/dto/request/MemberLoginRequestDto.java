@@ -1,4 +1,4 @@
-package com.app.bdink.member.controller.dto.response;
+package com.app.bdink.member.controller.dto.request;
 
 public record MemberLoginRequestDto(
         String email,
