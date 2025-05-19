@@ -272,46 +272,54 @@ public class KollusService {
 
         long unixExp = System.currentTimeMillis() / 1000 + 3600;
 
-        //todo: kind가 3일 경우
-        if (playRequestDTO.kind() == 3) {
-            if (playRequestDTO.clientUserId() != null) {
-                Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.clientUserId());
-
-                if (memberOpt.isPresent()) {
-                    data.put("content_expired", 0); // 재생 허용
-                    data.put("result", 1);
-                } else {
-                    data.put("content_expired", 1); // 재생 차단
-                    data.put("result", 0);
-                    log.info("kind 3 콜백이 유효하지 않은 사용자입니다.");
-                }
-
-                result.put("data", data);
-                result.put("exp", unixExp); // optional
-
-            } else {
-                data.put("content_expired", 0); // 재생 허용
-                data.put("result", 1);
-                result.put("data", data);
-                result.put("exp", unixExp);
-            }
-
-            log.info(result.toString());
-        } else {
-            //todo: kind 1일 경우?
-            data.put("expiration_date", unixExp);
-            data.put("vmcheck", 0);
-            data.put("disable_tvout", 0);
-            data.put("expiration_playtime", 0);
+        if (playRequestDTO.clientUserId() == null || playRequestDTO.mediaContentKey() == null) {
+            log.warn("Play 콜백 누락된 필드 감지: {}", playRequestDTO);
             data.put("result", 1);
+            data.put("content_expired", 0);
             result.put("data", data);
             result.put("exp", unixExp);
-            log.info(result.toString());
+
+            //    //todo: kind가 3일 경우
+            //    if (playRequestDTO.kind() == 3) {
+            //        if (playRequestDTO.clientUserId() != null) {
+            //            Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.clientUserId());
+//
+            //            if (memberOpt.isPresent()) {
+            //                data.put("content_expired", 0); // 재생 허용
+            //                data.put("result", 1);
+            //            } else {
+            //                data.put("content_expired", 1); // 재생 차단
+            //                data.put("result", 0);
+            //                log.info("kind 3 콜백이 유효하지 않은 사용자입니다.");
+            //            }
+//
+            //            result.put("data", data);
+            //            result.put("exp", unixExp); // optional
+//
+            //        } else {
+            //            data.put("content_expired", 0); // 재생 허용
+            //            data.put("result", 1);
+            //            result.put("data", data);
+            //            result.put("exp", unixExp);
+            //        }
+//
+            //        log.info(result.toString());
+            //    } else {
+            //        //todo: kind 1일 경우?
+            //        data.put("expiration_date", unixExp);
+            //        data.put("vmcheck", 0);
+            //        data.put("disable_tvout", 0);
+            //        data.put("expiration_playtime", 0);
+            //        data.put("result", 1);
+            //        result.put("data", data);
+            //        result.put("exp", unixExp);
+            //        log.info(result.toString());
+            //    }
+
+            //todo: 예를들어 client_userId로 멤버가 있으면 kind3로 유효값보내면 될듯.
+
+            //    return ResponseEntity.ok(result);
         }
-
-        //todo: 예를들어 client_userId로 멤버가 있으면 kind3로 유효값보내면 될듯.
-
         return ResponseEntity.ok(result);
     }
-
 }
