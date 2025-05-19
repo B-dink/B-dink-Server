@@ -79,7 +79,7 @@ public class KollusController {
     @Operation(method = "POST", description = "Kollus media를 강의와 연결합니다.")
     public RspTemplate<?> connectLecture(Principal principal, @RequestParam Long lectureId, @RequestParam Long kollusMediaId) {
 
-        if (!instructorUtilService.validateLectureOwner(principal, lectureId)){
+        if (!instructorUtilService.validateLectureOwner(principal, lectureId)) {
             throw new CustomException(Error.NO_INSTRUCTOR, Error.NO_INSTRUCTOR.getMessage());
         }
 
@@ -100,7 +100,7 @@ public class KollusController {
 
     @PostMapping("/media-link")
     @Operation(method = "POST", description = "콜러스 미디어 시청 기록 생성")
-    public RspTemplate<?> saveMediaLink(Principal principal, @RequestParam Long lectureId){
+    public RspTemplate<?> saveMediaLink(Principal principal, @RequestParam Long lectureId) {
         Member member = memberService.findById(Long.valueOf(principal.getName()));
 
         KollusMedia kollusMedia = kollusService.findByLectureId(lectureId);
@@ -115,9 +115,16 @@ public class KollusController {
         return RspTemplate.success(Success.KOLLUS_LMS_SUCCESS);
     }
 
+    //@PostMapping("/play")
+    //@Operation(method = "POST", description = "Kollus Play Callback API 입니다.")
+    //public ResponseEntity<Map<String, Object>> playCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
+    //    return kollusService.playCallbackService(playRequestDTO);
+    //}
+
     @PostMapping("/play")
     @Operation(method = "POST", description = "Kollus Play Callback API 입니다.")
     public ResponseEntity<Map<String, Object>> playCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
+        log.info(playRequestDTO.toString());
         return kollusService.playCallbackService(playRequestDTO);
     }
 }
