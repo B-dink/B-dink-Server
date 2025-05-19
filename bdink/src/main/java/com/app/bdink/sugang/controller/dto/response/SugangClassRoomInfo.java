@@ -7,6 +7,7 @@ public record SugangClassRoomInfo (
         Long classRoomId,
         String classRoomTitle,
         String classRoomThumnail,
+        String InstructorName,
         Double progressClassRoom
 )
 {
@@ -17,6 +18,7 @@ public record SugangClassRoomInfo (
                 sugang.getClassRoomEntity().getId(),
                 sugang.getClassRoomEntity().getTitle(),
                 sugang.getClassRoomEntity().getThumbnail(),
+                sugang.getClassRoomEntity().getInstructor().getMember().getName(),
                 roundedProgress
         );
     }
