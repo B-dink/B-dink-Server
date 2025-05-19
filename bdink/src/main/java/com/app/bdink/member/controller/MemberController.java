@@ -6,6 +6,8 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.controller.dto.request.MemberMarketingDto;
 import com.app.bdink.member.controller.dto.request.MemberPhoneUpdateRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberUpdateNameDto;
+import com.app.bdink.member.controller.dto.response.OperationType;
+import com.app.bdink.member.controller.dto.response.PatchResponseDto;
 import com.app.bdink.member.controller.dto.response.SocialTypeDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
@@ -27,10 +29,10 @@ public class MemberController {
 
     @PatchMapping("/phone")
     @Operation(method = "PATCH", description = "핸드폰 번호 수정")
-    public RspTemplate<String> updatePhone(Principal principal,
-                                           @RequestBody @Valid MemberPhoneUpdateRequestDto memberPhoneUpdateRequestDto) {
+    public RspTemplate<PatchResponseDto> updatePhone(Principal principal,
+                                                     @RequestBody @Valid MemberPhoneUpdateRequestDto memberPhoneUpdateRequestDto) {
         memberService.updatePhoneNumber(Long.parseLong(principal.getName()), memberPhoneUpdateRequestDto);
-        return RspTemplate.success(Success.UPDATE_PHONE_SUCCESS, Success.UPDATE_PHONE_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_PHONE_SUCCESS, PatchResponseDto.from(Long.parseLong(principal.getName()), OperationType.PHONE_UPDATE));
     }
 
     @PatchMapping("/marketing")
@@ -39,7 +41,7 @@ public class MemberController {
                                            @RequestBody MemberMarketingDto memberMarketingDto) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         memberService.updateMarketing(member, memberMarketingDto);
-        return RspTemplate.success(Success.UPDATE_MAKETING_SUCCESS, Success.UPDATE_MAKETING_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_MAKETING_SUCCESS, PatchResponseDto.from(Long.parseLong(principal.getName()), OperationType.MARKETING_UPDATE));
     }
 
 //    @PatchMapping("/password/reset")
@@ -72,7 +74,7 @@ public class MemberController {
     public RspTemplate<?> updateName(Principal principal, @Valid @RequestBody MemberUpdateNameDto memberUpdateNameDto) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         memberService.updateName(member, memberUpdateNameDto);
-        return RspTemplate.success(Success.UPDATE_NAME_SUCCESS, Success.UPDATE_NAME_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_NAME_SUCCESS, PatchResponseDto.from(Long.parseLong(principal.getName()), OperationType.NAME_UPDATE));
     }
 
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/picture")
@@ -80,6 +82,6 @@ public class MemberController {
             @RequestPart(value = "profile") MultipartFile img) {
         Member member = memberService.findById(Long.parseLong(principal.getName()));
         memberService.updateProfile(member, s3Service.uploadImageOrMedia("image/", img));
-        return RspTemplate.success(Success.UPDATE_PICTUREURL_SUCCESS, Success.UPDATE_PICTUREURL_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_PICTUREURL_SUCCESS, PatchResponseDto.from(Long.parseLong(principal.getName()), OperationType.PROFILE_PICTURE_UPDATE));
     }
 }
