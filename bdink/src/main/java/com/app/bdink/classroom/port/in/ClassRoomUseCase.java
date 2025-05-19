@@ -28,7 +28,7 @@ public interface ClassRoomUseCase {
 
     void deleteClassRoom(final ClassRoomEntity classRoomEntity);
 
-    CareerListDto getAllClassRoom();
+    CareerListDto getAllClassRoom(Member member);
 
     List<CareerClassroomDto> getClassRoomByCareer(Career career);
 

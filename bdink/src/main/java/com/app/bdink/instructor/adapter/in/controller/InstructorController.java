@@ -1,7 +1,5 @@
 package com.app.bdink.instructor.adapter.in.controller;
 
-import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
-import com.app.bdink.classroom.adapter.in.controller.dto.response.CareerClassroomDto;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
