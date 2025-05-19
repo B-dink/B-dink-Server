@@ -62,7 +62,6 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
     private final SugangRepository sugangRepository;
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
-    private final SugangService sugangService;
     private final BookmarkRepository bookmarkRepository;
 
     public ClassRoomEntity findById(Long id) {
@@ -96,7 +95,6 @@ public class ClassRoomService implements ClassRoomUseCase {
 
     @Transactional
     public String createClassRoom(CreateClassRoomCommand command) {
-
         ClassRoom classRoom = classRoomMapper.commandToDomain(command); //mapper에서 커맨드를 -> 도메인으로 바꾸고
         PriceDetail priceDetail = priceDetailMapper.commandToDomain(command);
         Instructor instructor = instructorMapper.commandToEntity(command); //TODO: 나중에 도메인으로 바꾸든가하기.
