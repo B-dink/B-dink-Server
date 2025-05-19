@@ -139,8 +139,9 @@ public class ClassRoomController {
 
     @GetMapping("/all")
     @Operation(method = "GET", description = "클래스룸을 전체 조회합니다.")
-    public RspTemplate<CareerListDto> getAllClassRoom() {
-        return RspTemplate.success(Success.GET_ALL_CLASSROOM_SUCCESS, classRoomService.getAllClassRoom());
+    public RspTemplate<CareerListDto> getAllClassRoom(Principal principal) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        return RspTemplate.success(Success.GET_ALL_CLASSROOM_SUCCESS, classRoomService.getAllClassRoom(member));
     }
 
     @GetMapping("/career")

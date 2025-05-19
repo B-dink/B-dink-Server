@@ -62,7 +62,6 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
     private final SugangRepository sugangRepository;
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
-    private final SugangService sugangService;
     private final BookmarkRepository bookmarkRepository;
 
     public ClassRoomEntity findById(Long id) {
@@ -96,7 +95,6 @@ public class ClassRoomService implements ClassRoomUseCase {
 
     @Transactional
     public String createClassRoom(CreateClassRoomCommand command) {
-
         ClassRoom classRoom = classRoomMapper.commandToDomain(command); //mapper에서 커맨드를 -> 도메인으로 바꾸고
         PriceDetail priceDetail = priceDetailMapper.commandToDomain(command);
         Instructor instructor = instructorMapper.commandToEntity(command); //TODO: 나중에 도메인으로 바꾸든가하기.
@@ -132,7 +130,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public CareerListDto getAllClassRoom() {
+    public CareerListDto getAllClassRoom(Member member) {
         List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
         List<PromotionDto> dtos = promotions.stream()
                 .map(PromotionDto::from)
@@ -142,20 +140,31 @@ public class ClassRoomService implements ClassRoomUseCase {
             if (career.equals(Career.PROMOTION)) {
                 continue;
             }
-            List<CareerClassroomDto> classroomsByCareer = getClassRoomByCareer(career);
+            List<AllCareerClassRoomResponse> classroomsByCareer = getClassRoomByCareerWithIsBookmarked(career, member);
             result.add(CategorizedClassroomDto.from(classroomsByCareer));
         }
         return CareerListDto.of(dtos, result);
     }
 
     @Transactional(readOnly = true)
+    public List<AllCareerClassRoomResponse> getClassRoomByCareerWithIsBookmarked(Career career, Member member) {
+        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
+        return classRoomEntities.stream()
+                .map(classRoom -> AllCareerClassRoomResponse.of(
+                        classRoom,
+                        getChapterSummary(classRoom.getId()),
+                        isClassRoomBookmarked(member, classRoom),
+                        reviewService.countReview(classRoom)))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CareerClassroomDto> getClassRoomByCareer(Career career) {
         List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
 
-        List<CareerClassroomDto> careerClassroomDtos = classRoomEntities.stream()
+        return classRoomEntities.stream()
                 .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
                 .toList();
-        return careerClassroomDtos;
     }
 
     @Transactional(readOnly = true)
