@@ -7,13 +7,15 @@ import lombok.Builder;
 public record MyPageResponse (
         Boolean isInstructor,
         String memberProfile,
-        String memberEmail
+        String memberEmail,
+        String memberName
 ) {
     public static MyPageResponse of(Member member, Boolean isInstructor) {
         return MyPageResponse.builder()
                 .isInstructor(isInstructor)
                 .memberEmail(member.getEmail())
                 .memberProfile(member.getPictureUrl())
+                .memberName(member.getName())
                 .build();
     }
 }
