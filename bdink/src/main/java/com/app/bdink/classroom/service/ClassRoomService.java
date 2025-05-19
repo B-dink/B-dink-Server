@@ -130,7 +130,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public CareerListDto getAllClassRoom() {
+    public CareerListDto getAllClassRoom(Member member) {
         List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
         List<PromotionDto> dtos = promotions.stream()
                 .map(PromotionDto::from)
@@ -140,20 +140,31 @@ public class ClassRoomService implements ClassRoomUseCase {
             if (career.equals(Career.PROMOTION)) {
                 continue;
             }
-            List<CareerClassroomDto> classroomsByCareer = getClassRoomByCareer(career);
+            List<AllCareerClassRoomResponse> classroomsByCareer = getClassRoomByCareerWithIsBookmarked(career, member);
             result.add(CategorizedClassroomDto.from(classroomsByCareer));
         }
         return CareerListDto.of(dtos, result);
     }
 
     @Transactional(readOnly = true)
+    public List<AllCareerClassRoomResponse> getClassRoomByCareerWithIsBookmarked(Career career, Member member) {
+        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
+        return classRoomEntities.stream()
+                .map(classRoom -> AllCareerClassRoomResponse.of(
+                        classRoom,
+                        getChapterSummary(classRoom.getId()),
+                        isClassRoomBookmarked(member, classRoom),
+                        reviewService.countReview(classRoom)))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CareerClassroomDto> getClassRoomByCareer(Career career) {
         List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
 
-        List<CareerClassroomDto> careerClassroomDtos = classRoomEntities.stream()
+        return classRoomEntities.stream()
                 .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
                 .toList();
-        return careerClassroomDtos;
     }
 
     @Transactional(readOnly = true)
