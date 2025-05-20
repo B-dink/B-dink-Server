@@ -149,7 +149,7 @@ public class SocialAuthController {
     public RspTemplate<?> signOut(Principal principal) {
         Long userId = Long.valueOf(principal.getName());
         authService.signOut(userId);
-        return RspTemplate.success(Success.DELETE_USER_SUCCESS, Success.DELETE_USER_SUCCESS.getMessage());
+        return RspTemplate.success(Success.SIGNOUT_SUCCESS, null);
     }
 
 
