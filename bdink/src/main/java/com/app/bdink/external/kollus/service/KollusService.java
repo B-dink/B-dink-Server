@@ -270,11 +270,11 @@ public class KollusService {
         Map<String, Object> result = new LinkedHashMap<>();
         long unixExp = System.currentTimeMillis() / 1000 + 3600;
 
-        Integer kind = playRequestDTO.kind();
+        Integer kind = playRequestDTO.getKind();
 
         if (kind != null && kind == 3) {
-            if (playRequestDTO.clientUserId() != null) {
-                Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.clientUserId());
+            if (playRequestDTO.getClientUserId() != null) {
+                Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.getClientUserId());
 
                 if (memberOpt.isPresent()) {
                     data.put("content_expired", 0);
@@ -282,7 +282,7 @@ public class KollusService {
                 } else {
                     data.put("content_expired", 1);
                     data.put("result", 0);
-                    log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.clientUserId());
+                    log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.getClientUserId());
                 }
             } else {
                 data.put("content_expired", 0);
