@@ -277,18 +277,22 @@ public class KollusService {
 
                 if (memberOpt.isPresent()) {
                     log.info("kind 3 콜백 응답: content_expired=0");
+                    log.info("kind 3 콜백 응답 : {}", KollusPlayResponse.ofKind3(0, 1, unixExp));
                     return ResponseEntity.ok(KollusPlayResponse.ofKind3(0, 1, unixExp));
                 } else {
                     log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.getClient_user_id());
+                    log.info("kind 3 유효x 사용자 응답 : {}", KollusPlayResponse.ofKind3(1, 0, unixExp));
                     return ResponseEntity.ok(KollusPlayResponse.ofKind3(1, 0, unixExp));
                 }
             } else {
                 log.info("kind 3 콜백 응답: 사용자 ID 없음 → 기본 허용");
-                return ResponseEntity.ok(KollusPlayResponse.ofKind3(0, 1, unixExp));
+                log.info("kind 3 기본 허용 응답 : {}", KollusPlayResponse.ofKind3(1, 0, unixExp));
+                return ResponseEntity.ok(KollusPlayResponse.ofKind3(1, 0, unixExp));
             }
 
         } else {
             log.info("kind 1 콜백 응답: expiration_date={}", unixExp);
+            log.info("kind 1 기본 허용 응답 : {}", KollusPlayResponse.ofKind1(unixExp, 1, unixExp));
             return ResponseEntity.ok(KollusPlayResponse.ofKind1(unixExp, 1, unixExp));
         }
     }
