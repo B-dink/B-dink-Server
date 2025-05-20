@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -267,8 +267,8 @@ public class KollusService {
     @Transactional
     public ResponseEntity<Map<String, Object>> playCallbackService(PlayRequestDTO playRequestDTO) {
         //todo: kollus 쪽에서 넘어오는 데이터를 통해 kind 3 과 관련된 로직을 짜서 넘겨주면 될것 같음.
-        Map<String, Object> data = new HashMap<>();
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
 
         long unixExp = System.currentTimeMillis() / 1000 + 3600;
 
