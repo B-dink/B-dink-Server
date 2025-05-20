@@ -8,17 +8,13 @@ import java.util.Map;
 public class PlayRequestDTO {
         private Integer kind;
 
-        @JsonProperty("client_user_id")
-        private String clientUserId;
+        private String client_user_id;
 
-        @JsonProperty("player_id")
-        private String playerId;
+        private String player_id;
 
-        @JsonProperty("device_name")
-        private String deviceName;
+        private String device_name;
 
-        @JsonProperty("media_content_key")
-        private String mediaContentKey;
+        private String media_content_key;
 
         private Map<String, String> uservalues;
 }

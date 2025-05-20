@@ -273,8 +273,8 @@ public class KollusService {
         Integer kind = playRequestDTO.getKind();
 
         if (kind != null && kind == 3) {
-            if (playRequestDTO.getClientUserId() != null) {
-                Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.getClientUserId());
+            if (playRequestDTO.getClient_user_id() != null) {
+                Optional<Member> memberOpt = memberRepository.findByKollusClientUserId(playRequestDTO.getClient_user_id());
 
                 if (memberOpt.isPresent()) {
                     data.put("content_expired", 0);
@@ -282,7 +282,7 @@ public class KollusService {
                 } else {
                     data.put("content_expired", 1);
                     data.put("result", 0);
-                    log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.getClientUserId());
+                    log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.getClient_user_id());
                 }
             } else {
                 data.put("content_expired", 0);
