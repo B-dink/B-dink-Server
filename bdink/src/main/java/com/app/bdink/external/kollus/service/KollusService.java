@@ -274,8 +274,8 @@ public class KollusService {
 
         if (playRequestDTO.clientUserId() == null || playRequestDTO.mediaContentKey() == null) {
             log.warn("Play 콜백 누락된 필드 감지: {}", playRequestDTO);
-            data.put("result", 1);
             data.put("content_expired", 0);
+            data.put("result", 1);
             result.put("data", data);
             result.put("exp", unixExp);
 
