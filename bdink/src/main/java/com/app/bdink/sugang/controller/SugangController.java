@@ -51,10 +51,11 @@ public class SugangController {
 
     @GetMapping("/all")
     @Operation(method = "GET", description = "결제 완료된 수강신청 클래스룸 목록입니다. 진행률까지 포함되어있습니다.")
-    public RspTemplate<List<SugangClassRoomInfo>> getSugangClassRoom(Principal principal){
+    public RspTemplate<List<SugangClassRoomInfo>> getSugangClassRoom(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         Member member = memberService.findById(memberId);
+        List<SugangClassRoomInfo> sugangClassRoomInfo = sugangService.getSugangClassRoomInfo(member);
 
-        return RspTemplate.success(Success.GET_SUGANG_CLASSROOM_SUCCESS, sugangService.getSugangClassRoomInfo(member));
+        return RspTemplate.success(Success.GET_SUGANG_CLASSROOM_SUCCESS, sugangClassRoomInfo.isEmpty() ? null : sugangClassRoomInfo);
     }
 }
