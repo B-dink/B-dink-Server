@@ -7,7 +7,8 @@ import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
 import com.app.bdink.external.kollus.dto.response.KollusApiResponse;
-import com.app.bdink.external.kollus.dto.response.callback.KollusPlayResponse;
+import com.app.bdink.external.kollus.dto.response.callback.KollusPlayKind1DTO;
+import com.app.bdink.external.kollus.dto.response.callback.KollusPlayKind3DTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.external.kollus.entity.UserKey;
@@ -30,8 +31,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -266,7 +265,7 @@ public class KollusService {
 
     //todo: 잘 돌아가는지 테스트 해보기 그전에 콜러스 콜백 설정하기
     @Transactional
-    public ResponseEntity<KollusPlayResponse> playCallbackService(PlayRequestDTO playRequestDTO) {
+    public ResponseEntity<?> playCallbackService(PlayRequestDTO playRequestDTO) {
         long unixExp = System.currentTimeMillis() / 1000 + 3600;
 
         Integer kind = playRequestDTO.getKind();
@@ -277,23 +276,23 @@ public class KollusService {
 
                 if (memberOpt.isPresent()) {
                     log.info("kind 3 콜백 응답: content_expired=0");
-                    log.info("kind 3 콜백 응답 : {}", KollusPlayResponse.ofKind3(0, 1, unixExp));
-                    return ResponseEntity.ok(KollusPlayResponse.ofKind3(0, 1, unixExp));
+                    log.info("kind 3 콜백 응답 : {}", KollusPlayKind3DTO.ofKind3(0, 1, unixExp));
+                    return ResponseEntity.ok(KollusPlayKind3DTO.ofKind3(0, 1, unixExp));
                 } else {
                     log.warn("kind 3 콜백 - 유효하지 않은 사용자: {}", playRequestDTO.getClient_user_id());
-                    log.info("kind 3 유효x 사용자 응답 : {}", KollusPlayResponse.ofKind3(1, 0, unixExp));
-                    return ResponseEntity.ok(KollusPlayResponse.ofKind3(1, 0, unixExp));
+                    log.info("kind 3 유효x 사용자 응답 : {}", KollusPlayKind3DTO.ofKind3(1, 0, unixExp));
+                    return ResponseEntity.ok(KollusPlayKind3DTO.ofKind3(1, 0, unixExp));
                 }
             } else {
                 log.info("kind 3 콜백 응답: 사용자 ID 없음 → 기본 허용");
-                log.info("kind 3 기본 허용 응답 : {}", KollusPlayResponse.ofKind3(1, 0, unixExp));
-                return ResponseEntity.ok(KollusPlayResponse.ofKind3(1, 0, unixExp));
+                log.info("kind 3 기본 허용 응답 : {}", KollusPlayKind3DTO.ofKind3(1, 0, unixExp));
+                return ResponseEntity.ok(KollusPlayKind3DTO.ofKind3(1, 0, unixExp));
             }
 
         } else {
             log.info("kind 1 콜백 응답: expiration_date={}", unixExp);
-            log.info("kind 1 기본 허용 응답 : {}", KollusPlayResponse.ofKind1(unixExp, 1, unixExp));
-            return ResponseEntity.ok(KollusPlayResponse.ofKind1(unixExp, 1, unixExp));
+            log.info("kind 1 기본 허용 응답 : {}", KollusPlayKind1DTO.ofKind1(unixExp, 1, unixExp));
+            return ResponseEntity.ok(KollusPlayKind1DTO.ofKind1(unixExp, 1, unixExp));
         }
     }
 }

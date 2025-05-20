@@ -6,7 +6,7 @@ import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
-import com.app.bdink.external.kollus.dto.response.callback.KollusPlayResponse;
+import com.app.bdink.external.kollus.dto.response.callback.KollusPlayKind3DTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.service.KollusService;
 import com.app.bdink.global.exception.CustomException;
@@ -123,7 +123,7 @@ public class KollusController {
 
     @PostMapping("/play")
     @Operation(method = "POST", description = "Kollus Play Callback API 입니다.")
-    public ResponseEntity<KollusPlayResponse> playCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
+    public ResponseEntity<?> playCallback(@ModelAttribute PlayRequestDTO playRequestDTO) {
         log.info(playRequestDTO.toString());
         return kollusService.playCallbackService(playRequestDTO);
     }
