@@ -156,8 +156,9 @@ public class ClassRoomController {
         Long memberId = Long.parseLong((principal.getName()));
         Member member = memberService.findById(memberId);
         ClassRoomEntity classRoom = classRoomService.findById(id);
+        Boolean isBookmarked = classRoomService.isClassRoomBookmarked(member, classRoom);
         long bookmarkCount = bookmarkService.getBookmarkCountForClassRoom(classRoom);
-        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount, member);
+        ClassRoomDetailResponse classRoomDetailResponse = classRoomService.getClassRoomDetail(id, bookmarkCount, member, isBookmarked);
         return RspTemplate.success(Success.GET_CLASSROOM_DETAIL_SUCCESS, classRoomDetailResponse);
     }
 

@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.port.in;
 
+import com.app.bdink.bookmark.entity.Bookmark;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.domain.Career;
@@ -32,6 +33,6 @@ public interface ClassRoomUseCase {
 
     List<CareerClassroomDto> getClassRoomByCareer(Career career);
 
-    ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member);
+    ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member, Boolean isBookmarked);
     ChapterSummary getChapterSummary(Long id);
 }
