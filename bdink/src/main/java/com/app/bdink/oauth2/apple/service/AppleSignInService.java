@@ -80,9 +80,9 @@ public class AppleSignInService {
                             .socialType(SocialType.APPLE)
                             .role(Role.SIGNUP_PROGRESS)
                             .build()));
-            return LoginResult.from(member.get(), false);
+            return LoginResult.from(member.get(), true);
         }
-        return LoginResult.from(member.get(), true);
+        return LoginResult.from(member.get(), false);
     }
 
     @Transactional(readOnly = true)
