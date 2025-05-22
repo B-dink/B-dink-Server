@@ -129,7 +129,7 @@ public class KollusService {
 
         kollusMediaRepository.save(kollusMedia);
 
-        String url = "https://v.kr.kollus.com/s?jwt=" + kollusJwtToken.kollusAccessToken() + "&custom_key=" + userKey.getUserKey();
+        String url = "https://v.kr.kollus.com/si?jwt=" + kollusJwtToken.kollusAccessToken() + "&custom_key=" + userKey.getUserKey();
         log.info("생성된 kollus media 접속 url은 : {}", url);
 
         return KollusApiResponse.KollusUrlResponse.builder()
