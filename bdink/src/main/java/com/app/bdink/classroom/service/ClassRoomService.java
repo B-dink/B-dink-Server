@@ -215,7 +215,6 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
                 isBookmarked,
-                id,
                 imageUrls
         );
     }

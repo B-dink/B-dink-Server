@@ -22,7 +22,8 @@ public class BookmarkService {
 
     @Transactional
     public String saveBookmark(final Member member, final ClassRoomEntity classRoomEntity){
-        if (bookmarkRepository.existsByClassRoomAndMember(classRoomEntity, member)) {
+        if (bookmarkRepository.existsByClassRoomIdAndMemberId(
+                classRoomEntity.getId(), member.getId())) {
             throw new CustomException(Error.EXIST_BOOKMARK, Error.EXIST_BOOKMARK.getMessage());
         }
         Bookmark bookmark = Bookmark.builder()
