@@ -93,8 +93,6 @@ public class KakaoSignInService {
         }
 
         return new LoginResult(member.get(), false);
-
-
     }
 
     public void revokeMember(final Member member) {
