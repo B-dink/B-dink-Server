@@ -1,7 +1,6 @@
 package com.app.bdink.sugang.entity;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import jakarta.persistence.*;
@@ -10,12 +9,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Sugang extends BaseTimeEntity {
+public class Sugang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -33,16 +30,12 @@ public class Sugang extends BaseTimeEntity {
     @Column(nullable = false)
     private double progressPercent; // 수강한 클래스룸 전체 진행률
 
-    @Column(nullable = false)
-    private LocalDate expiredDate;
-
     @Builder
     public Sugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
         this.classRoomEntity = classRoomEntity;
         this.member = member;
         this.sugangStatus = sugangStatus;
         this.progressPercent = 0;
-        this.expiredDate = LocalDate.now().plusMonths(6);
     }
 
     public void updateProgressPercent(double progressPercent) {

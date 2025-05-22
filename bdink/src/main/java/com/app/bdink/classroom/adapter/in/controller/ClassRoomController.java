@@ -91,8 +91,8 @@ public class ClassRoomController {
 
     @GetMapping("/chapter")
     @Operation(method = "GET", description = "해당 클래스룸의 챕터 정보를 조회합니다.")
-    RspTemplate<?> getChapterInfo(@RequestParam Long id, Principal principal) {
-        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS, classRoomService.getChapterInfo(id, principal));
+    RspTemplate<?> getChapterInfo(@RequestParam Long id) {
+        return RspTemplate.success(Success.GET_CHAPTER_SUCCESS, classRoomService.getChapterInfo(id));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
