@@ -55,6 +55,7 @@ public class AppleSignInService {
     private final MemberRepository memberRepository;
 
     public LoginResult getAppleId(String identityToken) {
+        log.info("getAppleId: {}", identityToken);
         Map<String, String> headers = appleJwtParser.parseHeaders(identityToken);
 
         ResponseEntity<ApplePublicKeys> result = restClient.get()
@@ -70,6 +71,7 @@ public class AppleSignInService {
         Optional<Member> member = getByAppleId(appleId);
 
         if (member.isEmpty()){
+            log.info("apple id {} not found", appleId);
             member = Optional.of(memberRepository.save(
                     Member.builder()
                             .name("버딩크 유저"+ UUID.randomUUID())
@@ -80,9 +82,10 @@ public class AppleSignInService {
                             .socialType(SocialType.APPLE)
                             .role(Role.SIGNUP_PROGRESS)
                             .build()));
-            return LoginResult.from(member.get(), false);
+            return LoginResult.from(member.get(), true);
         }
-        return LoginResult.from(member.get(), true);
+        log.info("apple id {} found", appleId);
+        return LoginResult.from(member.get(), false);
     }
 
     @Transactional(readOnly = true)
