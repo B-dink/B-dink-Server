@@ -26,19 +26,23 @@ import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.price.domain.PriceDetail;
 import com.app.bdink.price.mapper.PriceDetailMapper;
 import com.app.bdink.review.service.ReviewService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
-import com.app.bdink.sugang.service.SugangService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +67,8 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final SugangRepository sugangRepository;
     private final KollusMediaLinkRepository kollusMediaLinkRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final MemberService memberService;
+    private final MemberUtilService memberUtilService;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -86,11 +92,30 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<ChapterResponse> getChapterInfo(Long id) {
+    public ChapterListResponse getChapterInfo(Long id, Principal principal) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
         ClassRoomEntity classRoomEntity = findById(id);
-        return classRoomEntity.getChapters().stream()
+
+        List<ChapterResponse> chapters = classRoomEntity.getChapters().stream()
                 .map(ChapterResponse::of)
                 .collect(Collectors.toList());
+
+        int totalLectures = lectureRepository.countByClassRoom(classRoomEntity);
+
+        int completedLectures = kollusMediaLinkRepository.countByMemberAndLectureClassRoomAndCompleted(member, classRoomEntity, true);
+
+        double progressRatio = totalLectures == 0 ? 0.0 :
+                ((double) completedLectures / totalLectures) * 100;
+
+        double totalProgress = BigDecimal.valueOf(progressRatio)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        Optional<Sugang> sugangOPT = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
+
+        LocalDate expiredDate = sugangOPT.get().getExpiredDate();
+
+        return ChapterListResponse.of(totalProgress, totalLectures, completedLectures, expiredDate, chapters);
     }
 
     @Transactional
