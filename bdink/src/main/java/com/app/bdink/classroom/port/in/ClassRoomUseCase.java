@@ -1,14 +1,14 @@
 package com.app.bdink.classroom.port.in;
 
-import com.app.bdink.bookmark.entity.Bookmark;
+import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
-import com.app.bdink.classroom.domain.Career;
-import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
 import com.app.bdink.member.entity.Member;
 
+import java.security.Principal;
 import java.util.List;
 
 //* useCase에서는 Command를 받아서 서비스에 넘겨주고, 도메인(ResponseDto)을 컨트롤러에 반환한다.
@@ -16,7 +16,7 @@ public interface ClassRoomUseCase {
 
     ClassRoomResponse getClassRoomInfo(final Member member, final Long id);
 
-    List<ChapterResponse> getChapterInfo(Long id);
+    ChapterListResponse getChapterInfo(Long id, Principal principal);
 
     String createClassRoom(CreateClassRoomCommand command);
 
