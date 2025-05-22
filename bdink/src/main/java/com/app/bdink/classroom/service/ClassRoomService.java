@@ -181,7 +181,7 @@ public class ClassRoomService implements ClassRoomUseCase {
 
 
     @Transactional(readOnly = true)
-    public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member) {
+    public ClassRoomDetailResponse getClassRoomDetail(Long id, long bookmarkCount, Member member, Boolean isBookmarked) {
         ClassRoomEntity classRoomEntity = findById(id);
 
         Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
@@ -214,6 +214,8 @@ public class ClassRoomService implements ClassRoomUseCase {
                 payment,
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
+                isBookmarked,
+                id,
                 imageUrls
         );
     }
