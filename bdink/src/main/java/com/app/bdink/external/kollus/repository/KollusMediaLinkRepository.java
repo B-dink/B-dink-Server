@@ -1,7 +1,6 @@
 package com.app.bdink.external.kollus.repository;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.classroom.domain.ClassRoom;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.member.entity.Member;
@@ -17,6 +16,8 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
 
     Optional<KollusMediaLink> findByMemberIdAndLectureId(Long memberId, Long lectureId);
 
+    int countByMemberAndLectureClassRoomAndCompleted(Member member, ClassRoomEntity classRoomEntity, boolean completed);
+
     // 사용자별 등록된 영상 리스트 가져오기
     List<KollusMediaLink> findAllByMemberId(Long memberId);
 
@@ -25,4 +26,6 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
     int countByMemberAndLecture_ClassRoomAndPlaytimePercentGreaterThanEqual(Member member,
                                                                                  ClassRoomEntity classRoomEntity,
                                                                                  int progressPercent);
+
+    List<KollusMediaLink> findAllByMemberAndLectureClassRoom(Member member, ClassRoomEntity classRoomEntity);
 }
