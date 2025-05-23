@@ -1,5 +1,6 @@
 package com.app.bdink.version.service;
 
+import com.app.bdink.version.controller.dto.ForceUpdateInfo;
 import com.app.bdink.version.entity.Platform;
 import com.app.bdink.version.entity.Version;
 import com.app.bdink.version.respository.VersionRepository;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +31,9 @@ public class VersionServiceImpl implements VersionService {
         );
     }
 
-    @Override
-    public void updateVersion(Version version) {
-    }
+//    @Override
+//    public void updateVersion(Version version) {
+//    }
 
     @Override
     public void deleteVersion(Long id) {
@@ -49,11 +51,27 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public Boolean isForceUpdateRequired(String currentVersion, Platform platform) {
-        Version latestVersion = getLatestVersion(platform);
-        if (latestVersion.getForceUpdateRequired()) {
-            return compareVersions(currentVersion, latestVersion.getMinimumRequiredVersion()) < 0;
-        }
-        return false;
+        List<Version> allVersions = versionRepository.findAllByPlatform(platform);
+
+        return allVersions.stream()
+                .filter(v -> Boolean.TRUE.equals(v.getForceUpdateRequired()))
+                .anyMatch(v -> compareVersions(currentVersion, v.getCurrentVersion()) < 0);
+    }
+
+    @Override
+    public ForceUpdateInfo checkForceUpdateInfo(String currentVersion, Platform platform) {
+        List<Version> allVersions = versionRepository.findAllByPlatform(platform);
+
+        // 현재 버전보다 높으면서 강제 업데이트가 필요한 버전들 중 가장 높은 버전 찾기
+        Optional<Version> forceUpdateVersion = allVersions.stream()
+                .filter(v -> Boolean.TRUE.equals(v.getForceUpdateRequired()))
+                .filter(v -> compareVersions(currentVersion, v.getCurrentVersion()) < 0)
+                .max((v1, v2) -> compareVersions(v1.getCurrentVersion(), v2.getCurrentVersion()));
+
+        return forceUpdateVersion.map(
+                version -> new ForceUpdateInfo(true, version.getCurrentVersion()))
+                .orElseGet(
+                        () -> new ForceUpdateInfo(false, null));
     }
 
     @Override
