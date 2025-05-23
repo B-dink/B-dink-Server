@@ -45,6 +45,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -96,9 +97,16 @@ public class ClassRoomService implements ClassRoomUseCase {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         ClassRoomEntity classRoomEntity = findById(id);
 
+        List<KollusMediaLink> mediaLinks = kollusMediaLinkRepository
+                .findAllByMemberAndLectureClassRoom(member, classRoomEntity);
+
+        Map<Long, KollusMediaLink> mediaLinkMap = mediaLinks.stream()
+                .collect(Collectors.toMap(link -> link.getLecture().getId(), link -> link));
+
         List<ChapterResponse> chapters = classRoomEntity.getChapters().stream()
-                .map(ChapterResponse::of)
+                .map(chapter -> ChapterResponse.of(chapter, mediaLinkMap))
                 .collect(Collectors.toList());
+
 
         int totalLectures = lectureRepository.countByClassRoom(classRoomEntity);
 
