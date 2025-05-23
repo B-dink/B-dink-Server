@@ -31,10 +31,6 @@ public class VersionServiceImpl implements VersionService {
         );
     }
 
-//    @Override
-//    public void updateVersion(Version version) {
-//    }
-
     @Override
     public void deleteVersion(Long id) {
         if (!versionRepository.existsById(id)) {
@@ -47,15 +43,6 @@ public class VersionServiceImpl implements VersionService {
     public Boolean isUpdateRequired(String currentVersion, Platform platform) {
         Version latestVersion = getLatestVersion(platform);
         return !currentVersion.equals(latestVersion.getCurrentVersion());
-    }
-
-    @Override
-    public Boolean isForceUpdateRequired(String currentVersion, Platform platform) {
-        List<Version> allVersions = versionRepository.findAllByPlatform(platform);
-
-        return allVersions.stream()
-                .filter(v -> Boolean.TRUE.equals(v.getForceUpdateRequired()))
-                .anyMatch(v -> compareVersions(currentVersion, v.getCurrentVersion()) < 0);
     }
 
     @Override
