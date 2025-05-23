@@ -42,7 +42,7 @@ public class Sugang extends BaseTimeEntity {
         this.member = member;
         this.sugangStatus = sugangStatus;
         this.progressPercent = 0;
-        this.expiredDate = LocalDate.now().plusMonths(6);
+        this.expiredDate = LocalDate.now().plusMonths(3);
     }
 
     public void updateProgressPercent(double progressPercent) {
