@@ -8,7 +8,7 @@ public record LectureResponse(
     String progress
 ) {
     public static LectureResponse from(final Lecture lecture, final double watchProgress) {
-        String progressStr = watchProgress >= 90 ? "완강" : Math.round(watchProgress) + "%";;
+        String progressStr = watchProgress >= 90 ? "완강" : Math.round(watchProgress) + "%";
         return new LectureResponse(lecture.getTitle(), lecture.getTime().toString(), progressStr);
     }
 }
