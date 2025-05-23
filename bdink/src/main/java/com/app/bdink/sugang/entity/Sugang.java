@@ -36,6 +36,14 @@ public class Sugang extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDate expiredDate;
 
+    // 생성 시 기준 3개월 유효기간 (createdAt + 3개월과 동의어로 취급)
+    @PrePersist
+    public void prePersist() {
+        if (this.expiredDate == null) {
+            this.expiredDate = LocalDate.now().plusMonths(3);
+        }
+    }
+
     @Builder
     public Sugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
         this.classRoomEntity = classRoomEntity;
