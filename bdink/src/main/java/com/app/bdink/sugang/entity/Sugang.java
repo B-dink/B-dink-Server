@@ -57,4 +57,8 @@ public class Sugang extends BaseTimeEntity {
         this.progressPercent = progressPercent;
     }
 
+    public void updateSugangStatus(SugangStatus sugangStatus) {
+        this.sugangStatus = sugangStatus;
+    }
+
 }
