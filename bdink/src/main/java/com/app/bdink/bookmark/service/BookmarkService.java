@@ -4,8 +4,10 @@ import com.app.bdink.bookmark.adapter.in.controller.dto.response.BookmarkRespons
 import com.app.bdink.bookmark.entity.Bookmark;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.bookmark.repository.BookmarkRepository;
+import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
+    private final LectureService lectureService;
 
     @Transactional
     public String saveBookmark(final Member member, final ClassRoomEntity classRoomEntity){
@@ -33,11 +36,17 @@ public class BookmarkService {
         return String.valueOf(bookmarkRepository.save(bookmark).getId());
     }
 
-    public List<BookmarkResponse> getBookmarkClassRoom(final Member member){
-        List<Bookmark> bookmarkList = bookmarkRepository.findByMember(member);
-        return bookmarkList.stream()
-            .map((bookmark) -> BookmarkResponse.from(bookmark.getClassRoom()))
-            .toList();
+    @Transactional(readOnly = true)
+    public List<BookmarkResponse> getBookmarkClassRoomWithLectureCount(final Member member) {
+        List<Bookmark> bookmarks = bookmarkRepository.findByMember(member);
+
+        return bookmarks.stream()
+                .map(bookmark -> {
+                    ClassRoomEntity classRoom = bookmark.getClassRoom();
+                    int lectureCount = lectureService.countLectureByClassRoom(classRoom);
+                    return BookmarkResponse.from(bookmark, lectureCount);
+                })
+                .toList();
     }
 
     @Transactional

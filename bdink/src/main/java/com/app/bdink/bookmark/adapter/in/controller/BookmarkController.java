@@ -1,9 +1,11 @@
 package com.app.bdink.bookmark.adapter.in.controller;
 
+import com.app.bdink.bookmark.adapter.in.controller.dto.response.BookmarkResponse;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.bookmark.service.BookmarkService;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
@@ -13,6 +15,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +31,7 @@ public class BookmarkController {
     private final ClassRoomService classRoomService;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
+    private final LectureService lectureService;
 
     @PostMapping
     @Operation(method = "POST", description = "북마크를 저장합니다.")
@@ -39,9 +44,10 @@ public class BookmarkController {
 
     @GetMapping
     @Operation(method = "GET", description = "북마크한 클래스룸을 조회합니다.")
-    public RspTemplate<?> getBookmarkClassRoom(Principal principal) {
+    public RspTemplate<List<BookmarkResponse>> getBookmarkClassRoom(Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        return RspTemplate.success(Success.GET_BOOKMARK_SUCCESS,bookmarkService.getBookmarkClassRoom(member));
+        List<BookmarkResponse> responses = bookmarkService.getBookmarkClassRoomWithLectureCount(member);
+        return RspTemplate.success(Success.GET_BOOKMARK_SUCCESS, responses);
     }
 
     @DeleteMapping("/{bookmarkId}")

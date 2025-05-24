@@ -109,6 +109,8 @@ public enum Error {
 
     NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN_BELOW_AMOUNT(HttpStatus.BAD_REQUEST, "5만원 이하의 결제는 할부가 불가능해서 결제에 실패했습니다."),
 
+    INVALID_VERSION_ORDER(HttpStatus.BAD_REQUEST, "새로운 버전은 최신 버전보다 높은 버전이어야 합니다."),
+
     /**
      * 401 UNAUTHORIZED EXCEPTION
      */
@@ -161,6 +163,10 @@ public enum Error {
     UNPROCESSABLE_APPLE_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
     UNPROCESSABLE_JWT_CREATE_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "서버에서 KOLLUS JWT토큰을 생성 중 오류가 발생했습니다."),
 
+    /**
+     * 409 UNPROCESSABLE_ENTITY
+     */
+    VERSION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 버전입니다."),
 
     /**
      * 500 INTERNAL_SERVER_ERROR

@@ -29,6 +29,7 @@ public enum Success {
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
     CONNECT_KOLLUSMEDIA_SUCCESS(HttpStatus.CREATED, "미디어와 강의의 연결 성공"),
+    CREATE_VERSION_SUCCESS(HttpStatus.CREATED, "버전 정보 생성 성공"),
     /**
      * 200 OK
      */
@@ -118,6 +119,9 @@ public enum Success {
 
     GET_TOSS_PAYMENT_SUCCESS(HttpStatus.OK, "승인된 결제를 조회 성공"),
     CANCEL_TOSS_PAYMENT_SUCCESS(HttpStatus.OK, "승인된 결제를 취소 성공"),
+
+    GET_VERSION_SUCCESS(HttpStatus.OK, "버전 정보 조회 성공"),
+    GET_UPDATE_CHECK_SUCCESS(HttpStatus.OK, "버전업 필요성 확인 성공"),
 
     /**
      * 202 accepted
