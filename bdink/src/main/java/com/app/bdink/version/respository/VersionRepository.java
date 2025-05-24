@@ -10,5 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface VersionRepository extends JpaRepository<Version, Long> {
+    Boolean existsByVersionAndPlatform(String version, Platform platform);
     List<Version> findAllByPlatform(Platform platform);
 }

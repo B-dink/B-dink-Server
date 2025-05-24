@@ -8,7 +8,6 @@ public interface VersionService {
 
     Long addVersion(Version version);
     Version getVersion(Long id);
-    void deleteVersion(Long id);
 
     Boolean isUpdateRequired(String currentVersion, Platform platform);
     ForceUpdateInfo checkForceUpdateInfo(String currentVersion, Platform platform);

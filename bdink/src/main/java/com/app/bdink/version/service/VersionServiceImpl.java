@@ -1,5 +1,7 @@
 package com.app.bdink.version.service;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.version.controller.dto.ForceUpdateInfo;
 import com.app.bdink.version.entity.Platform;
 import com.app.bdink.version.entity.Version;
@@ -21,6 +23,15 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public Long addVersion(Version version) {
+        if (versionRepository.existsByVersionAndPlatform(version.getVersion(), version.getPlatform())) {
+            throw new CustomException(Error.VERSION_ALREADY_EXISTS, Error.VERSION_ALREADY_EXISTS.getMessage());
+        }
+
+        Version latestVersion = getLatestVersion(version.getPlatform());
+        if (latestVersion != null &&
+                compareVersions(version.getVersion(), latestVersion.getVersion()) <= 0) {
+            throw new CustomException(Error.INVALID_VERSION_ORDER, Error.INVALID_VERSION_ORDER.getMessage());
+        }
         return versionRepository.save(version).getId();
     }
 
@@ -32,17 +43,9 @@ public class VersionServiceImpl implements VersionService {
     }
 
     @Override
-    public void deleteVersion(Long id) {
-        if (!versionRepository.existsById(id)) {
-            throw new NoSuchElementException("Version not found");
-        }
-        versionRepository.deleteById(id);
-    }
-
-    @Override
     public Boolean isUpdateRequired(String currentVersion, Platform platform) {
         Version latestVersion = getLatestVersion(platform);
-        return !currentVersion.equals(latestVersion.getCurrentVersion());
+        return !currentVersion.equals(latestVersion.getVersion());
     }
 
     @Override
@@ -52,11 +55,11 @@ public class VersionServiceImpl implements VersionService {
         // 현재 버전보다 높으면서 강제 업데이트가 필요한 버전들 중 가장 높은 버전 찾기
         Optional<Version> forceUpdateVersion = allVersions.stream()
                 .filter(v -> Boolean.TRUE.equals(v.getForceUpdateRequired()))
-                .filter(v -> compareVersions(currentVersion, v.getCurrentVersion()) < 0)
-                .max((v1, v2) -> compareVersions(v1.getCurrentVersion(), v2.getCurrentVersion()));
+                .filter(v -> compareVersions(currentVersion, v.getVersion()) < 0)
+                .max((v1, v2) -> compareVersions(v1.getVersion(), v2.getVersion()));
 
         return forceUpdateVersion.map(
-                version -> new ForceUpdateInfo(true, version.getCurrentVersion()))
+                version -> new ForceUpdateInfo(true, version.getVersion()))
                 .orElseGet(
                         () -> new ForceUpdateInfo(false, null));
     }
@@ -66,7 +69,7 @@ public class VersionServiceImpl implements VersionService {
         List<Version> versionsByPlatform = versionRepository.findAllByPlatform(platform);
 
         return versionsByPlatform.stream()
-                .max((v1, v2) -> compareVersions(v1.getCurrentVersion(), v2.getCurrentVersion()))
+                .max((v1, v2) -> compareVersions(v1.getVersion(), v2.getVersion()))
                 .orElseThrow(() -> new NoSuchElementException("해당 플랫폼의 버전을 찾을 수 없습니다: " + platform));
     }
 
