@@ -119,9 +119,10 @@ public class ClassRoomService implements ClassRoomUseCase {
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
 
-        Optional<Sugang> sugangOPT = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
+        Sugang sugang = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity).orElseThrow(() ->
+                new CustomException(Error.NOT_FOUND_SUGANGLIST, Error.NOT_FOUND_SUGANGLIST.getMessage()));
 
-        LocalDate expiredDate = sugangOPT.get().getExpiredDate();
+        LocalDate expiredDate = sugang.getExpiredDate();
 
         return ChapterListResponse.of(totalProgress, totalLectures, completedLectures, expiredDate, chapters);
     }
