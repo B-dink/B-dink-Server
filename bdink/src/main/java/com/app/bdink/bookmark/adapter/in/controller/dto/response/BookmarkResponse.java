@@ -1,19 +1,22 @@
 package com.app.bdink.bookmark.adapter.in.controller.dto.response;
 
-import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.bookmark.entity.Bookmark;
 
 public record BookmarkResponse(
     String classRoomTitle,
     String instructor,
-    Long classRoomId
+    Long classRoomId,
+    String thumbnail,
+    Integer totalLectureCount
 ) {
 
-    public static BookmarkResponse from(final ClassRoomEntity classRoomEntity) {
+    public static BookmarkResponse from(final Bookmark bookmark, final Integer totalLectureCount) {
         return new BookmarkResponse(
-            classRoomEntity.getTitle(),
-            // TODO: instructor 고민해보기
-            classRoomEntity.getInstructor().getMember().getName(),
-            classRoomEntity.getId()
+                bookmark.getClassRoom().getTitle(),
+                bookmark.getClassRoom().getInstructor().getMember().getName(),
+                bookmark.getClassRoom().getId(),
+                bookmark.getClassRoom().getThumbnail(),
+                totalLectureCount
         );
     }
 }

@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LectureService {
 
     private final LectureRepository lectureRepository;
-    private final ChapterRepository chapterRepository;
     private final ChapterService chapterService;
 
     public Lecture findById(Long id){

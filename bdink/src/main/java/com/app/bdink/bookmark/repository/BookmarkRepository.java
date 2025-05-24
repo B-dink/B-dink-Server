@@ -16,7 +16,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     boolean existsByClassRoomAndMember(ClassRoomEntity classRoomEntity, Member member);
     Optional<Bookmark> findByClassRoomAndMember(ClassRoomEntity classRoomEntity, Member member);
 
-    // 또는 ID로 비교 (더 안전)
     @Query("SELECT COUNT(b) > 0 FROM Bookmark b WHERE b.classRoom.id = :classRoomId AND b.member.id = :memberId")
     boolean existsByClassRoomIdAndMemberId(@Param("classRoomId") Long classRoomId,
                                            @Param("memberId") Long memberId);
