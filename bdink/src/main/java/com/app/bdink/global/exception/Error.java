@@ -22,6 +22,7 @@ public enum Error {
     NOT_FOUND_ANSWER(HttpStatus.NOT_FOUND, "찾을 수 없는 답변입니다."),
     NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "찾을 수 없는 북마크입니다."),
     NOT_FOUND_SUGANG(HttpStatus.NOT_FOUND, "찾을 수 없는 수강입니다."),
+    NOT_FOUND_SUGANGLIST(HttpStatus.NOT_FOUND, "수강 신청이 되어있지 않은 유저입니다."),
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
