@@ -21,6 +21,8 @@ public record ClassRoomDetailResponse(
         Level level,
         Boolean isBookmarked,
 
-        List<String> detailPageImageUrls
+        List<String> detailPageImageUrls,
+
+        List<ClassRoomDetailChapterResponse> chapters
 ) {
 }
