@@ -29,14 +29,17 @@ public class Chapter extends BaseTimeEntity {
 
     private String title; // 챕터 제목
 
+    private String thumbnail; //챕터당 필요한 썸네일
+
     // TODO: lectureCount 필드는 사용하지 않는 것으로 보입니다. 제거해도 될 것 같습니다.
     private int lectureCount; // 해당 챕터에 속한 강좌의 수
 
     private int number;
 
-    public Chapter(ClassRoomEntity classRoomEntity, String title) {
+    public Chapter(ClassRoomEntity classRoomEntity, String title, String thumbnail) {
         this.classRoom = classRoomEntity;
         this.title = title;
+        this.thumbnail = thumbnail;
         this.lectureCount = 0;
         this.number = 1;
     }

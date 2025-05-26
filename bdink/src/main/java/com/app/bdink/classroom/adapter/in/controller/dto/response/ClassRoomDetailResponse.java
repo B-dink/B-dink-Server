@@ -15,12 +15,14 @@ public record ClassRoomDetailResponse(
 
         String thumbnail,
 
-        Boolean payment,
+        boolean payment,
 
         PriceDetail priceDetail,
         Level level,
         Boolean isBookmarked,
 
-        List<String> detailPageImageUrls
+        List<String> detailPageImageUrls,
+
+        List<ClassRoomDetailChapterResponse> chapters
 ) {
 }
