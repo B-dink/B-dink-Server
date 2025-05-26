@@ -22,6 +22,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.mapper.InstructorMapper;
+import com.app.bdink.lecture.controller.dto.response.LectureDetailResponse;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
@@ -220,7 +221,7 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
 
-        Boolean payment = false;
+        boolean payment = false;
 
         if(sugangOpt.isPresent()){
             Sugang sugang = sugangOpt.get();
@@ -238,6 +239,15 @@ public class ClassRoomService implements ClassRoomUseCase {
                 .map(ClassRoomDetailImage::getImageUrl)
                 .toList();
 
+        List<ClassRoomDetailChapterResponse> chapters = classRoomEntity.getChapters().stream()
+                .map(chapter -> {
+                    List<LectureDetailResponse> lectureDetailResponses = chapter.getLectures().stream()
+                            .map(LectureDetailResponse::from)
+                            .collect(Collectors.toList());
+                    return ClassRoomDetailChapterResponse.from(chapter, lectureDetailResponses);
+                })
+                .collect(Collectors.toList());
+
         return new ClassRoomDetailResponse(
                 classRoomEntity.getTitle(),
                 classRoomEntity.getIntroduction(),
@@ -249,7 +259,8 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
                 isBookmarked,
-                imageUrls
+                imageUrls,
+                chapters
         );
     }
 
