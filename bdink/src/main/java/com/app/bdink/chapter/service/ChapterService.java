@@ -28,8 +28,8 @@ public class ChapterService {
 
 
 
-    public String createChapter(final ClassRoomEntity classRoomEntity, final String title){
-        Chapter chapter = new Chapter(classRoomEntity, title);
+    public String createChapter(final ClassRoomEntity classRoomEntity, final String title, final String thumbnail){
+        Chapter chapter = new Chapter(classRoomEntity, title, thumbnail);
         boolean isNotFirstChapter = chapterRepository.existsByClassRoom(classRoomEntity);
 
         if (isNotFirstChapter){ //첫번째 챕터아니면 ++
