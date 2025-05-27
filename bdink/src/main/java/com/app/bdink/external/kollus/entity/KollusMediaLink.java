@@ -48,15 +48,15 @@ public class KollusMediaLink {
         this.tokenCreatedAt = tokenCreatedAt;
     }
 
-    public void updateWatchProgress(double watchProgress){
+    public void updateWatchProgress(double watchProgress) {
         this.watchProgress = watchProgress;
     }
 
-    public void updatePlaytimePercent(int playtimePercent){
+    public void updatePlaytimePercent(int playtimePercent) {
         this.playtimePercent = playtimePercent;
     }
 
-    public void updateCompleted(boolean completed){
+    public void updateCompleted(boolean completed) {
         this.completed = completed;
     }
 }

@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -113,6 +112,8 @@ public class KollusService {
 
 
         //TODO: KOLLUS 채널 업로드키 LECTURE에서 들고와도 될것 같기도. -> 사이드이펙트 고려해서 생각 확장해보기.
+        Lecture lecture = lectureService.findById(lectureId);
+
         KollusMedia kollusMedia = kollusMediaRepository
                 .findByLectureId(lectureId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
@@ -134,6 +135,8 @@ public class KollusService {
 
         return KollusApiResponse.KollusUrlResponse.builder()
                 .url(url)
+                .lectureTitle(lecture.getTitle())
+                .InstructorName(lecture.getClassRoom().getInstructor().getMember().getName())
                 .build();
     }
 
