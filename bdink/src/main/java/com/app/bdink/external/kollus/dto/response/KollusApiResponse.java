@@ -11,5 +11,7 @@ public class KollusApiResponse {
     @AllArgsConstructor
     public static class KollusUrlResponse {
         private String url;
+        private String lectureTitle;
+        private String InstructorName;
     }
 }

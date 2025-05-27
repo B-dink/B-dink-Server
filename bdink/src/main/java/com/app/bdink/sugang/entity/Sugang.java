@@ -60,5 +60,4 @@ public class Sugang extends BaseTimeEntity {
     public void updateSugangStatus(SugangStatus sugangStatus) {
         this.sugangStatus = sugangStatus;
     }
-
 }

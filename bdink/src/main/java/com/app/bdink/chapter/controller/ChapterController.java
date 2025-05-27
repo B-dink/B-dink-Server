@@ -1,15 +1,15 @@
 package com.app.bdink.chapter.controller;
 
+import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
-import com.app.bdink.external.aws.service.S3Service;
-import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
-import com.app.bdink.chapter.service.ChapterService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
