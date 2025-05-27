@@ -78,6 +78,7 @@ public class SugangService {
                                 KollusMediaLink kollusMediaLink = kollusMediaLinkRepository
                                         .findByMemberIdAndLectureId(member.getId(), lecture.getId())
                                         .orElse(null);
+                                //todo: 이쪽 문제 터질수도? 나중에 확인한번 더하기
                                 return SugangClassRoomInfo.of(sugang, lecture, kollusMediaLink);
                             });
                 })
