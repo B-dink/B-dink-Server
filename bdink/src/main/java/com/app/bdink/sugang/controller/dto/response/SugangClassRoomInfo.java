@@ -8,7 +8,7 @@ public record SugangClassRoomInfo (
         Long lectureId,
         String lectureTitle,
         double lectureProgress,
-        String classRoomThumnail,
+        String classRoomThumbnail,
         String InstructorName
 //        Double progressClassRoom //클래스룸 전체 진행률
 )
