@@ -1,7 +1,6 @@
 package com.app.bdink.lecture.service;
 
 import com.app.bdink.chapter.entity.Chapter;
-import com.app.bdink.chapter.repository.ChapterRepository;
 import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.external.kollus.entity.KollusMedia;
