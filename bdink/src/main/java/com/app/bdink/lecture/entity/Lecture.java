@@ -4,7 +4,6 @@ import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.external.kollus.entity.KollusMedia;
-import com.app.bdink.sugang.entity.Sugang;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -40,17 +38,21 @@ public class Lecture extends BaseTimeEntity {
     @Column(name = "media_link")
     private String mediaLink;
 
+    @Column(name = "subtitles")
+    private String subtitles;
+
     // KollusMedia 연관관계 (Lecture 기준 1:1)
     @OneToOne(mappedBy = "lecture")
     private KollusMedia kollusMedia;
 
     @Builder
-    public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink) {
+    public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink, String subtitles) {
         this.classRoom = classRoom;
         this.chapter = chapter;
         this.title = title;
         this.time = time;
         this.mediaLink = mediaLink;
+        this.subtitles = subtitles;
     }
 
     public void updateKollusMedia(KollusMedia kollusMedia) {

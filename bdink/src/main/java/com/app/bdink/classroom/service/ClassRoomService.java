@@ -19,6 +19,7 @@ import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.totalTime.TotalTimeUtil;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.mapper.InstructorMapper;
@@ -223,13 +224,17 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         boolean payment = false;
 
+        Sugang sugang = null;
+
         if(sugangOpt.isPresent()){
-            Sugang sugang = sugangOpt.get();
+            sugang = sugangOpt.get();
             if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
                 log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
                 payment = true;
             }
         }
+
+        LocalDate expiredDate = sugang != null ? sugang.getExpiredDate() : null;
 
 
         //클래스룸 엔티티로 디테일이미지 리스트를 가져옴.
@@ -254,6 +259,11 @@ public class ClassRoomService implements ClassRoomUseCase {
                 bookmarkCount,
                 classRoomEntity.getInstructor().getMember().getName(),
                 classRoomEntity.getInstructor().getMember().getPictureUrl(),
+                chapterRepository.countByClassRoom(classRoomEntity),
+                lectureRepository.countByClassRoom(classRoomEntity),
+                expiredDate,
+                getTotalTimeFormatted(classRoomEntity.getId()),
+                classRoomEntity.getSubtitles(),
                 classRoomEntity.getThumbnail(),
                 payment,
                 classRoomEntity.getPriceDetail(),
@@ -316,5 +326,11 @@ public class ClassRoomService implements ClassRoomUseCase {
     @Transactional(readOnly = true)
     public Boolean isClassRoomBookmarked(Member member, ClassRoomEntity classRoom) {
         return bookmarkRepository.existsByClassRoomAndMember(classRoom, member);
+    }
+
+    public String getTotalTimeFormatted(Long classRoomId) {
+        Long seconds = lectureRepository.getTotalLectureSeconds(classRoomId);
+        if (seconds == null) return "00:00:00";
+        return TotalTimeUtil.formatSecondsToHHMMSS(seconds);
     }
 }

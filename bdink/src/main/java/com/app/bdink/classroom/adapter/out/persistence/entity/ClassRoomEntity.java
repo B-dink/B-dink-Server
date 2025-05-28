@@ -55,12 +55,16 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Embedded
     private PriceDetail priceDetail;
 
+    @Column(nullable = false)
+    private String subtitles;
+
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassRoomDetailImage> detailPageImages = new ArrayList<>();
 
     @Builder
     public ClassRoomEntity(final String title, final String introduction,
                            final String thumbnail, final String introLink,
+                           final String subtitles,
                            final Instructor instructor, final PriceDetail priceDetail, final Level level, final Career career) {
 
         this.title = title;
@@ -69,6 +73,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
         this.introduction = introduction;
         this.priceDetail = priceDetail;
         this.introLink = introLink;
+        this.subtitles = subtitles;
         this.level = level;
         this.career = career;
     }
