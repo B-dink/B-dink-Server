@@ -17,6 +17,7 @@ public record ClassRoomDetailResponse(
         Integer totalLectureCount,
         LocalDate expiredDate,
         String totalLectureTime,
+        String subtitles,
 
         String thumbnail,
 

@@ -224,13 +224,17 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         boolean payment = false;
 
+        Sugang sugang = null;
+
         if(sugangOpt.isPresent()){
-            Sugang sugang = sugangOpt.get();
+            sugang = sugangOpt.get();
             if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
                 log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
                 payment = true;
             }
         }
+
+        LocalDate expiredDate = sugang != null ? sugang.getExpiredDate() : null;
 
 
         //클래스룸 엔티티로 디테일이미지 리스트를 가져옴.
@@ -257,8 +261,9 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getInstructor().getMember().getPictureUrl(),
                 chapterRepository.countByClassRoom(classRoomEntity),
                 lectureRepository.countByClassRoom(classRoomEntity),
-                sugangOpt.get().getExpiredDate(),
+                expiredDate,
                 getTotalTimeFormatted(classRoomEntity.getId()),
+                classRoomEntity.getSubtitles(),
                 classRoomEntity.getThumbnail(),
                 payment,
                 classRoomEntity.getPriceDetail(),

@@ -8,6 +8,7 @@ public record ClassRoomDto(
         String title,
 
         String introduction,
+        String subtitles,
         PriceDto priceDto,
         Level level,
         Career career
