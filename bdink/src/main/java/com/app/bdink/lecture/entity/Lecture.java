@@ -4,7 +4,6 @@ import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.external.kollus.entity.KollusMedia;
-import com.app.bdink.sugang.entity.Sugang;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Getter
