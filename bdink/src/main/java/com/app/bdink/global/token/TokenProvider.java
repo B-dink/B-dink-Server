@@ -119,6 +119,27 @@ public class TokenProvider {
         }
     }
 
+    /**
+     * 리프레시 토큰에서 memberId 추출
+     * 리프레시 토큰 재발급 시 사용
+     */
+    public Long getMemberIdFromRefreshToken(String refreshToken) {
+        try {
+            Claims claims = parseClaims(refreshToken);
+            String subject = claims.getSubject();
+
+            if (subject == null || subject.isEmpty()) {
+                throw new CustomException(Error.INVALID_TOKEN_EXCEPTION, "토큰에 사용자 정보가 없습니다.");
+            }
+
+            return Long.valueOf(subject);
+        } catch (NumberFormatException e) {
+            throw new CustomException(Error.INVALID_TOKEN_EXCEPTION, "유효하지 않은 사용자 ID 형식입니다.");
+        } catch (Exception e) {
+            throw new CustomException(Error.INVALID_TOKEN_EXCEPTION, "리프레시 토큰에서 사용자 정보를 추출할 수 없습니다.");
+        }
+    }
+
     // 클레임 파싱
     private Claims parseClaims(String accessToken) {
         try {
