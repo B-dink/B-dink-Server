@@ -111,10 +111,8 @@ public class SocialAuthController {
 
     @PostMapping("/token")
     @Operation(method = "POST", description = "리프레시토큰을 통해 엑세스, 리프레시토큰을 발급받습니다. 이 API에서 에러가 나오는 경우 리프레시도 만료된 케이스 이기 때문에 새로 로그인 하는 방식을 생각하고 있습니다.")
-    public RspTemplate<?> reIssueToken(
-            @RequestBody RefreshToken token,
-            Principal principal) {
-        Long memberId = memberUtilService.getMemberId(principal);
+    public RspTemplate<?> reIssueToken(@RequestBody RefreshToken token) {
+        Long memberId = tokenProvider.getMemberIdFromRefreshToken(token.refreshToken());
         CommonOauthDto commonOauthDto = new CommonOauthDto(authService.reIssueToken(token), memberId);
         return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS, commonOauthDto);
     }
