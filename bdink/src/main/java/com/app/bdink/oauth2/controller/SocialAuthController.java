@@ -12,7 +12,7 @@ import com.app.bdink.member.controller.dto.response.NameCheckDto;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
-import com.app.bdink.oauth2.controller.response.SignUpDto;
+import com.app.bdink.oauth2.controller.response.CommonOauthDto;
 import com.app.bdink.oauth2.domain.LoginResult;
 import com.app.bdink.oauth2.domain.RefreshToken;
 import com.app.bdink.oauth2.domain.TokenDto;
@@ -54,11 +54,11 @@ public class SocialAuthController {
     ) {
         LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
         TokenDto tokenDto = tokenProvider.createToken(result.member());
-        SignUpDto signUpDto = new SignUpDto(tokenDto, result.member().getId());
+        CommonOauthDto commonOauthDto = new CommonOauthDto(tokenDto, result.member().getId());
         if (result.isNewMember()) {
-            return RspTemplate.success(Success.LOGIN_ACCEPTED, signUpDto);
+            return RspTemplate.success(Success.LOGIN_ACCEPTED, commonOauthDto);
         }
-        return RspTemplate.success(Success.SIGNUP_SUCCESS, signUpDto);
+        return RspTemplate.success(Success.SIGNUP_SUCCESS, commonOauthDto);
     }
 
     @DeleteMapping("/revoke")
@@ -92,10 +92,11 @@ public class SocialAuthController {
             @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
             @RequestPart(value = "profile") MultipartFile profileImage
     ) {
-        Member member = memberService.findById(Long.parseLong(principal.getName()));
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
         String image = s3Service.uploadImageOrMedia("image/", profileImage);
         member = memberService.socialJoin(member, memberRequestDto, image);
-        return RspTemplate.success(Success.SIGNUP_SUCCESS, tokenProvider.createToken(member));
+        CommonOauthDto commonOauthDto = new CommonOauthDto(tokenProvider.createToken(member), member.getId());
+        return RspTemplate.success(Success.SIGNUP_SUCCESS, commonOauthDto);
     }
 
 
@@ -110,8 +111,12 @@ public class SocialAuthController {
 
     @PostMapping("/token")
     @Operation(method = "POST", description = "리프레시토큰을 통해 엑세스, 리프레시토큰을 발급받습니다. 이 API에서 에러가 나오는 경우 리프레시도 만료된 케이스 이기 때문에 새로 로그인 하는 방식을 생각하고 있습니다.")
-    public RspTemplate<?> reIssueToken(@RequestBody RefreshToken token) {
-        return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS, authService.reIssueToken(token));
+    public RspTemplate<?> reIssueToken(
+            @RequestBody RefreshToken token,
+            Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        CommonOauthDto commonOauthDto = new CommonOauthDto(authService.reIssueToken(token), memberId);
+        return RspTemplate.success(Success.RE_ISSUE_TOKEN_SUCCESS, commonOauthDto);
     }
 
 //    @PostMapping("/password/double-check")
