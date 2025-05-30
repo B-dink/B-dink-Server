@@ -3,7 +3,11 @@ package com.app.bdink.classroom.adapter.in.controller.dto.response;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.member.entity.Member;
 import com.app.bdink.price.domain.PriceDetail;
+
+import java.util.Optional;
 
 public record CareerClassroomDto(
         Long id,
@@ -17,12 +21,17 @@ public record CareerClassroomDto(
         int totalReviewCount
 ) {
     public static CareerClassroomDto of(final ClassRoomEntity classRoomEntity, final ChapterSummary chapterSummary, int totalReviewCount){
+        String instructorName = Optional.ofNullable(classRoomEntity.getInstructor())
+                .map(Instructor::getMember)
+                .map(Member::getName)
+                .orElse("강사 정보 없음");
+
         return new CareerClassroomDto(
                 classRoomEntity.getId(),
                 classRoomEntity.getCareer(),
                 classRoomEntity.getTitle(),
                 classRoomEntity.getThumbnail(),
-                classRoomEntity.getInstructor().getMember().getName(),
+                instructorName,
                 classRoomEntity.getPriceDetail(),
                 chapterSummary.getTotalLectureCount(),
                 totalReviewCount
