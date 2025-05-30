@@ -13,6 +13,12 @@ public interface LectureRepository extends JpaRepository<Lecture, Long> {
 
     List<Lecture> findAllByClassRoom(ClassRoomEntity classRoomEntity);
 
+    List<Lecture> findByClassRoomIdOrderBySortOrderAsc(Long classRoomId);
+
+
+    @Query("SELECT MAX(l.sortOrder) FROM Lecture l WHERE l.classRoom.id = :classRoomId")
+    Integer findMaxSortOrderByClassRoom(@Param("classRoomId") Long classRoomId);
+
     //LocalDate의 합 값을 사용하기 위한 메서드
     @Query(value = """
                 SELECT SUM(TIME_TO_SEC(time))

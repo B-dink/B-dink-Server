@@ -13,5 +13,7 @@ public class KollusApiResponse {
         private String url;
         private String lectureTitle;
         private String InstructorName;
+        private Long prevLectureId;
+        private Long nextLectureId;
     }
 }

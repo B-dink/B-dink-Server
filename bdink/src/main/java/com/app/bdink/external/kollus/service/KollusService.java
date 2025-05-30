@@ -19,6 +19,7 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.token.KollusTokenProvider;
 import com.app.bdink.lecture.entity.Lecture;
+import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.lecture.service.LectureService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
@@ -30,7 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
@@ -44,6 +47,7 @@ public class KollusService {
     private final UserKeyRepository userKeyRepository;
     private final LectureService lectureService;
     private final MemberRepository memberRepository;
+    private final LectureRepository lectureRepository;
 
 //    @Value("${kollus.API_ACCESS_TOKEN}")
 //    private String apiAccessToken;
@@ -121,6 +125,17 @@ public class KollusService {
         Long kollusMediaId = kollusMedia.getId();
         String mediaContentKey = kollusMedia.getMediaContentKey();
 
+        // prev, next Lecture Logic
+        List<Lecture> lectures = lectureRepository.findByClassRoomIdOrderBySortOrderAsc(lecture.getClassRoom().getId());
+
+        int index = IntStream.range(0, lectures.size())
+                .filter(i -> lectures.get(i).getId().equals(lecture.getId()))
+                .findFirst()
+                .orElse(-1);
+
+        Long prevLectureId = (index > 0) ? lectures.get(index - 1).getId() : null;
+        Long nextLectureId = (index < lectures.size() - 1) ? lectures.get(index + 1).getId() : null;
+
         KollusMediaLink kollusMediaLink = kollusMediaLinkRepository
                 .findByMemberIdAndKollusMediaId(memberId, kollusMediaId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LECTURE, Error.NOT_FOUND_LECTURE.getMessage()));
@@ -137,6 +152,8 @@ public class KollusService {
                 .url(url)
                 .lectureTitle(lecture.getTitle())
                 .InstructorName(lecture.getClassRoom().getInstructor().getMember().getName())
+                .prevLectureId(prevLectureId)
+                .nextLectureId(nextLectureId)
                 .build();
     }
 
