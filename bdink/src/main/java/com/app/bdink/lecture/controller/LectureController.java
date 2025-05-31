@@ -61,7 +61,7 @@ public class LectureController {
 
         //todo:kollus 미디어 링크나 미디어를 연결하는 로직을 생성 기존에 생각했던건 미디어를 강좌와 연결
 
-        return RspTemplate.success(Success.CREATE_LECTURE_SUCCESS, CreateIdDto.from(lectureService.createLecture(chapterId, lectureDto, kollusMedia)));
+        return RspTemplate.success(Success.CREATE_LECTURE_SUCCESS, CreateIdDto.from(lectureService.createLecture(classRoomId ,chapterId, lectureDto, kollusMedia)));
     }
 
     @GetMapping

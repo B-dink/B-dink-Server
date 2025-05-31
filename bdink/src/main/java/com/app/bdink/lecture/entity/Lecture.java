@@ -38,21 +38,21 @@ public class Lecture extends BaseTimeEntity {
     @Column(name = "media_link")
     private String mediaLink;
 
-    @Column(name = "subtitles")
-    private String subtitles;
-
     // KollusMedia 연관관계 (Lecture 기준 1:1)
     @OneToOne(mappedBy = "lecture")
     private KollusMedia kollusMedia;
 
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
     @Builder
-    public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink, String subtitles) {
+    public Lecture(ClassRoomEntity classRoom, Chapter chapter, String title, LocalTime time, String mediaLink, Integer sortOrder) {
         this.classRoom = classRoom;
         this.chapter = chapter;
         this.title = title;
         this.time = time;
         this.mediaLink = mediaLink;
-        this.subtitles = subtitles;
+        this.sortOrder = sortOrder;
     }
 
     public void updateKollusMedia(KollusMedia kollusMedia) {
