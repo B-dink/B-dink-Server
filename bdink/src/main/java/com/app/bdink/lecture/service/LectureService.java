@@ -31,13 +31,17 @@ public class LectureService {
 
     //chapter에 강좌 추가
     @Transactional
-    public String createLecture(final Long chapterId,
+    public String createLecture(final Long classRoomId, final Long chapterId,
                                 final LectureDto lectureDto, final KollusMedia kollusMedia){
         String mediaContentKey = kollusMedia.getMediaContentKey(); //todo:kollus id를 가져올 필요가 없을것 같음.
 
         Chapter chapter = chapterService.findWithClassRoomById(chapterId);
 
         ClassRoomEntity classRoom = chapter.getClassRoom();
+
+        Integer maxSortOrder = lectureRepository.findMaxSortOrderByClassRoom(classRoomId);
+
+        int nextSortOrder = (maxSortOrder != null ? maxSortOrder : 0) + 1;
 
         log.info("클래스룸 id는 값 : {}", classRoom.getId());
 
@@ -48,6 +52,7 @@ public class LectureService {
                         .title(lectureDto.title())
                         .time(lectureDto.convertToLocalTime())
                         .mediaLink(mediaContentKey)
+                        .sortOrder(nextSortOrder)
                         .build());
 
         chapter.addLectures(lecture);
