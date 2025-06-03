@@ -1,4 +1,4 @@
-package com.app.bdink.payment.apple;
+package com.app.bdink.payment.apple.entity;
 
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

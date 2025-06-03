@@ -1,4 +1,4 @@
-package com.app.bdink.payment.apple;
+package com.app.bdink.payment.apple.dto;
 
 import lombok.Builder;
 

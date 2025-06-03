@@ -1,6 +1,5 @@
-package com.app.bdink.payment.apple;
+package com.app.bdink.payment.apple.dto;
 
-import com.app.bdink.payment.domain.Receipt;
 import lombok.Getter;
 
 @Getter

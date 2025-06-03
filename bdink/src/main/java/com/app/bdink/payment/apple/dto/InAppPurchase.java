@@ -1,4 +1,4 @@
-package com.app.bdink.payment.apple;
+package com.app.bdink.payment.apple.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
