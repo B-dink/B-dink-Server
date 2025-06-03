@@ -8,6 +8,7 @@ import com.app.bdink.payment.apple.repository.ApplePurchaseHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -16,7 +17,8 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class ApplePurchaseServiceImpl implements ApplePurchaseService {
+@Transactional
+public class ApplePaymentServiceImpl implements ApplePaymentService {
 
     private static final String PRODUCTION_URL = "https://buy.itunes.apple.com/verifyReceipt";
     private static final String SANDBOX_URL = "https://sandbox.itunes.apple.com/verifyReceipt";

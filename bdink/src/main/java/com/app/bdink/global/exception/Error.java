@@ -44,6 +44,7 @@ public enum Error {
     NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
 
     NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보 입니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다"),
 
     /**
      * 400 BAD REQUEST EXCEPTION
@@ -112,6 +113,9 @@ public enum Error {
 
     INVALID_VERSION_ORDER(HttpStatus.BAD_REQUEST, "새로운 버전은 최신 버전보다 높은 버전이어야 합니다."),
 
+    INVALID_RECEIPT(HttpStatus.BAD_REQUEST, "유효하지 않은 영수증입니다"),
+    PRODUCT_MISMATCH(HttpStatus.BAD_REQUEST, "상품 정보가 일치하지 않습니다"),
+
     /**
      * 401 UNAUTHORIZED EXCEPTION
      */
@@ -156,6 +160,8 @@ public enum Error {
     NOT_ALLOWED_PARTIAL_REFUND(HttpStatus.FORBIDDEN, "에스크로 주문, 현금 카드 결제일 때는 부분 환불이 불가합니다. 이외 다른 결제 수단에서 부분 취소가 되지 않을 때는 토스페이먼츠에 문의해 주세요."),
     NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER(HttpStatus.FORBIDDEN, "휴면 처리된 회원의 결제는 취소할 수 없습니다."),
 
+    PRODUCT_NOT_AVAILABLE(HttpStatus.FORBIDDEN, "구매할 수 없는 상품입니다"),
+
     /**
      * 422 UNPROCESSABLE_ENTITY
      */
@@ -165,10 +171,13 @@ public enum Error {
     UNPROCESSABLE_APPLE_SERVER_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "카카오서버와 통신 중 오류가 발생했습니다."),
     UNPROCESSABLE_JWT_CREATE_EXCEPTION(HttpStatus.UNPROCESSABLE_ENTITY, "서버에서 KOLLUS JWT토큰을 생성 중 오류가 발생했습니다."),
 
+    APPLE_VERIFICATION_FAILED(HttpStatus.UNPROCESSABLE_ENTITY, "Apple 영수증 검증에 실패했습니다"),
+
     /**
      * 409 UNPROCESSABLE_ENTITY
      */
     VERSION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 버전입니다."),
+    DUPLICATE_PURCHASE(HttpStatus.CONFLICT, "이미 처리된 구매입니다"),
 
     /**
      * 500 INTERNAL_SERVER_ERROR
@@ -183,7 +192,9 @@ public enum Error {
     FAILED_PARTIAL_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "은행 점검, 해약 계좌 등의 사유로 부분 환불이 실패했습니다."),
     FAILED_CLOSED_ACCOUNT_REFUND(HttpStatus.INTERNAL_SERVER_ERROR, "해약된 계좌로 인해 환불이 실패했습니다."),
     COMMON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
-    PAYMENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제는 성공적으로 처리되었으나, 시스템에 주문 정보를 저장하는 과정에서 오류가 발생했습니다.")
+    PAYMENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제는 성공적으로 처리되었으나, 시스템에 주문 정보를 저장하는 과정에서 오류가 발생했습니다."),
+
+    PAYMENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 처리 중 오류가 발생했습니다");
     ;
 
     private final HttpStatus httpStatus;
