@@ -36,7 +36,7 @@ public class ApplePaymentController {
         return RspTemplate.success(Success.GET_APPLE_PRODUCTS_SUCCESS, applePaymentService.getAllProducts());
     }
 
-    @GetMapping("/purchase-history")
+    @GetMapping("/purchase-histories")
     public RspTemplate<?> purchaseHistory(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         return RspTemplate.success(Success.GET_APPLE_PURCHASE_HISTORY, applePaymentService.getMemberPurchaseHistory(memberId));
