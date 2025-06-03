@@ -28,21 +28,7 @@ public class ApplePaymentController {
             Principal principal,
             @Valid @RequestBody PurchaseRequest purchaseRequest) {
         Long memberId = memberUtilService.getMemberId(principal);
-        try {
-            PurchaseResponse response = applePaymentService.purchase(memberId, purchaseRequest);
-
-            if ("SUCCESS".equals(response.getStatus())) {
-                return RspTemplate.success(Success.PURCHASE_SUCCESS, response);
-            } else {
-                return RspTemplate.fail(Error.PURCHASE_FAILED, response.getMessage());
-            }
-
-        } catch (IllegalArgumentException e) {
-            return RspTemplate.fail(Error.INVALID_PURCHASE_REQUEST, e.getMessage());
-
-        } catch (Exception e) {
-            return RspTemplate.fail(Error.PURCHASE_PROCESSING_ERROR, "결제 처리 중 오류가 발생했습니다");
-        }
+        PurchaseResponse purchaseResponse = applePaymentService.purchase(memberId, purchaseRequest);
+        return RspTemplate.success(Success.APPLE_PURCHASE_SUCCESS, purchaseResponse);
     }
-
 }

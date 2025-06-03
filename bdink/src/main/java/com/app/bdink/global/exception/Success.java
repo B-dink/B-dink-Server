@@ -123,6 +123,8 @@ public enum Success {
     GET_VERSION_SUCCESS(HttpStatus.OK, "버전 정보 조회 성공"),
     GET_UPDATE_CHECK_SUCCESS(HttpStatus.OK, "버전업 필요성 확인 성공"),
 
+    APPLE_PURCHASE_SUCCESS(HttpStatus.OK, "Apple 인앱 구매가 성공적으로 완료되었습니다"),
+
     /**
      * 202 accepted
      */
