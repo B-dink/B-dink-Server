@@ -3,17 +3,16 @@ package com.app.bdink.payment.apple.controller;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.util.MemberUtilService;
+import com.app.bdink.payment.apple.dto.AppleProductResponse;
 import com.app.bdink.payment.apple.dto.PurchaseRequest;
 import com.app.bdink.payment.apple.dto.PurchaseResponse;
 import com.app.bdink.payment.apple.service.ApplePaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,5 +29,10 @@ public class ApplePaymentController {
         Long memberId = memberUtilService.getMemberId(principal);
         PurchaseResponse purchaseResponse = applePaymentService.purchase(memberId, purchaseRequest);
         return RspTemplate.success(Success.APPLE_PURCHASE_SUCCESS, purchaseResponse);
+    }
+
+    @GetMapping("/products")
+    public RspTemplate<List<AppleProductResponse>> allProducts() {
+        return RspTemplate.success(Success.GET_APPLE_PRODUCTS_SUCCESS, applePaymentService.getAllProducts());
     }
 }

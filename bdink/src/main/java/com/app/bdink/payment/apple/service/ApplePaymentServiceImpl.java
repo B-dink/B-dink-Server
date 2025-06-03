@@ -15,9 +15,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.client.RestTemplate;
 import com.app.bdink.global.exception.Error;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,14 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
     private final AppleProductRepository appleProductRepository;
     private final ApplePurchaseHistoryRepository applePurchaseHistoryRepository;
     private final RestTemplate restTemplate;
+
+    @Override
+    public List<AppleProductResponse> getAllProducts() {
+        return appleProductRepository.findAll()
+                .stream()
+                .map(AppleProductResponse::from)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public PurchaseResponse purchase(Long memberId, PurchaseRequest request) {
