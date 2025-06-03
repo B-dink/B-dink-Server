@@ -3,6 +3,7 @@ package com.app.bdink.payment.apple.service;
 import com.app.bdink.payment.apple.repository.AppleProductRepository;
 import com.app.bdink.payment.apple.dto.*;
 import com.app.bdink.payment.apple.entity.AppleProduct;
+import com.app.bdink.payment.apple.repository.ApplePurchaseHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class ApplePurchaseServiceImpl implements ApplePurchaseService {
     private static final String SANDBOX_URL = "https://sandbox.itunes.apple.com/verifyReceipt";
 
     private final AppleProductRepository appleProductRepository;
+    private final ApplePurchaseHistoryRepository applePurchaseHistoryRepository;
 
     @Override
     public PurchaseResponse purchase(PurchaseRequest request) {
@@ -104,8 +106,7 @@ public class ApplePurchaseServiceImpl implements ApplePurchaseService {
     }
 
     private boolean isDuplicatePurchase(String transactionId) {
-        // TODO: transaction_id로 기존 구매 이력 확인
-        return false;
+        return applePurchaseHistoryRepository.existsByTransactionId(transactionId);
     }
 
     private void savePurchaseHistory(PurchaseRequest request, InAppPurchase inAppPurchase) {

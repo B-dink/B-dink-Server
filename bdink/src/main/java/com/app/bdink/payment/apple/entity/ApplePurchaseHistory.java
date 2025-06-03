@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class PurchaseHistory extends BaseTimeEntity {
+public class ApplePurchaseHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
