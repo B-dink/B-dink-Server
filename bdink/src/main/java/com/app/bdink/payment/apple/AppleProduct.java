@@ -2,8 +2,10 @@ package com.app.bdink.payment.apple;
 
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class AppleProduct extends BaseTimeEntity {
 
     @Id

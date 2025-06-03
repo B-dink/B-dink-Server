@@ -1,6 +1,8 @@
 package com.app.bdink.payment.apple;
 
+import com.app.bdink.member.entity.Member;
+
 public interface ApplePurchaseService {
 
-    AppleProduct findProduct(String productId);
+    PurchaseResponse purchase(PurchaseRequest request);
 }
