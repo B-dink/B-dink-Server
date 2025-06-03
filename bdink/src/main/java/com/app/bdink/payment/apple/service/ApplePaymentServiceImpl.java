@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,14 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         return appleProductRepository.findAll()
                 .stream()
                 .map(AppleProductResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ApplePurchaseHistoryResponse> getMemberPurchaseHistory(Long memberId) {
+        return applePurchaseHistoryRepository.findAllByUserId(memberId)
+                .stream()
+                .map(ApplePurchaseHistoryResponse::from)
                 .collect(Collectors.toList());
     }
 

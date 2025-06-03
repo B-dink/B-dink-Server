@@ -35,4 +35,10 @@ public class ApplePaymentController {
     public RspTemplate<List<AppleProductResponse>> allProducts() {
         return RspTemplate.success(Success.GET_APPLE_PRODUCTS_SUCCESS, applePaymentService.getAllProducts());
     }
+
+    @GetMapping("/purchase-history")
+    public RspTemplate<?> purchaseHistory(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        return RspTemplate.success(Success.GET_APPLE_PURCHASE_HISTORY, applePaymentService.getMemberPurchaseHistory(memberId));
+    }
 }
