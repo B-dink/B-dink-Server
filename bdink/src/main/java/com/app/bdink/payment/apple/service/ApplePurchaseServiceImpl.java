@@ -1,5 +1,6 @@
 package com.app.bdink.payment.apple.service;
 
+import com.app.bdink.payment.apple.entity.ApplePurchaseHistory;
 import com.app.bdink.payment.apple.repository.AppleProductRepository;
 import com.app.bdink.payment.apple.dto.*;
 import com.app.bdink.payment.apple.entity.AppleProduct;
@@ -24,37 +25,48 @@ public class ApplePurchaseServiceImpl implements ApplePurchaseService {
     private final ApplePurchaseHistoryRepository applePurchaseHistoryRepository;
 
     @Override
-    public PurchaseResponse purchase(PurchaseRequest request) {
-        if (!isProductExistAndCanPurchase(request.productId())) {
-            return createFailResponse("Product does not exist");
-        }
-
+    public PurchaseResponse purchase(Long memberId, PurchaseRequest request) {
         try {
-            AppleReceiptResponse appleReceiptResponse = verifyPurchase(request.appStoreReceipt());
-            AppleReceipt receipt = appleReceiptResponse.getReceipt();
-
-            if (receipt.getInApp() == null || receipt.getInApp().isEmpty()) {
-                return createFailResponse("Apple receipt is empty");
+            ValidationResult validation = validatePurchaseRequest(request);
+            if (!validation.isValid()) {
+                return createFailResponse(validation.getErrorMessage());
             }
 
-            InAppPurchase inAppPurchase = receipt.getInApp().get(0);
-
-            if (!request.productId().equals(inAppPurchase.getProductId())) {
-                return createFailResponse("Product ID mismatch");
+            // 중복 구매 체크
+            if (isDuplicatePurchase(validation.getTransactionId())) {
+                return createSuccessResponse(validation.getTransactionId(), "Already processed");
             }
 
-            // 4. 중복 구매 체크
-            if (isDuplicatePurchase(inAppPurchase.getTransactionId())) {
-                return createSuccessResponse(inAppPurchase.getTransactionId(), "Already processed");
-            }
+            // DB에 구매 정보 저장
+            savePurchaseHistory(memberId, validation.getInAppPurchase());
 
-            // 5. DB에 구매 정보 저장
-            savePurchaseHistory(request, inAppPurchase);
-
-            return createSuccessResponse(inAppPurchase.getTransactionId(), "Purchase verified successfully");
+            return createSuccessResponse(validation.getTransactionId(), "Purchase verified successfully");
         } catch (Exception e) {
             return createFailResponse("Purchase verification failed: " + e.getMessage());
         }
+    }
+
+    private ValidationResult validatePurchaseRequest(PurchaseRequest request) {
+        // 상품 존재 체크
+        if (!isProductExistAndCanPurchase(request.productId())) {
+            return ValidationResult.fail("Product does not exist");
+        }
+
+        // Apple 검증
+        AppleReceiptResponse appleReceiptResponse = verifyPurchase(request.appStoreReceipt());
+        AppleReceipt receipt = appleReceiptResponse.getReceipt();
+
+        if (receipt.getInApp() == null || receipt.getInApp().isEmpty()) {
+            return ValidationResult.fail("Apple receipt is empty");
+        }
+
+        InAppPurchase inAppPurchase = receipt.getInApp().get(0);
+
+        if (!request.productId().equals(inAppPurchase.getProductId())) {
+            return ValidationResult.fail("Product ID mismatch");
+        }
+
+        return ValidationResult.success(inAppPurchase);
     }
 
     private Boolean isProductExistAndCanPurchase(String productId) {
@@ -109,8 +121,10 @@ public class ApplePurchaseServiceImpl implements ApplePurchaseService {
         return applePurchaseHistoryRepository.existsByTransactionId(transactionId);
     }
 
-    private void savePurchaseHistory(PurchaseRequest request, InAppPurchase inAppPurchase) {
-        // TODO: DB에 구매 정보 저장
+    private void savePurchaseHistory(Long memberId, InAppPurchase inAppPurchase) {
+        ApplePurchaseHistory applePurchaseHistory = ApplePurchaseHistory.createPurchase(
+                memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
+        applePurchaseHistoryRepository.save(applePurchaseHistory);
     }
 
     private PurchaseResponse createSuccessResponse(String transactionId, String message) {
