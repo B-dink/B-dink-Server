@@ -55,7 +55,6 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Embedded
     private PriceDetail priceDetail;
 
-    @Column(nullable = false)
     private String subtitles;
 
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
