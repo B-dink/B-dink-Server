@@ -146,16 +146,33 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
     private void savePurchaseHistoryWithDuplicateCheck(Long memberId, InAppPurchase inAppPurchase) {
         try {
             ApplePurchaseHistory applePurchaseHistory = ApplePurchaseHistory.createPurchase(
-                    memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
+                    memberId,
+                    inAppPurchase.getProductId(),
+                    inAppPurchase.getTransactionId(),
+                    inAppPurchase.getOriginalTransactionId());
 
-            // 즉시 DB 반영하여 UNIQUE 제약조건 검사
-            applePurchaseHistoryRepository.saveAndFlush(applePurchaseHistory);
-
+            applePurchaseHistoryRepository.save(applePurchaseHistory);
         } catch (DataIntegrityViolationException e) {
-            // UNIQUE 제약조건 위반 = 중복 구매!
-            throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
-                    "Duplicate purchase detected: " + inAppPurchase.getTransactionId());
+            // 유니크 제약조건 위반 = 이미 존재, 복원인지 중복인지 확인해서 적절히 처리
+            handleDuplicateTransaction(memberId, inAppPurchase);
         }
+    }
+
+    private void handleDuplicateTransaction(Long memberId, InAppPurchase inAppPurchase) {
+        ApplePurchaseHistory existing = applePurchaseHistoryRepository
+                .findByUserIdAndOriginalTransactionIdAndProductId(
+                        memberId, inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId())
+                .orElseThrow(() -> new PaymentFailedException(Error.INTERNAL_SERVER_ERROR,
+                        "Constraint violation but no existing record found"));
+
+        // 중복 결제 상황
+        if (existing.getTransactionId().equals(inAppPurchase.getTransactionId())) {
+            throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
+                    "This purchase has already been processed: " + inAppPurchase.getTransactionId());
+        }
+
+        // 복원, DB 업데이트 없이 그냥 성공 처리
+        return;
     }
 
     private PurchaseResponse createSuccessResponse(String transactionId) {
