@@ -11,6 +11,7 @@ import com.app.bdink.payment.toss.controller.dto.PaymentResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -28,7 +29,8 @@ import reactor.core.scheduler.Schedulers;
 public class PaymentService {
 
     //TODO: 테스트에서 나중에 사업자등록된거로 받기.
-    private final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${toss.WIDGET_SECRET_KEY}")
+    private String WIDGET_SECRET_KEY;
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
     private final TransactionalPaymentService transactionalPaymentService;
