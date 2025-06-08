@@ -11,6 +11,7 @@ import com.app.bdink.payment.toss.controller.dto.PaymentResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import com.app.bdink.global.exception.Error;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -114,7 +116,14 @@ public class PaymentService {
     private String getBasicAuthHeader() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
+
+        String header = "Basic " + new String(encodedBytes);
+        
+        //todo : 실제 클라에서 불렀을 때 테스트 로그이기 때문에 운영하기 전 삭제필요
+        log.info(">>> Toss WIDGET_SECRET_KEY in use = {}", WIDGET_SECRET_KEY);
+        log.info(">>> Toss Authorization header = {}", header);
+        
+        return header;
     }
 
     private Mono<? extends Throwable> handleErrorResponse(ClientResponse response) {
