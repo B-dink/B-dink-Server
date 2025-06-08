@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.service;
 
+import com.app.bdink.bookmark.entity.Bookmark;
 import com.app.bdink.bookmark.repository.BookmarkRepository;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.chapter.repository.ChapterRepository;
@@ -190,6 +191,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                         classRoom,
                         getChapterSummary(classRoom.getId()),
                         isClassRoomBookmarked(member, classRoom),
+                        getClassRoomBookmarkId(member, classRoom),
                         reviewService.countReview(classRoom)))
                 .toList();
     }
@@ -222,11 +224,15 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
 
+        Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByClassRoomAndMember(classRoomEntity, member);
+
+        Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
+
         boolean payment = false;
 
         Sugang sugang = null;
 
-        if(sugangOpt.isPresent()){
+        if (sugangOpt.isPresent()) {
             sugang = sugangOpt.get();
             if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
                 log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
@@ -269,6 +275,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
                 isBookmarked,
+                bookmarkId,
                 imageUrls,
                 chapters
         );
@@ -326,6 +333,13 @@ public class ClassRoomService implements ClassRoomUseCase {
     @Transactional(readOnly = true)
     public Boolean isClassRoomBookmarked(Member member, ClassRoomEntity classRoom) {
         return bookmarkRepository.existsByClassRoomAndMember(classRoom, member);
+    }
+
+    @Transactional(readOnly = true)
+    public Long getClassRoomBookmarkId(Member member, ClassRoomEntity classRoom) {
+        Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByClassRoomAndMember(classRoom, member);
+        Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
+        return bookmarkId;
     }
 
     public String getTotalTimeFormatted(Long classRoomId) {
