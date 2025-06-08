@@ -1,5 +1,6 @@
 package com.app.bdink.classroom.service;
 
+import com.app.bdink.bookmark.entity.Bookmark;
 import com.app.bdink.bookmark.repository.BookmarkRepository;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.chapter.repository.ChapterRepository;
@@ -222,6 +223,10 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
 
+        Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByClassRoomAndMember(classRoomEntity, member);
+
+        Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
+
         boolean payment = false;
 
         Sugang sugang = null;
@@ -269,6 +274,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
                 isBookmarked,
+                bookmarkId,
                 imageUrls,
                 chapters
         );

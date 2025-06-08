@@ -26,6 +26,7 @@ public record ClassRoomDetailResponse(
         PriceDetail priceDetail,
         Level level,
         Boolean isBookmarked,
+        Long bookmarkId,
 
         List<String> detailPageImageUrls,
 
