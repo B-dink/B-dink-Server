@@ -16,11 +16,12 @@ public record AllCareerClassRoomResponse(
         String instructor,
         PriceDetail priceDetail,
         Boolean isBookmarked,
+        Long bookmarkId,
 
         int totalLectureCount,
         int totalReviewCount
 ) {
-    public static AllCareerClassRoomResponse of(final ClassRoomEntity classRoomEntity, final ChapterSummary chapterSummary, Boolean isBookmarked, int totalReviewCount){
+    public static AllCareerClassRoomResponse of(final ClassRoomEntity classRoomEntity, final ChapterSummary chapterSummary, Boolean isBookmarked, Long bookmarkId, int totalReviewCount){
         String instructorName = Optional.ofNullable(classRoomEntity.getInstructor())
                 .map(Instructor::getMember)
                 .map(Member::getName)
@@ -34,6 +35,7 @@ public record AllCareerClassRoomResponse(
                 instructorName,
                 classRoomEntity.getPriceDetail(),
                 isBookmarked,
+                bookmarkId,
                 chapterSummary.getTotalLectureCount(),
                 totalReviewCount
         );
