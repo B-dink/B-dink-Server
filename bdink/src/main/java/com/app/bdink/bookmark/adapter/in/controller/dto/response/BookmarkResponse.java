@@ -7,6 +7,7 @@ public record BookmarkResponse(
     String instructor,
     Long classRoomId,
     String thumbnail,
+    Long bookmarkId,
     Integer totalLectureCount
 ) {
 
@@ -16,6 +17,7 @@ public record BookmarkResponse(
                 bookmark.getClassRoom().getInstructor().getMember().getName(),
                 bookmark.getClassRoom().getId(),
                 bookmark.getClassRoom().getThumbnail(),
+                bookmark.getId(),
                 totalLectureCount
         );
     }
