@@ -30,19 +30,21 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    //TODO: 테스트에서 나중에 사업자등록된거로 받기.
     @Value("${toss.WIDGET_SECRET_KEY}")
     private String WIDGET_SECRET_KEY;
+
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
     private final TransactionalPaymentService transactionalPaymentService;
 
     public Mono<RspTemplate<PaymentResponse>> confirm(Long memberId, ConfirmRequest confirmRequest) throws CustomException {
+        log.info(">>> ConfirmRequest: {}", confirmRequest);
         if (memberId == null) {
             return Mono.error(new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다."));
         }
 
         String authorizations = getBasicAuthHeader();
+
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
                 .uri("/confirm")
@@ -77,7 +79,8 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                ).bodyToMono(PaymentResponse.class);
+                )
+                .bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -116,13 +119,7 @@ public class PaymentService {
     private String getBasicAuthHeader() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-
         String header = "Basic " + new String(encodedBytes);
-        
-        //todo : 실제 클라에서 불렀을 때 테스트 로그이기 때문에 운영하기 전 삭제필요
-        log.info(">>> Toss WIDGET_SECRET_KEY in use = {}", WIDGET_SECRET_KEY);
-        log.info(">>> Toss Authorization header = {}", header);
-        
         return header;
     }
 
