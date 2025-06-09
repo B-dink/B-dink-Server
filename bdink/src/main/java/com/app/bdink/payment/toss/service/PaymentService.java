@@ -30,19 +30,26 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    //TODO: 테스트에서 나중에 사업자등록된거로 받기.
     @Value("${toss.WIDGET_SECRET_KEY}")
     private String WIDGET_SECRET_KEY;
+
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
     private final TransactionalPaymentService transactionalPaymentService;
 
     public Mono<RspTemplate<PaymentResponse>> confirm(Long memberId, ConfirmRequest confirmRequest) throws CustomException {
+        log.info(">>> ConfirmRequest: {}", confirmRequest);
         if (memberId == null) {
             return Mono.error(new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, "해당 멤버를 찾지 못했습니다."));
         }
 
         String authorizations = getBasicAuthHeader();
+
+        // 요청 정보 로그 출력
+        log.info(">>> Authorization header: {}", authorizations);
+        log.info(">>> Request Body: {}", confirmRequest);
+        log.info(">>> Request URL: {}/confirm", tossUrl);
+
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
                 .uri("/confirm")
@@ -69,6 +76,13 @@ public class PaymentService {
 
     public Mono<RspTemplate<PaymentResponse>> getPaymentByPaymentKey(String paymentKey) {
         String authorization = getBasicAuthHeader();
+
+        // 요청 정보 로그 출력
+        log.info(">>> GET Payment by PaymentKey");
+        log.info(">>> PaymentKey: {}", paymentKey);
+        log.info(">>> Authorization header: {}", authorization);
+        log.info(">>> Request URL: {}/{}", tossUrl, paymentKey);
+
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.get()
                 .uri("/{paymentKey}", paymentKey)
@@ -77,7 +91,14 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                ).bodyToMono(PaymentResponse.class);
+                )
+                .bodyToMono(PaymentResponse.class)
+                .doOnSuccess(response -> {
+                    log.info(">>> GET Payment Success: {}", response);
+                })
+                .doOnError(error -> {
+                    log.error(">>> GET Payment Error: ", error);
+                });
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -129,6 +150,7 @@ public class PaymentService {
     private Mono<? extends Throwable> handleErrorResponse(ClientResponse response) {
         return response.bodyToMono(String.class)
                 .flatMap(errorBody -> {
+                    log.error(">>> Toss API Error Response: {}", errorBody);
                     try {
                         ObjectMapper objectMapper = new ObjectMapper();
                         JsonNode errorJson = objectMapper.readTree(errorBody);
