@@ -45,11 +45,6 @@ public class PaymentService {
 
         String authorizations = getBasicAuthHeader();
 
-        // 요청 정보 로그 출력
-        log.info(">>> Authorization header: {}", authorizations);
-        log.info(">>> Request Body: {}", confirmRequest);
-        log.info(">>> Request URL: {}/confirm", tossUrl);
-
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
                 .uri("/confirm")
@@ -76,13 +71,6 @@ public class PaymentService {
 
     public Mono<RspTemplate<PaymentResponse>> getPaymentByPaymentKey(String paymentKey) {
         String authorization = getBasicAuthHeader();
-
-        // 요청 정보 로그 출력
-        log.info(">>> GET Payment by PaymentKey");
-        log.info(">>> PaymentKey: {}", paymentKey);
-        log.info(">>> Authorization header: {}", authorization);
-        log.info(">>> Request URL: {}/{}", tossUrl, paymentKey);
-
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.get()
                 .uri("/{paymentKey}", paymentKey)
@@ -92,13 +80,7 @@ public class PaymentService {
                         HttpStatusCode::isError,
                         this::handleErrorResponse
                 )
-                .bodyToMono(PaymentResponse.class)
-                .doOnSuccess(response -> {
-                    log.info(">>> GET Payment Success: {}", response);
-                })
-                .doOnError(error -> {
-                    log.error(">>> GET Payment Error: ", error);
-                });
+                .bodyToMono(PaymentResponse.class);
 
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
@@ -137,20 +119,13 @@ public class PaymentService {
     private String getBasicAuthHeader() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-
         String header = "Basic " + new String(encodedBytes);
-        
-        //todo : 실제 클라에서 불렀을 때 테스트 로그이기 때문에 운영하기 전 삭제필요
-        log.info(">>> Toss WIDGET_SECRET_KEY in use = {}", WIDGET_SECRET_KEY);
-        log.info(">>> Toss Authorization header = {}", header);
-        
         return header;
     }
 
     private Mono<? extends Throwable> handleErrorResponse(ClientResponse response) {
         return response.bodyToMono(String.class)
                 .flatMap(errorBody -> {
-                    log.error(">>> Toss API Error Response: {}", errorBody);
                     try {
                         ObjectMapper objectMapper = new ObjectMapper();
                         JsonNode errorJson = objectMapper.readTree(errorBody);
