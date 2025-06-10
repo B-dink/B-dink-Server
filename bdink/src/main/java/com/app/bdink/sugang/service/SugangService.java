@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
@@ -119,4 +120,10 @@ public class SugangService {
         log.info("progress3 : {}", sugang.getProgressPercent());
     }
 
+    @Transactional
+    public void updateSugangStatus(Long sugangId, SugangStatus sugangStatus) {
+        Sugang sugang = sugangRepository.findById(sugangId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
+        sugang.updateSugangStatus(sugangStatus);
+    }
 }
