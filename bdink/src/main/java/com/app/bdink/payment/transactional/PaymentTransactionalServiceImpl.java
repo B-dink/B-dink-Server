@@ -1,4 +1,4 @@
-package com.app.bdink.payment.toss.service;
+package com.app.bdink.payment.transactional;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
@@ -13,14 +13,13 @@ import com.app.bdink.payment.toss.repository.EssentialPaymentRepository;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
-import com.app.bdink.sugang.service.SugangService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionalPaymentService {
+public class PaymentTransactionalServiceImpl implements PaymentTransactionalService {
 
     private final EssentialPaymentRepository essentialPaymentRepository;
     private final MemberRepository memberRepository;

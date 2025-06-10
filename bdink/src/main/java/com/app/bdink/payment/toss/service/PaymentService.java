@@ -8,6 +8,7 @@ import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.payment.toss.controller.dto.CancelRequest;
 import com.app.bdink.payment.toss.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.toss.controller.dto.PaymentResponse;
+import com.app.bdink.payment.transactional.PaymentTransactionalService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class PaymentService {
 
     private final String tossUrl = "https://api.tosspayments.com/v1/payments";
 
-    private final TransactionalPaymentService transactionalPaymentService;
+    private final PaymentTransactionalService paymentTransactionalService;
 
     public Mono<RspTemplate<PaymentResponse>> confirm(Long memberId, ConfirmRequest confirmRequest) throws CustomException {
         log.info(">>> ConfirmRequest: {}", confirmRequest);
@@ -60,7 +61,7 @@ public class PaymentService {
                 .bodyToMono(PaymentResponse.class)
                 .flatMap(response ->
                         Mono.fromCallable(() ->
-                                        transactionalPaymentService.savePaymentTransactional(memberId, response)
+                                        paymentTransactionalService.savePaymentTransactional(memberId, response)
                                 )
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenReturn(response)
@@ -116,7 +117,7 @@ public class PaymentService {
                 ).bodyToMono(PaymentResponse.class)
                 .flatMap(response ->
                         Mono.fromRunnable(() ->
-                                        transactionalPaymentService.updateSugangStatus(
+                                        paymentTransactionalService.updateSugangStatus(
                                                 memberId, cancelRequest.cancelClassRoomId(), SugangStatus.PAYMENT_REFUNDED)
                                 )
                                 .subscribeOn(Schedulers.boundedElastic())
