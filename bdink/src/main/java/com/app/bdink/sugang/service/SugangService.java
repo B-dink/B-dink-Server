@@ -119,11 +119,4 @@ public class SugangService {
         sugangRepository.save(sugang);
         log.info("progress3 : {}", sugang.getProgressPercent());
     }
-
-    @Transactional
-    public void updateSugangStatus(Long sugangId, SugangStatus sugangStatus) {
-        Sugang sugang = sugangRepository.findById(sugangId).orElseThrow(
-                () -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
-        sugang.updateSugangStatus(sugangStatus);
-    }
 }

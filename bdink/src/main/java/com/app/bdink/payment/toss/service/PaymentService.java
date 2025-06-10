@@ -100,7 +100,8 @@ public class PaymentService {
         return toRspTemplate(responseMono, Success.GET_TOSS_PAYMENT_SUCCESS);
     }
 
-    public Mono<RspTemplate<PaymentResponse>> cancelPayment(String paymentKey, CancelRequest cancelRequest) {
+    public Mono<RspTemplate<PaymentResponse>> cancelPayment(
+            String paymentKey, CancelRequest cancelRequest, Long memberId, Long classRoomId) {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
@@ -111,9 +112,15 @@ public class PaymentService {
                 .onStatus(
                         HttpStatusCode::isError,
                         this::handleErrorResponse
-                ).bodyToMono(PaymentResponse.class);
-
-
+                ).bodyToMono(PaymentResponse.class)
+                .flatMap(response ->
+                        Mono.fromRunnable(() ->
+                                        transactionalPaymentService.updateSugangStatusToPaymentRefunded(memberId, classRoomId)
+                                )
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .thenReturn(response)
+                )
+                .onErrorResume(ex -> Mono.error(new PaymentFailedException(Error.SUGANG_STATUS_UPDATE, ex.getMessage())));
 
         return toRspTemplate(responseMono, Success.CANCEL_TOSS_PAYMENT_SUCCESS);
     }
