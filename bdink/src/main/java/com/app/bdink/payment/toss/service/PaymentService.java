@@ -8,6 +8,7 @@ import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.payment.toss.controller.dto.CancelRequest;
 import com.app.bdink.payment.toss.controller.dto.ConfirmRequest;
 import com.app.bdink.payment.toss.controller.dto.PaymentResponse;
+import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -101,7 +102,7 @@ public class PaymentService {
     }
 
     public Mono<RspTemplate<PaymentResponse>> cancelPayment(
-            String paymentKey, CancelRequest cancelRequest, Long memberId, Long classRoomId) {
+            String paymentKey, CancelRequest cancelRequest, Long memberId) {
         String authorization = getBasicAuthHeader();
         WebClient webClient = WebClient.create(tossUrl);
         Mono<PaymentResponse> responseMono = webClient.post()
@@ -115,7 +116,8 @@ public class PaymentService {
                 ).bodyToMono(PaymentResponse.class)
                 .flatMap(response ->
                         Mono.fromRunnable(() ->
-                                        transactionalPaymentService.updateSugangStatusToPaymentRefunded(memberId, classRoomId)
+                                        transactionalPaymentService.updateSugangStatus(
+                                                memberId, cancelRequest.cancelClassRoomId(), SugangStatus.PAYMENT_REFUNDED)
                                 )
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenReturn(response)

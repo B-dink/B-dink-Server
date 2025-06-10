@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TransactionalPaymentService {
 
-    private final SugangService sugangService;
-
     private final EssentialPaymentRepository essentialPaymentRepository;
     private final MemberRepository memberRepository;
     private final SugangRepository sugangRepository;
@@ -39,7 +37,7 @@ public class TransactionalPaymentService {
     }
 
     @Transactional
-    public void updateSugangStatusToPaymentRefunded(Long memberId, Long classRoomId) {
+    public void updateSugangStatus(Long memberId, Long classRoomId, SugangStatus sugangStatus) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundMemberException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage())
         );
@@ -49,6 +47,6 @@ public class TransactionalPaymentService {
         Sugang sugang = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity).orElseThrow(
                 () -> new NotFoundException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage())
         );
-        sugang.updateSugangStatus(SugangStatus.PAYMENT_REFUNDED);
+        sugang.updateSugangStatus(sugangStatus);
     }
 }
