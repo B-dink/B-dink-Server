@@ -6,6 +6,7 @@ import com.app.bdink.payment.apple.repository.AppleProductRepository;
 import com.app.bdink.payment.apple.dto.*;
 import com.app.bdink.payment.apple.entity.AppleProduct;
 import com.app.bdink.payment.apple.repository.ApplePurchaseHistoryRepository;
+import com.app.bdink.payment.transactional.PaymentTransactionalService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
@@ -31,6 +32,9 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
     private final AppleProductRepository appleProductRepository;
     private final ApplePurchaseHistoryRepository applePurchaseHistoryRepository;
     private final RestTemplate restTemplate;
+
+    // 결제 취소에 대한 처리 필요
+    private final PaymentTransactionalService paymentTransactionalService;
 
     @Override
     public List<AppleProductResponse> getAllProducts() {

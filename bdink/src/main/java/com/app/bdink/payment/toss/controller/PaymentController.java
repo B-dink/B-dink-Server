@@ -54,7 +54,9 @@ public class PaymentController {
                     "결제 금액의 일부만 부분 취소하려면 cancelAmount에 취소할 금액을 추가해서 API를 요청합니다. " +
                     "cancelAmount에 값을 넣지 않으면 전액 취소됩니다. cancelAmout에 빈문자열을 넣으면 전액 취소됩니다.")
     public Mono<RspTemplate<PaymentResponse>> cancelPayment(
+            Principal principal,
             @PathVariable String paymentKey, @RequestBody CancelRequest cancelRequest) {
-        return paymentService.cancelPayment(paymentKey, cancelRequest);
+        Long memberId = memberUtilService.getMemberId(principal);
+        return paymentService.cancelPayment(paymentKey, cancelRequest, memberId);
     }
 }

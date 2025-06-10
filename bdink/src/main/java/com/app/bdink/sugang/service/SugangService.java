@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
@@ -118,5 +119,4 @@ public class SugangService {
         sugangRepository.save(sugang);
         log.info("progress3 : {}", sugang.getProgressPercent());
     }
-
 }

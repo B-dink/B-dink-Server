@@ -194,7 +194,9 @@ public enum Error {
     COMMON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
     PAYMENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제는 성공적으로 처리되었으나, 시스템에 주문 정보를 저장하는 과정에서 오류가 발생했습니다."),
 
-    PAYMENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 처리 중 오류가 발생했습니다");
+    PAYMENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 처리 중 오류가 발생했습니다"),
+
+    SUGANG_STATUS_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "수강 결제 상태를 변경하지 못했습니다.")
     ;
 
     private final HttpStatus httpStatus;
