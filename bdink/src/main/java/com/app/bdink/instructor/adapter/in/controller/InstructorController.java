@@ -5,8 +5,10 @@ import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
+import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorAllInfoDto;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.repository.InstructorRepository;
 import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
@@ -40,6 +42,7 @@ public class InstructorController {
     private final ClassRoomService classRoomService;
     private final S3Service s3Service;
     private final InstructorUtilService instructorUtilService;
+    private final InstructorRepository instructorRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "POST", description = "강사 정보를 생성합니다.")
@@ -66,6 +69,14 @@ public class InstructorController {
         InstructorInfoDto instructorInfo = instructorService.getInfo(member);
         return RspTemplate.success(Success.GET_INSTRUCTOR_SUCCESS, instructorInfo);
     }
+
+    @GetMapping("/all")
+    @Operation(method = "GET", description = "모든 강사 정보를 조회합니다.")
+    public RspTemplate<?> getInstructorInfo(){
+        List<InstructorAllInfoDto> allInstructorInfo = instructorService.getAllInstructorInfo();
+        return RspTemplate.success(Success.GET_INSTRUCTOR_SUCCESS, allInstructorInfo);
+    }
+
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "PUT", description = "강사 정보를 수정합니다.")
