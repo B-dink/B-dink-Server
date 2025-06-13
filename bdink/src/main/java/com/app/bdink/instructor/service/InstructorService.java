@@ -5,6 +5,7 @@ import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.classroom.service.ClassRoomService;
+import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorAllInfoDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
@@ -12,6 +13,7 @@ import com.app.bdink.instructor.adapter.in.controller.dto.InstructorDto;
 import com.app.bdink.instructor.adapter.in.controller.dto.request.UpdateInstructorDto;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorInfoDto;
 import com.app.bdink.instructor.repository.InstructorRepository;
+import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,19 @@ public class InstructorService {
                         .build()
         ).getId();
         return id.toString();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<InstructorAllInfoDto> getAllInstructorInfo() {
+        // 강사의 모든 정보를 담고있는 api처리를 위한 비즈니스로직
+        List<Instructor> instructors = instructorRepository.findAll();
+
+        return instructors.stream()
+                .map(instructor -> {
+                    int clasRoomCount = classRoomRepository.countByInstructor(instructor);
+                    return InstructorAllInfoDto.from(instructor, clasRoomCount);
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
