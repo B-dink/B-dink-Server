@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long> {
     int countById(Long id);
+
+    int countByInstructor(Instructor instructor);
+
     List<ClassRoomEntity> findAllByInstructorCareer(Career career);
 
     List<ClassRoomEntity> findAllByCareer(Career career);
