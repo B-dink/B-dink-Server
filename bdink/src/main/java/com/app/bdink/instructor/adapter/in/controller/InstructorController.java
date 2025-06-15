@@ -5,25 +5,24 @@ import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
-import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorAllInfoDto;
-import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
-import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
-import com.app.bdink.instructor.repository.InstructorRepository;
-import com.app.bdink.instructor.util.InstructorUtilService;
-import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.instructor.adapter.in.controller.dto.InstructorDto;
 import com.app.bdink.instructor.adapter.in.controller.dto.request.UpdateInstructorDto;
+import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorAllInfoDto;
+import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorInfoDto;
+import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
+import com.app.bdink.instructor.repository.InstructorRepository;
 import com.app.bdink.instructor.service.InstructorService;
+import com.app.bdink.instructor.util.InstructorUtilService;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.member.util.MemberUtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -107,10 +106,9 @@ public class InstructorController {
 
     @GetMapping("/{id}/classroom")
     @Operation(method = "GET", description = "강사별 클래스룸을 조회합니다.")
-    public RspTemplate<List<InstructorClassroomDto>> getClassRoomByInstructor(Principal principal, @PathVariable Long id){
+    public RspTemplate<List<InstructorClassroomDto>> getClassRoomByInstructor(@PathVariable Long id){
         Instructor instructor = instructorService.findById(id);
-        Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        List<InstructorClassroomDto> classRoomEntityList = classRoomService.getFilteredClassroomByInstructor(member, instructor);
+        List<InstructorClassroomDto> classRoomEntityList = classRoomService.getFilteredClassroomByInstructor(instructor);
         return RspTemplate.success(Success.GET_CLASSROOM_FILTERED_INSTURCTOR_SUCCESS, classRoomEntityList);
     }
 
