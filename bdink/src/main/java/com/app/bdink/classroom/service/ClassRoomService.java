@@ -211,9 +211,9 @@ public class ClassRoomService implements ClassRoomUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<InstructorClassroomDto> getFilteredClassroomByInstructor(Member member, final Instructor instructor) {
+    public List<InstructorClassroomDto> getFilteredClassroomByInstructor(final Instructor instructor) {
         return classRoomRepository.findAllByInstructor(instructor).stream()
-                .map(classRoom -> InstructorClassroomDto.of(classRoom, member, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                .map(classRoom -> InstructorClassroomDto.of(classRoom, instructor, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
                 .toList();
     }
 
