@@ -6,6 +6,7 @@ import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 public record InstructorAllInfoDto(
         Long instructorId,
         String instructorName,
+        String instructorImage,
         Career career,
         Integer LectureCount
 ) {
@@ -13,6 +14,7 @@ public record InstructorAllInfoDto(
         return new InstructorAllInfoDto(
                 instructor.getId(),
                 instructor.getMember().getName(),
+                instructor.getMember().getPictureUrl(),
                 instructor.getCareer(),
                 clasRoomCount
         );
