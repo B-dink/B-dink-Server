@@ -6,7 +6,6 @@ import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
-import com.app.bdink.external.kollus.dto.response.callback.KollusPlayKind3DTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.service.KollusService;
 import com.app.bdink.global.exception.CustomException;
@@ -91,12 +90,11 @@ public class KollusController {
         return RspTemplate.success(Success.CONNECT_KOLLUSMEDIA_SUCCESS, CreateIdDto.from(kollusService.connectKollusAndLecture(lecture, kollusMedia)));
     }
 
-    @GetMapping("/media-link/{memberId}")
-    @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
-    public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
-
-        return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
-    }
+//    @GetMapping("/media-link/{memberId}")
+//    @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
+//    public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
+//        return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
+//    }
 
     @PostMapping("/media-link")
     @Operation(method = "POST", description = "콜러스 미디어 시청 기록 생성")
@@ -105,7 +103,9 @@ public class KollusController {
 
         KollusMedia kollusMedia = kollusService.findByLectureId(lectureId);
 
-        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS, CreateIdDto.from(kollusService.saveMediaLink(member, kollusMedia, lectureId)));
+        kollusService.saveMediaLink(member, kollusMedia);
+
+        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS);
     }
 
     @PostMapping("/lms")

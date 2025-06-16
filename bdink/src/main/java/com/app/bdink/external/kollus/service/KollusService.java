@@ -237,21 +237,17 @@ public class KollusService {
     }
 
     @Transactional
-    public String saveMediaLink(final Member member, final KollusMedia kollusMedia, final Long lectureId) {
+    public void saveMediaLink(final Member member, final KollusMedia kollusMedia) {
+        //시청기록은 처음 한번만 생성. 분기처리 로직 구현
         if (kollusMediaLinkRepository.existsByMemberAndKollusMedia(member, kollusMedia)) {
-            throw new CustomException(Error.EXIST_KOLLUSMEDIALINK, Error.EXIST_KOLLUSMEDIALINK.getMessage());
+        } else {
+            KollusMediaLink kollusMediaLink = KollusMediaLink.builder()
+                    .member(member)
+                    .kollusMedia(kollusMedia)
+                    .lecture(kollusMedia.getLecture())
+                    .build();
+            kollusMediaLinkRepository.save(kollusMediaLink);
         }
-        //TODO: 시청기록 생성, 시청기록은 처음 한번만 호출할지? 아니면 이렇게 유지할지 생각
-
-        Lecture lecture = lectureService.findById(lectureId);
-
-        KollusMediaLink kollusMediaLink = KollusMediaLink.builder()
-                .member(member)
-                .kollusMedia(kollusMedia)
-                .lecture(lecture)
-                .build();
-        kollusMediaLinkRepository.save(kollusMediaLink);
-        return String.valueOf(kollusMediaLink.getId());
     }
 
     @Transactional
