@@ -33,7 +33,7 @@ public class KollusMediaLink {
     private LocalDateTime tokenCreatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lecture_id", insertable = false, updatable = false)
+    @JoinColumn(name = "lecture_id")
     private Lecture lecture;
 
     private double watchProgress;

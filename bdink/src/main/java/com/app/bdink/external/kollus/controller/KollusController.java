@@ -6,7 +6,6 @@ import com.app.bdink.external.kollus.dto.request.callback.DeleteRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.LmsRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.PlayRequestDTO;
 import com.app.bdink.external.kollus.dto.request.callback.UploadRequestDTO;
-import com.app.bdink.external.kollus.dto.response.callback.KollusPlayKind3DTO;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.external.kollus.service.KollusService;
 import com.app.bdink.global.exception.CustomException;
@@ -105,7 +104,9 @@ public class KollusController {
 
         KollusMedia kollusMedia = kollusService.findByLectureId(lectureId);
 
-        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS, CreateIdDto.from(kollusService.saveMediaLink(member, kollusMedia, lectureId)));
+        kollusService.saveMediaLink(member, kollusMedia);
+
+        return RspTemplate.success(Success.KOLLUS_MEDIALINK_SAVE_SUCCESS);
     }
 
     @PostMapping("/lms")
