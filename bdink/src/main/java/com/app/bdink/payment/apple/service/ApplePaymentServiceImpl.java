@@ -18,6 +18,7 @@ import com.app.bdink.global.exception.Error;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,13 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
 
     // 결제 취소에 대한 처리 필요
     private final PaymentTransactionalService paymentTransactionalService;
+
+    @Override
+    public AppleProductResponse getProduct(Long classRoomId) {
+        return appleProductRepository.findByClassRoomId(classRoomId)
+                .map(AppleProductResponse::from)
+                .orElseThrow(NoSuchElementException::new);
+    }
 
     @Override
     public List<AppleProductResponse> getAllProducts() {

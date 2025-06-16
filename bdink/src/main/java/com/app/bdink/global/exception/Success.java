@@ -125,6 +125,7 @@ public enum Success {
 
     APPLE_PURCHASE_SUCCESS(HttpStatus.OK, "Apple 인앱 구매가 성공적으로 완료되었습니다"),
     GET_APPLE_PRODUCTS_SUCCESS(HttpStatus.OK, "Apple Products 조회 성공"),
+    GET_APPLE_PRODUCT_SUCCESS(HttpStatus.OK, "Apple Product 조회 성공"),
     GET_APPLE_PURCHASE_HISTORY(HttpStatus.OK, "Apple 인앱 구매 내역 조회 성공"),
 
     /**
