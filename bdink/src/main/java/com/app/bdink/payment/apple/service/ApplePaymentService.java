@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ApplePaymentService {
 
+    AppleProductResponse getProduct(Long classRoomId);
     List<AppleProductResponse> getAllProducts();
     List<ApplePurchaseHistoryResponse> getMemberPurchaseHistory(Long memberId);
 
