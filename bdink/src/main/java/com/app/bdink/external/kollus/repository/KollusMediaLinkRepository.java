@@ -18,6 +18,8 @@ public interface KollusMediaLinkRepository extends JpaRepository<KollusMediaLink
 
     int countByMemberAndLectureClassRoomAndCompleted(Member member, ClassRoomEntity classRoomEntity, boolean completed);
 
+    List<KollusMediaLink> findAllByMemberIdAndLectureIdIn(Long memberId, List<Long> lectureIds);
+
     // 사용자별 등록된 영상 리스트 가져오기
     List<KollusMediaLink> findAllByMemberId(Long memberId);
 
