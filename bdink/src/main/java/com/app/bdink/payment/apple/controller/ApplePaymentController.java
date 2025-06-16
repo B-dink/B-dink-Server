@@ -31,10 +31,10 @@ public class ApplePaymentController {
         return RspTemplate.success(Success.APPLE_PURCHASE_SUCCESS, purchaseResponse);
     }
 
-    @GetMapping("/products")
-    public RspTemplate<List<AppleProductResponse>> allProducts() {
-        return RspTemplate.success(Success.GET_APPLE_PRODUCTS_SUCCESS, applePaymentService.getAllProducts());
-    }
+//    @GetMapping("/products")
+//    public RspTemplate<List<AppleProductResponse>> allProducts() {
+//        return RspTemplate.success(Success.GET_APPLE_PRODUCTS_SUCCESS, applePaymentService.getAllProducts());
+//    }
 
     @GetMapping("/product/{classRoomId}")
     public RspTemplate<AppleProductResponse> getProductByClassRoomId(
