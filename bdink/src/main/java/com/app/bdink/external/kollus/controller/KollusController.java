@@ -90,12 +90,11 @@ public class KollusController {
         return RspTemplate.success(Success.CONNECT_KOLLUSMEDIA_SUCCESS, CreateIdDto.from(kollusService.connectKollusAndLecture(lecture, kollusMedia)));
     }
 
-    @GetMapping("/media-link/{memberId}")
-    @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
-    public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
-
-        return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
-    }
+//    @GetMapping("/media-link/{memberId}")
+//    @Operation(method = "GET", description = "특정 사용자의 시청 기록을 확인합니다.")
+//    public RspTemplate<?> getMediaLink(@PathVariable Long memberId, Principal principal) {
+//        return RspTemplate.success(Success.GET_KOLLUSMEDIA_SUCCESS);
+//    }
 
     @PostMapping("/media-link")
     @Operation(method = "POST", description = "콜러스 미디어 시청 기록 생성")
