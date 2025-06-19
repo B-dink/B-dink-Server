@@ -5,6 +5,7 @@ import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.sugang.entity.Sugang;
 
 public record SugangClassRoomInfo (
+        Long classRoomId,
         Long lectureId,
         String lectureTitle,
         double lectureProgress,
@@ -18,6 +19,7 @@ public record SugangClassRoomInfo (
         double watchProgress = kollusMediaLink != null ? kollusMediaLink.getPlaytimePercent() : 0.0;
         return new SugangClassRoomInfo(
                 //todo: 수강말고 다른 엔티티에서 찾아야함.
+                lecture.getClassRoom().getId(),
                 lecture.getId(),
                 lecture.getTitle(),
                 watchProgress,
