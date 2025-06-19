@@ -260,6 +260,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 .collect(Collectors.toList());
 
         return new ClassRoomDetailResponse(
+                classRoomEntity.getId(),
                 classRoomEntity.getTitle(),
                 classRoomEntity.getIntroduction(),
                 bookmarkCount,

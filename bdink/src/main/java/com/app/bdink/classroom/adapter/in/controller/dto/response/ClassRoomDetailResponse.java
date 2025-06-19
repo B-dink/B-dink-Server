@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record ClassRoomDetailResponse(
+        Long classRoomId,
         String title,
         String introduction,
         long bookmarkCount,
