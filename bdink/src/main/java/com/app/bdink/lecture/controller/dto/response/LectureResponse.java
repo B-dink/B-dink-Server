@@ -3,7 +3,6 @@ package com.app.bdink.lecture.controller.dto.response;
 import com.app.bdink.lecture.entity.Lecture;
 
 public record LectureResponse(
-        Long classRoomId,
         Long lectureId,
         String title,
         String lectureTime,
@@ -11,6 +10,6 @@ public record LectureResponse(
 ) {
     public static LectureResponse from(final Lecture lecture, final double watchProgress) {
         String progressStr = watchProgress >= 90 ? "완강" : Math.round(watchProgress) + "%";
-        return new LectureResponse(lecture.getClassRoom().getId() ,lecture.getId(), lecture.getTitle(), lecture.getTime().toString(), progressStr);
+        return new LectureResponse(lecture.getId(), lecture.getTitle(), lecture.getTime().toString(), progressStr);
     }
 }
