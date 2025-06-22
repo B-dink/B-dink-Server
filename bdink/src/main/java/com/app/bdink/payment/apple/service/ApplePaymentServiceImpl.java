@@ -70,16 +70,13 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
 
     private PurchaseResponse executeSecurePurchase(Long memberId, PurchaseRequest request) {
         // 1. 락을 걸고 상품 조회 및 검증
-        AppleProduct product = acquireProductLock(request.productId());
+        AppleProduct product = acquireProductLock(memberId, request.productId());
 
         try {
             // 2. Apple 영수증 검증
             InAppPurchase inAppPurchase = verifyAppleReceipt(request);
             // 3. 구매 이력 저장
             savePurchaseHistoryWithDuplicateCheck(memberId, inAppPurchase);
-            // 4. 상품 상태 변경
-            product.setCanPurchase(false);
-
             return createSuccessResponse(inAppPurchase.getTransactionId());
         } catch (Exception e) {
             log.error("Purchase failed for member: {}, product: {}, error: {}",
@@ -88,15 +85,23 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         }
     }
 
-    private AppleProduct acquireProductLock(String productId) {
+    private AppleProduct acquireProductLock(Long memberId, String productId) {
         try {
+            // 1. 애플 상품 락으로 체크
             AppleProduct product = appleProductRepository.findByProductIdWithLock(productId)
                     .orElseThrow(() -> new PaymentFailedException(Error.PRODUCT_NOT_FOUND,
                             "Product not found: " + productId));
-
             if (!product.getCanPurchase()) {
                 throw new PaymentFailedException(Error.PRODUCT_NOT_AVAILABLE,
-                        "Product not available for purchase: " + productId);
+                        Error.PRODUCT_NOT_AVAILABLE.getMessage() + productId);
+            }
+
+            // 2. 구매 이력도 락으로 체크
+            boolean existingPurchases =
+                    applePurchaseHistoryRepository.findByUserIdAndProductIdWithLock(memberId, productId);
+            if (existingPurchases) {
+                throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
+                        Error.DUPLICATE_PURCHASE.getMessage() + productId);
             }
 
             return product;

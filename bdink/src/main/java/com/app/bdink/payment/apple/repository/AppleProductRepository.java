@@ -10,11 +10,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface AppleProductRepository extends JpaRepository<AppleProduct, Long> {
-    Optional<AppleProduct> findByProductId(String productId);
 
     Optional<AppleProduct> findByClassRoomId(Long classRoomId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("SELECT p FROM AppleProduct p WHERE p.productId = :productId")
     Optional<AppleProduct> findByProductIdWithLock(@Param("productId") String productId);
 }
