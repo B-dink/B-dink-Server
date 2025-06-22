@@ -129,6 +129,7 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         try {
+            // 1. 프로덕션 시도
             ResponseEntity<AppleReceiptResponse> response = restTemplate.exchange(
                     PRODUCTION_URL,
                     HttpMethod.POST,
@@ -140,7 +141,7 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                     .orElseThrow(() -> new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                             "Apple API returned null response"));
 
-            // 3. 상태코드 확인 - 21007의 경우 테스트 영수증임
+            // 2. 21007인 경우 샌드박스로 재시도
             if (receiptResponse.getStatus() == 21007) {
                 // Sandbox 환경으로 재시도
                 response = restTemplate.exchange(
@@ -152,10 +153,14 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                 receiptResponse = Optional.ofNullable(response.getBody())
                         .orElseThrow(() -> new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                                 "Apple Sandbox API returned null response"));
-            }
 
-            if (receiptResponse.getStatus() != 0) {
-                // RuntimeException → PaymentFailedException
+                // 샌드박스 결과 검증
+                if (receiptResponse.getStatus() != 0) {
+                    throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
+                            "Sandbox verification also failed with status: " + receiptResponse.getStatus());
+                }
+            } else if (receiptResponse.getStatus() != 0) {
+                // // 프로덕션에서 21007이 아닌 다른 에러 - RuntimeException → PaymentFailedException
                 throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                         "Apple verification failed with status: " + receiptResponse.getStatus());
             }
