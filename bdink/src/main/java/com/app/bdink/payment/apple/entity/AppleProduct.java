@@ -4,6 +4,7 @@ import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -20,5 +21,6 @@ public class AppleProduct extends BaseTimeEntity {
 
     private String productId;
 
+    // 시스템 차원의 구매 가능 여부
     private Boolean canPurchase;
 }
