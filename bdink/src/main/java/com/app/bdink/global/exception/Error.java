@@ -196,7 +196,8 @@ public enum Error {
 
     PAYMENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 처리 중 오류가 발생했습니다"),
 
-    SUGANG_STATUS_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "수강 결제 상태를 변경하지 못했습니다.")
+    SUGANG_STATUS_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "수강 결제 상태를 변경하지 못했습니다."),
+    CONCURRENT_PURCHASE_ATTEMPT(HttpStatus.INTERNAL_SERVER_ERROR, "Product is currently being processed by another user")
     ;
 
     private final HttpStatus httpStatus;
