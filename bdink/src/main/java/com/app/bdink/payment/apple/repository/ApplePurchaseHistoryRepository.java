@@ -15,7 +15,10 @@ public interface ApplePurchaseHistoryRepository extends JpaRepository<ApplePurch
     List<ApplePurchaseHistory> findAllByUserId(Long memberId);
 
     @Lock(LockModeType.PESSIMISTIC_READ)
-    @Query("SELECT ph FROM ApplePurchaseHistory ph WHERE ph.productId = :productId AND ph.userId = :userId")
+//    @Query("SELECT ph FROM ApplePurchaseHistory ph WHERE ph.productId = :productId AND ph.userId = :userId")
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END " +
+            "FROM ApplePurchaseHistory p " +
+            "WHERE p.userId = :userId AND p.productId = :productId")
     boolean findByUserIdAndProductIdWithLock(@Param("userId") Long userId, @Param("productId") String productId);
 
     Optional<ApplePurchaseHistory> findByUserIdAndOriginalTransactionIdAndProductId(Long memberId, String originalTransactionId, String productId);
