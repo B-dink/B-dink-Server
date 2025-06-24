@@ -57,6 +57,9 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     private String subtitles;
 
+    //PROMOTION FLAG
+    private int promotionOf;
+
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassRoomDetailImage> detailPageImages = new ArrayList<>();
 

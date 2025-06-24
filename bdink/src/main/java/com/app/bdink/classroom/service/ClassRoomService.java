@@ -198,11 +198,21 @@ public class ClassRoomService implements ClassRoomUseCase {
 
     @Transactional(readOnly = true)
     public List<CareerClassroomDto> getClassRoomByCareer(Career career) {
-        List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
+        // TODO: promotion에 대한 임시 로직 추후 다시 로직 수정
+        if (career == Career.PROMOTION) {
+            // PROMOTION인 경우는 promotionOf가 23일경우
+            List<ClassRoomEntity> promotionClassRoom = classRoomRepository.findAllByPromotionOf(23);
 
-        return classRoomEntities.stream()
-                .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
-                .toList();
+            return promotionClassRoom.stream()
+                    .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                    .toList();
+        } else {
+            List<ClassRoomEntity> classRoomEntities = classRoomRepository.findAllByCareer(career);
+
+            return classRoomEntities.stream()
+                    .map(classRoom -> CareerClassroomDto.of(classRoom, getChapterSummary(classRoom.getId()), reviewService.countReview(classRoom)))
+                    .toList();
+        }
     }
 
     @Transactional(readOnly = true)
