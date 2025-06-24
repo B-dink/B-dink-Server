@@ -1,15 +1,20 @@
 package com.app.bdink.payment.apple.service;
 
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.model.PaymentFailedException;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
 import com.app.bdink.payment.apple.entity.ApplePurchaseHistory;
 import com.app.bdink.payment.apple.repository.AppleProductRepository;
 import com.app.bdink.payment.apple.dto.*;
 import com.app.bdink.payment.apple.entity.AppleProduct;
 import com.app.bdink.payment.apple.repository.ApplePurchaseHistoryRepository;
 import com.app.bdink.payment.transactional.PaymentTransactionalService;
+import com.app.bdink.sugang.controller.dto.SugangStatus;
+import com.app.bdink.sugang.service.SugangService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -36,6 +41,9 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
     private final AppleProductRepository appleProductRepository;
     private final ApplePurchaseHistoryRepository applePurchaseHistoryRepository;
     private final RestTemplate restTemplate;
+
+    private final SugangService sugangService;
+    private final MemberService memberService;
 
     // 결제 취소에 대한 처리 필요
     private final PaymentTransactionalService paymentTransactionalService;
@@ -98,8 +106,15 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
             log.info("Purchase history saved successfully - memberId: {}, productId: {}, transactionId: {}",
                     memberId, request.productId(), inAppPurchase.getTransactionId());
 
+            // 4. 결제 성공 후 자동으로 수강 시작
+            log.debug("Step 4: Starting sugang after successful payment - memberId: {}, productId: {}",
+                    memberId, request.productId());
+            startSugangAfterPayment(memberId, product.getClassRoom());
+            log.info("Sugang started successfully after payment - memberId: {}, classRoomId: {}",
+                    memberId, product.getClassRoom().getId());
+
             long processingTime = System.currentTimeMillis() - startTime;
-            log.info("Purchase process completed successfully - memberId: {}, productId: {}, transactionId: {}, processingTime: {}ms",
+            log.info("Purchase and sugang process completed successfully - memberId: {}, productId: {}, transactionId: {}, processingTime: {}ms",
                     memberId, request.productId(), inAppPurchase.getTransactionId(), processingTime);
 
             return createSuccessResponse(inAppPurchase.getTransactionId());
@@ -108,6 +123,22 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
             log.error("Purchase failed - memberId: {}, productId: {}, processingTime: {}ms, error: {}",
                     memberId, request.productId(), processingTime, e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private void startSugangAfterPayment(Long memberId, ClassRoomEntity classRoom) {
+        try {
+            log.debug("Starting sugang after payment - memberId: {}, classRoomId: {}",
+                    memberId, classRoom.getId());
+
+            Member member = memberService.findById(memberId);
+            sugangService.createSugang(classRoom, member, SugangStatus.PAYMENT_COMPLETED);
+        } catch (Exception e) {
+            log.error("Failed to start sugang after payment - memberId: {}, classRoomId: {}, error: {}",
+                    memberId, classRoom.getId(), e.getMessage(), e);
+            // 결제는 성공했으므로 수강 시작 실패 시에도 결제 성공으로 처리
+            // 대신 관리자에게 알림이나 별도 처리 필요할 수 있음
+            throw new PaymentFailedException(Error.SUGANG_STATUS_UPDATE, Error.SUGANG_STATUS_UPDATE.getMessage());
         }
     }
 
