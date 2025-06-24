@@ -168,7 +168,12 @@ public class ClassRoomService implements ClassRoomUseCase {
 
     @Transactional(readOnly = true)
     public CareerListDto getAllClassRoom(Member member) {
-        List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
+        /**
+         * 아래 코드는 기존 로직 > CAREER가 PROMOTION인 경우 다른 CAREER를 가질 수 없는 문제 발생
+         * List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
+         */
+
+        List<ClassRoomEntity> promotions = classRoomRepository.findAllByPromotionOf(23);
         List<PromotionDto> dtos = promotions.stream()
                 .map(PromotionDto::from)
                 .toList();
