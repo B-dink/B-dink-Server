@@ -2,6 +2,7 @@ package com.app.bdink.sugang.controller.dto.response;
 
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
