@@ -65,71 +65,127 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
 
     @Override
     public PurchaseResponse purchase(Long memberId, PurchaseRequest request) {
+        log.info("Starting secure purchase process - memberId: {}, productId: {}",
+                memberId, request.productId());
         return executeSecurePurchase(memberId, request);
     }
 
     private PurchaseResponse executeSecurePurchase(Long memberId, PurchaseRequest request) {
-        // 1. 락을 걸고 상품 조회 및 검증
-        AppleProduct product = acquireProductLock(memberId, request.productId());
+        log.debug("Executing secure purchase - memberId: {}, productId: {}",
+                memberId, request.productId());
+
+        long startTime = System.currentTimeMillis();
 
         try {
+            // 1. 락을 걸고 상품 조회 및 검증
+            log.debug("Step 1: Acquiring product lock - memberId: {}, productId: {}",
+                    memberId, request.productId());
+            AppleProduct product = acquireProductLock(memberId, request.productId());
+            log.info("Product lock acquired successfully - memberId: {}, productId: {}, canPurchase: {}",
+                    memberId, request.productId(), product.getCanPurchase());
+
             // 2. Apple 영수증 검증
+            log.debug("Step 2: Verifying Apple receipt - memberId: {}, productId: {}",
+                    memberId, request.productId());
             InAppPurchase inAppPurchase = verifyAppleReceipt(request);
+            log.info("Apple receipt verified successfully - memberId: {}, productId: {}, transactionId: {}, originalTransactionId: {}",
+                    memberId, request.productId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
+
             // 3. 구매 이력 저장
+            log.debug("Step 3: Saving purchase history - memberId: {}, productId: {}, transactionId: {}",
+                    memberId, request.productId(), inAppPurchase.getTransactionId());
             savePurchaseHistoryWithDuplicateCheck(memberId, inAppPurchase);
+            log.info("Purchase history saved successfully - memberId: {}, productId: {}, transactionId: {}",
+                    memberId, request.productId(), inAppPurchase.getTransactionId());
+
+            long processingTime = System.currentTimeMillis() - startTime;
+            log.info("Purchase process completed successfully - memberId: {}, productId: {}, transactionId: {}, processingTime: {}ms",
+                    memberId, request.productId(), inAppPurchase.getTransactionId(), processingTime);
+
             return createSuccessResponse(inAppPurchase.getTransactionId());
         } catch (Exception e) {
-            log.error("Purchase failed for member: {}, product: {}, error: {}",
-                    memberId, request.productId(), e.getMessage());
+            long processingTime = System.currentTimeMillis() - startTime;
+            log.error("Purchase failed - memberId: {}, productId: {}, processingTime: {}ms, error: {}",
+                    memberId, request.productId(), processingTime, e.getMessage(), e);
             throw e;
         }
     }
 
     private AppleProduct acquireProductLock(Long memberId, String productId) {
+        log.debug("Acquiring product lock - memberId: {}, productId: {}", memberId, productId);
+
         try {
             // 1. 애플 상품 락으로 체크
+            log.debug("Checking product availability with lock - productId: {}", productId);
             AppleProduct product = appleProductRepository.findByProductIdWithLock(productId)
-                    .orElseThrow(() -> new PaymentFailedException(Error.PRODUCT_NOT_FOUND,
-                            "Product not found: " + productId));
+                    .orElseThrow(() -> {
+                        log.warn("Product not found - productId: {}", productId);
+                        return new PaymentFailedException(Error.PRODUCT_NOT_FOUND,
+                                "Product not found: " + productId);
+                    });
+
+            log.debug("Product found - productId: {}, canPurchase: {}", productId, product.getCanPurchase());
+
             if (!product.getCanPurchase()) {
+                log.warn("Product not available for purchase - productId: {}", productId);
                 throw new PaymentFailedException(Error.PRODUCT_NOT_AVAILABLE,
                         Error.PRODUCT_NOT_AVAILABLE.getMessage() + productId);
             }
 
             // 2. 구매 이력도 락으로 체크
-            boolean existingPurchases =
-                    applePurchaseHistoryRepository.findByUserIdAndProductIdWithLock(memberId, productId);
+            log.debug("Checking existing purchases with lock - memberId: {}, productId: {}", memberId, productId);
+            boolean existingPurchases = applePurchaseHistoryRepository.findByUserIdAndProductIdWithLock(memberId, productId);
+
             if (existingPurchases) {
+                log.warn("Duplicate purchase attempt detected - memberId: {}, productId: {}", memberId, productId);
                 throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
                         Error.DUPLICATE_PURCHASE.getMessage() + productId);
             }
 
+            log.debug("No existing purchases found - memberId: {}, productId: {}", memberId, productId);
             return product;
+
         } catch (PessimisticLockingFailureException e) {
+            log.warn("Concurrent purchase attempt detected - memberId: {}, productId: {}, error: {}",
+                    memberId, productId, e.getMessage());
             throw new PaymentFailedException(Error.CONCURRENT_PURCHASE_ATTEMPT,
                     Error.CONCURRENT_PURCHASE_ATTEMPT.getMessage());
         }
     }
 
     private InAppPurchase verifyAppleReceipt(PurchaseRequest request) {
+        log.debug("Starting Apple receipt verification - productId: {}", request.productId());
+
         try {
             AppleReceiptResponse appleReceiptResponse = verifyPurchase(request.appStoreReceipt());
-            return getInAppPurchase(request, appleReceiptResponse);
+            InAppPurchase inAppPurchase = getInAppPurchase(request, appleReceiptResponse);
+
+            log.info("Apple receipt verification completed - productId: {}, transactionId: {}, originalTransactionId: {}",
+                    request.productId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
+
+            return inAppPurchase;
         } catch (PaymentFailedException e) {
+            log.error("Apple receipt verification failed - productId: {}, error: {}",
+                    request.productId(), e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("Unexpected error during Apple receipt verification - productId: {}, error: {}",
+                    request.productId(), e.getMessage(), e);
             throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                     "Apple receipt verification failed: " + e.getMessage());
         }
     }
 
     private AppleReceiptResponse verifyPurchase(String receiptData) {
+        log.debug("Verifying purchase with Apple - receiptData length: {}", receiptData.length());
+
         Map<String, String> payload = Map.of("receipt-data", receiptData);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         try {
             // 1. 프로덕션 시도
+            log.debug("Attempting Apple production verification");
             ResponseEntity<AppleReceiptResponse> response = restTemplate.exchange(
                     PRODUCTION_URL,
                     HttpMethod.POST,
@@ -138,62 +194,90 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
             );
 
             AppleReceiptResponse receiptResponse = Optional.ofNullable(response.getBody())
-                    .orElseThrow(() -> new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
-                            "Apple API returned null response"));
+                    .orElseThrow(() -> {
+                        log.error("Apple production API returned null response");
+                        return new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
+                                "Apple API returned null response");
+                    });
+
+            log.debug("Apple production response received - status: {}", receiptResponse.getStatus());
 
             // 2. 21007인 경우 샌드박스로 재시도
             if (receiptResponse.getStatus() == 21007) {
-                // Sandbox 환경으로 재시도
+                log.info("Production returned 21007, retrying with sandbox");
+
                 response = restTemplate.exchange(
                         SANDBOX_URL,
                         HttpMethod.POST,
                         new HttpEntity<>(payload, headers),
                         AppleReceiptResponse.class
                 );
-                receiptResponse = Optional.ofNullable(response.getBody())
-                        .orElseThrow(() -> new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
-                                "Apple Sandbox API returned null response"));
 
-                // 샌드박스 결과 검증
+                receiptResponse = Optional.ofNullable(response.getBody())
+                        .orElseThrow(() -> {
+                            log.error("Apple sandbox API returned null response");
+                            return new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
+                                    "Apple Sandbox API returned null response");
+                        });
+
+                log.debug("Apple sandbox response received - status: {}", receiptResponse.getStatus());
+
                 if (receiptResponse.getStatus() != 0) {
+                    log.error("Sandbox verification failed - status: {}", receiptResponse.getStatus());
                     throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                             "Sandbox verification also failed with status: " + receiptResponse.getStatus());
                 }
+
+                log.info("Apple sandbox verification successful");
             } else if (receiptResponse.getStatus() != 0) {
-                // // 프로덕션에서 21007이 아닌 다른 에러 - RuntimeException → PaymentFailedException
+                log.error("Apple production verification failed - status: {}", receiptResponse.getStatus());
                 throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                         "Apple verification failed with status: " + receiptResponse.getStatus());
+            } else {
+                log.info("Apple production verification successful");
             }
 
             return receiptResponse;
         } catch (PaymentFailedException e) {
             throw e;
         } catch (Exception e) {
-            // RuntimeException → PaymentFailedException
+            log.error("Network error during Apple verification - error: {}", e.getMessage(), e);
             throw new PaymentFailedException(Error.APPLE_VERIFICATION_FAILED,
                     "Network error during Apple verification: " + e.getMessage());
         }
     }
 
-    @NotNull
-    private static InAppPurchase getInAppPurchase(PurchaseRequest request, AppleReceiptResponse appleReceiptResponse) {
+//    @NotNull
+    private InAppPurchase getInAppPurchase(PurchaseRequest request, AppleReceiptResponse appleReceiptResponse) {
+        log.debug("Extracting in-app purchase data from receipt - requestedProductId: {}", request.productId());
+
         AppleReceipt receipt = appleReceiptResponse.getReceipt();
 
         if (receipt.getInApp() == null || receipt.getInApp().isEmpty()) {
+            log.error("No in-app purchase data found in receipt - requestedProductId: {}", request.productId());
             throw new PaymentFailedException(Error.INVALID_RECEIPT, "No in-app purchase data found in receipt");
         }
 
         InAppPurchase inAppPurchase = receipt.getInApp().get(0);
+        log.debug("In-app purchase data extracted - receiptProductId: {}, transactionId: {}",
+                inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
 
         if (!request.productId().equals(inAppPurchase.getProductId())) {
+            log.error("Product mismatch - requested: {}, receipt: {}",
+                    request.productId(), inAppPurchase.getProductId());
             throw new PaymentFailedException(Error.PRODUCT_MISMATCH,
                     String.format("Product mismatch - requested: %s, receipt: %s",
                             request.productId(), inAppPurchase.getProductId()));
         }
+
+        log.debug("Product verification successful - productId: {}", request.productId());
         return inAppPurchase;
     }
 
     private void savePurchaseHistoryWithDuplicateCheck(Long memberId, InAppPurchase inAppPurchase) {
+        log.debug("Saving purchase history - memberId: {}, productId: {}, transactionId: {}, originalTransactionId: {}",
+                memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
+
         try {
             ApplePurchaseHistory applePurchaseHistory = ApplePurchaseHistory.createPurchase(
                     memberId,
@@ -202,30 +286,51 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                     inAppPurchase.getOriginalTransactionId());
 
             applePurchaseHistoryRepository.save(applePurchaseHistory);
+            log.info("Purchase history saved successfully - memberId: {}, productId: {}, transactionId: {}",
+                    memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
+
         } catch (DataIntegrityViolationException e) {
-            // 유니크 제약조건 위반 = 이미 존재, 복원인지 중복인지 확인해서 적절히 처리
+            log.warn("Data integrity violation detected, handling duplicate transaction - memberId: {}, productId: {}, transactionId: {}, error: {}",
+                    memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId(), e.getMessage());
+
             handleDuplicateTransaction(memberId, inAppPurchase);
         }
     }
 
     private void handleDuplicateTransaction(Long memberId, InAppPurchase inAppPurchase) {
+        log.info("Handling duplicate transaction - memberId: {}, productId: {}, transactionId: {}, originalTransactionId: {}",
+                memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
+
         ApplePurchaseHistory existing = applePurchaseHistoryRepository
                 .findByUserIdAndOriginalTransactionIdAndProductId(
                         memberId, inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId())
-                .orElseThrow(() -> new PaymentFailedException(Error.INTERNAL_SERVER_ERROR,
-                        "Constraint violation but no existing record found"));
+                .orElseThrow(() -> {
+                    log.error("Constraint violation but no existing record found - memberId: {}, originalTransactionId: {}, productId: {}",
+                            memberId, inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId());
+                    return new PaymentFailedException(Error.INTERNAL_SERVER_ERROR,
+                            "Constraint violation but no existing record found");
+                });
+
+        log.debug("Found existing purchase - memberId: {}, existingTransactionId: {}, newTransactionId: {}",
+                memberId, existing.getTransactionId(), inAppPurchase.getTransactionId());
 
         // 중복 결제 상황
         if (existing.getTransactionId().equals(inAppPurchase.getTransactionId())) {
+            log.warn("Duplicate purchase detected - memberId: {}, transactionId: {}",
+                    memberId, inAppPurchase.getTransactionId());
             throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
                     "This purchase has already been processed: " + inAppPurchase.getTransactionId());
         }
 
-        // 복원, DB 업데이트 없이 그냥 성공 처리
-        return;
+        // 복원 상황
+        log.info("Purchase restoration detected - memberId: {}, productId: {}, originalTransactionId: {}, existingTransactionId: {}, newTransactionId: {}",
+                memberId, inAppPurchase.getProductId(), inAppPurchase.getOriginalTransactionId(),
+                existing.getTransactionId(), inAppPurchase.getTransactionId());
     }
 
     private PurchaseResponse createSuccessResponse(String transactionId) {
+        log.debug("Creating success response - transactionId: {}", transactionId);
+
         return PurchaseResponse.builder()
                 .status("SUCCESS")
                 .message("Purchase verified successfully")

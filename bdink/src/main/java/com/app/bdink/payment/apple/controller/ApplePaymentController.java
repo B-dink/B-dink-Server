@@ -7,16 +7,19 @@ import com.app.bdink.payment.apple.dto.AppleProductResponse;
 import com.app.bdink.payment.apple.dto.PurchaseRequest;
 import com.app.bdink.payment.apple.dto.PurchaseResponse;
 import com.app.bdink.payment.apple.service.ApplePaymentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payment/apple")
+@Tag(name = "Apple Payment", description = "애플 인앱 결제 API")
 public class ApplePaymentController {
 
     private final ApplePaymentService applePaymentService;
@@ -27,8 +30,22 @@ public class ApplePaymentController {
             Principal principal,
             @Valid @RequestBody PurchaseRequest purchaseRequest) {
         Long memberId = memberUtilService.getMemberId(principal);
-        PurchaseResponse purchaseResponse = applePaymentService.purchase(memberId, purchaseRequest);
-        return RspTemplate.success(Success.APPLE_PURCHASE_SUCCESS, purchaseResponse);
+
+        log.info("Apple purchase request initiated - memberId: {}, productId: {}",
+                memberId, purchaseRequest.productId());
+
+        try {
+            PurchaseResponse purchaseResponse = applePaymentService.purchase(memberId, purchaseRequest);
+
+            log.info("Apple purchase completed successfully - memberId: {}, productId: {}, transactionId: {}",
+                    memberId, purchaseRequest.productId(), purchaseResponse.getTransactionId());
+
+            return RspTemplate.success(Success.APPLE_PURCHASE_SUCCESS, purchaseResponse);
+        } catch (Exception e) {
+            log.error("Apple purchase failed in controller - memberId: {}, productId: {}, error: {}",
+                    memberId, purchaseRequest.productId(), e.getMessage(), e);
+            throw e;
+        }
     }
 
 //    @GetMapping("/products")
