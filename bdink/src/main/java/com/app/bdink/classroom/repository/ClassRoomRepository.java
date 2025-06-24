@@ -17,5 +17,8 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long
     List<ClassRoomEntity> findAllByCareer(Career career);
 
     List<ClassRoomEntity> findAllByInstructor(Instructor instructor);
+    
+    // promotionOf = '23'인 classRoom을 promotion으로 임시로 지정
+    List<ClassRoomEntity> findAllByPromotionOf(int promotionOf);
 
 }
