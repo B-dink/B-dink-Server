@@ -35,7 +35,7 @@ public class ScheduleService {
     }
 
     public List<ScheduleResponse> getAllSchedule() {
-        List<Schedule> scheduleList = scheduleRepository.findAll();
+        List<Schedule> scheduleList = scheduleRepository.findAllByOrderByDateAsc();
         return scheduleList.stream()
             .map(ScheduleResponse::new)
             .collect(Collectors.toList());
