@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByScheduleType(ScheduleType scheduleType);
-
+    List<Schedule> findAllByOrderByDateAsc();
     List<Schedule> findByDate(LocalDate date);
 
 }
