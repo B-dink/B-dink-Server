@@ -253,10 +253,16 @@ public class ClassRoomService implements ClassRoomUseCase {
                 log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
                 payment = true;
             }
+
+            // 0원 강의의 경우 구매 완료로 처리
+            if (classRoomEntity != null &&
+                    classRoomEntity.getPriceDetail() != null &&
+                    classRoomEntity.getPriceDetail().getOriginPrice() == 0) {
+                payment = true;
+            }
         }
 
         LocalDate expiredDate = sugang != null ? sugang.getExpiredDate() : null;
-
 
         //클래스룸 엔티티로 디테일이미지 리스트를 가져옴.
         List<ClassRoomDetailImage> byClassRoom = classRoomDetailImageRepository.findByClassRoomOrderBySortOrderAsc(classRoomEntity);
