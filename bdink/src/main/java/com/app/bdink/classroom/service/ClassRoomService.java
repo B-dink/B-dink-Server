@@ -243,7 +243,10 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
 
-        boolean payment = false;
+        // 0원 강의의 경우 구매 완료로 처리
+        boolean payment = classRoomEntity != null &&
+                classRoomEntity.getPriceDetail() != null &&
+                classRoomEntity.getPriceDetail().getOriginPrice() == 0;
 
         Sugang sugang = null;
 
@@ -251,13 +254,6 @@ public class ClassRoomService implements ClassRoomUseCase {
             sugang = sugangOpt.get();
             if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
                 log.info("해당 클래스에 대해 결제 완료된 유저입니다.");
-                payment = true;
-            }
-
-            // 0원 강의의 경우 구매 완료로 처리
-            if (classRoomEntity != null &&
-                    classRoomEntity.getPriceDetail() != null &&
-                    classRoomEntity.getPriceDetail().getOriginPrice() == 0) {
                 payment = true;
             }
         }
