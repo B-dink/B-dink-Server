@@ -255,7 +255,9 @@ public class ClassRoomService implements ClassRoomUseCase {
             }
 
             // 0원 강의의 경우 구매 완료로 처리
-            if (classRoomEntity.getPriceDetail().getOriginPrice() == 0) {
+            if (classRoomEntity != null &&
+                    classRoomEntity.getPriceDetail() != null &&
+                    classRoomEntity.getPriceDetail().getOriginPrice() == 0) {
                 payment = true;
             }
         }
