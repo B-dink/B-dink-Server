@@ -243,10 +243,7 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
 
-        // 0원 강의의 경우 구매 완료로 처리
-        boolean payment = classRoomEntity != null &&
-                classRoomEntity.getPriceDetail() != null &&
-                classRoomEntity.getPriceDetail().getOriginPrice() == 0;
+        boolean payment = false;
 
         Sugang sugang = null;
 
