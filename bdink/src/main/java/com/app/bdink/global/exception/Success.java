@@ -11,6 +11,8 @@ public enum Success {
     /**
      * 201 CREATED
      */
+    CREATE_ALIMETALK_TOKEN_SUCCESS(HttpStatus.CREATED, "알림톡 토큰 생성 성공"),
+    SEND_ALIMTALK_SUCCESS(HttpStatus.CREATED, "알림톡 전송 성공"),
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
     CREATE_SUGANG_SUCCESS(HttpStatus.CREATED, "수강 생성 성공"),
 
