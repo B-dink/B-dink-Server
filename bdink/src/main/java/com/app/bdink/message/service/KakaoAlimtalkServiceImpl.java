@@ -4,7 +4,6 @@ import com.app.bdink.message.controller.dto.AlimTalkRequest;
 import com.app.bdink.message.controller.dto.TokenRequest;
 import com.app.bdink.message.controller.dto.TokenResponse;
 import com.app.bdink.message.entity.AlimtalkToken;
-import com.app.bdink.message.repository.AlimtalkTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +19,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +40,11 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
     @Value("${surem.template-code}")
     private String templateCode;
 
-    private final AlimtalkTokenRepository alimtalkTokenRepository;
+    @Value("${surem.sender-key}")
+    private String senderKey;
+
+    private final KakaoAlimtalkDataService KakaoAlimtalkDataService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -96,28 +100,39 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
         log.info("요청 시간: {}", LocalDateTime.now());
         log.info("수신번호: {}", phoneNumber);
 
-        String accessToken = "";
-        try {
-            AlimtalkToken token = getAlimtalkToken();
-            accessToken = token.getToken();
-            log.info("토큰 조회 성공 - 토큰 길이: {}", accessToken != null ? accessToken.length() : 0);
-        } catch (RuntimeException e) {
-            log.error("토큰 조회 실패: {}", e.getMessage());
-            return Mono.error(new RuntimeException("토큰 조회 실패", e));
-        }
+        return Mono.fromCallable(() -> {
+                    AlimtalkToken token = KakaoAlimtalkDataService.getAlimtalkToken();
+                    return token.getToken();
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnSuccess(accessToken -> log.info("토큰 조회 성공 - 토큰 길이: {}", accessToken.length()))
+                .flatMap(accessToken -> {
+                    AlimTalkRequest alimTalkRequest = createAlimTalkRequest(phoneNumber);
+                    logRequestBody(alimTalkRequest);
+                    return sendAlimTalkRequest(accessToken, alimTalkRequest);
+                })
+                .doOnError(error -> {
+                    log.error("=== 알림톡 발송 실패 ===");
+                    log.error("에러 타입: {}", error.getClass().getSimpleName());
+                    log.error("에러 메시지: {}", error.getMessage());
+                    log.error("실패 시간: {}", LocalDateTime.now());
+                });
+    }
 
-        AlimTalkRequest alimTalkRequest = createAlimTalkRequest(phoneNumber);
+    private AlimTalkRequest createAlimTalkRequest(String phoneNumber) {
+        String text = "홍길동님, 안녕하세요. 슈어엠주식회사입니다.";
+        log.info("알림톡 요청 객체 생성:");
+        log.info("  - 메시지 타입: AT");
+        log.info("  - 템플릿 코드: {}", templateCode);
+        log.info("  - 수신번호: {}", phoneNumber);
+        log.info("  - 메시지 내용: {}", text);
 
-        // 요청 데이터 로깅
-        try {
-            String requestJson = objectMapper.writeValueAsString(alimTalkRequest);
-            log.info("알림톡 요청 Body: {}", requestJson);
-        } catch (Exception e) {
-            log.warn("알림톡 요청 Body 로깅 실패: {}", e.getMessage());
-        }
+        return new AlimTalkRequest("AT", senderKey, templateCode, phoneNumber, text);
+    }
 
+    private Mono<RspTemplate<String>> sendAlimTalkRequest(String accessToken, AlimTalkRequest alimTalkRequest) {
         log.info("요청 URL: {}/api/v1/send/alimtalk", baseUrl);
-        log.info("Authorization Header: Bearer {}***", accessToken.substring(0, Math.min(10, accessToken.length())));
+        log.info("Authorization Header: Bearer {}***", accessToken);
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(baseUrl)
@@ -131,24 +146,24 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
                 .header("Content-Type", "application/json")
                 .bodyValue(alimTalkRequest)
                 .retrieve()
-                .onStatus(
-                        HttpStatusCode::isError,
-                        response -> handleErrorResponse(response, "알림톡발송")
-                )
+                .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(response, "알림톡발송"))
                 .bodyToMono(String.class)
                 .doOnSuccess(response -> {
                     log.info("=== 알림톡 발송 성공 ===");
                     log.info("응답 내용: {}", response);
                     log.info("완료 시간: {}", LocalDateTime.now());
-                })
-                .doOnError(error -> {
-                    log.error("=== 알림톡 발송 실패 ===");
-                    log.error("에러 타입: {}", error.getClass().getSimpleName());
-                    log.error("에러 메시지: {}", error.getMessage());
-                    log.error("실패 시간: {}", LocalDateTime.now());
                 });
 
         return toRspTemplate(responseMono, Success.SEND_ALIMTALK_SUCCESS);
+    }
+
+    private void logRequestBody(AlimTalkRequest alimTalkRequest) {
+        try {
+            String requestJson = objectMapper.writeValueAsString(alimTalkRequest);
+            log.info("알림톡 요청 Body: {}", requestJson);
+        } catch (Exception e) {
+            log.warn("알림톡 요청 Body 로깅 실패: {}", e.getMessage());
+        }
     }
 
     /**
@@ -181,26 +196,6 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
 
             return Mono.just(clientResponse);
         });
-    }
-
-    private AlimtalkToken getAlimtalkToken() {
-        log.info("DB에서 최신 토큰 조회 시도");
-        return alimtalkTokenRepository.findTopByOrderByIdDesc()
-                .orElseThrow(() -> {
-                    log.error("DB에 저장된 토큰이 없습니다");
-                    return new RuntimeException("토큰이 존재하지 않습니다");
-                });
-    }
-
-    private AlimTalkRequest createAlimTalkRequest(String phoneNumber) {
-        String message = "홍길동님, 안녕하세요. 슈어엠주식회사입니다.";
-        log.info("알림톡 요청 객체 생성:");
-        log.info("  - 메시지 타입: AT");
-        log.info("  - 템플릿 코드: {}", templateCode);
-        log.info("  - 수신번호: {}", phoneNumber);
-        log.info("  - 메시지 내용: {}", message);
-
-        return new AlimTalkRequest("AT", "senderKey", templateCode, phoneNumber, message);
     }
 
     private Mono<? extends Throwable> handleErrorResponse(ClientResponse response, String apiType) {

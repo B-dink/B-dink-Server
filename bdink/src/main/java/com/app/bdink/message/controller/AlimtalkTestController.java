@@ -44,4 +44,13 @@ public class AlimtalkTestController {
                 .doOnSuccess(response -> log.info(">>> POST 테스트 성공: {}", response))
                 .doOnError(error -> log.error(">>> POST 테스트 실패: {}", error.getMessage()));
     }
+
+    @PostMapping("/alimtalk")
+    @Operation(summary = "알림톡 발송", description = "알림톡 발송 테스트")
+    public Mono<RspTemplate<String>> testAlimtalkSend() {
+        log.info(">>> 슈어엠 알림톡 발송 테스트 (POST) 시작");
+        return kakaoAlimtalkService.sendAlimTalk("82-1041242166")
+                .doOnSuccess(response -> log.info(">>> POST 테스트 성공: {}", response))
+                .doOnError(error -> log.error(">>> POST 테스트 실패: {}", error.getMessage()));
+    }
 }
