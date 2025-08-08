@@ -18,7 +18,6 @@ import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -33,9 +32,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class SugangService {
-
-    @Value("${surem.test-number}")
-    private String testNumber;
 
     private final KakaoAlimtalkService kakaoAlimtalkService;
 
@@ -87,8 +83,7 @@ public class SugangService {
         long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
         String count = String.valueOf(currentSugangCount);
 
-//        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
-        String phoneNumber = testNumber;
+        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
