@@ -1,6 +1,7 @@
 package com.app.bdink.message.controller;
 
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.message.controller.dto.AlimTalkText;
 import com.app.bdink.message.service.KakaoAlimtalkService;
 import com.app.bdink.message.controller.dto.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,11 @@ public class AlimtalkTestController {
     @Operation(summary = "알림톡 발송", description = "알림톡 발송 테스트")
     public Mono<RspTemplate<String>> testAlimtalkSend() {
         log.info(">>> 슈어엠 알림톡 발송 테스트 (POST) 시작");
-        return kakaoAlimtalkService.sendAlimTalk("82-1041242166")
+
+        // test data
+        AlimTalkText alimTalkText = new AlimTalkText("홍길동", "신난다", "재미난다", "10만");
+
+        return kakaoAlimtalkService.sendAlimTalk("82-1041242166", alimTalkText)
                 .doOnSuccess(response -> log.info(">>> POST 테스트 성공: {}", response))
                 .doOnError(error -> log.error(">>> POST 테스트 실패: {}", error.getMessage()));
     }

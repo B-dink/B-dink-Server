@@ -1,6 +1,7 @@
 package com.app.bdink.message.service;
 
 import com.app.bdink.message.controller.dto.AlimTalkRequest;
+import com.app.bdink.message.controller.dto.AlimTalkText;
 import com.app.bdink.message.controller.dto.TokenRequest;
 import com.app.bdink.message.controller.dto.TokenResponse;
 import com.app.bdink.message.entity.AlimtalkToken;
@@ -42,6 +43,9 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
 
     @Value("${surem.sender-key}")
     private String senderKey;
+
+    @Value("${surem.req-phone")
+    private String BdinkPhoneNumber;
 
     private final KakaoAlimtalkDataService KakaoAlimtalkDataService;
 
@@ -95,7 +99,7 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
     }
 
     @Override
-    public Mono<RspTemplate<String>> sendAlimTalk(String phoneNumber) {
+    public Mono<RspTemplate<String>> sendAlimTalk(String phoneNumber, AlimTalkText alimTalkText) {
         log.info("=== 알림톡 발송 요청 시작 ===");
         log.info("요청 시간: {}", LocalDateTime.now());
         log.info("수신번호: {}", phoneNumber);
@@ -107,7 +111,8 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnSuccess(accessToken -> log.info("토큰 조회 성공 - 토큰 길이: {}", accessToken.length()))
                 .flatMap(accessToken -> {
-                    AlimTalkRequest alimTalkRequest = createAlimTalkRequest(phoneNumber);
+                    String text = generateAlimTalkText(alimTalkText);
+                    AlimTalkRequest alimTalkRequest = createAlimTalkRequest(phoneNumber, text);
                     logRequestBody(alimTalkRequest);
                     return sendAlimTalkRequest(accessToken, alimTalkRequest);
                 })
@@ -119,20 +124,29 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
                 });
     }
 
-    private AlimTalkRequest createAlimTalkRequest(String phoneNumber) {
-        String text = "홍길동님, 안녕하세요. 슈어엠주식회사입니다.";
-        log.info("알림톡 요청 객체 생성:");
-        log.info("  - 메시지 타입: AT");
-        log.info("  - 템플릿 코드: {}", templateCode);
-        log.info("  - 수신번호: {}", phoneNumber);
-        log.info("  - 메시지 내용: {}", text);
+    private String generateAlimTalkText(AlimTalkText alimTalkText) {
+        return String.format("""
+%s님, 축하드립니다!
+귀하의 강의가 아래와 같이 판매되었습니다.
 
-        return new AlimTalkRequest("AT", senderKey, templateCode, phoneNumber, text);
+판매 강의: %s
+판매 일시: %s
+누적 판매량: %s개
+
+지속적인 인기와 관심에 감사드립니다!
+더 좋은 강의 운영을 응원합니다.""",
+                alimTalkText.getName(), alimTalkText.getCourse(), alimTalkText.getDate(), alimTalkText.getCount());
+    }
+
+    private AlimTalkRequest createAlimTalkRequest(String phoneNumber, String text) {
+        return new AlimTalkRequest("AT", senderKey, templateCode, phoneNumber,
+                BdinkPhoneNumber, "안녕하세요 비딩크입니다.", "강의가 판매 되었습니다.",
+                text);
     }
 
     private Mono<RspTemplate<String>> sendAlimTalkRequest(String accessToken, AlimTalkRequest alimTalkRequest) {
         log.info("요청 URL: {}/api/v1/send/alimtalk", baseUrl);
-        log.info("Authorization Header: Bearer {}***", accessToken);
+        log.info("Authorization Header: Bearer {}", accessToken);
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(baseUrl)
