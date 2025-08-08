@@ -44,7 +44,7 @@ public class KakaoAlimtalkServiceImpl implements KakaoAlimtalkService {
     @Value("${surem.sender-key}")
     private String senderKey;
 
-    @Value("${surem.req-phone")
+    @Value("${surem.req-phone}")
     private String BdinkPhoneNumber;
 
     private final KakaoAlimtalkDataService KakaoAlimtalkDataService;

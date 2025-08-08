@@ -5,9 +5,12 @@ import com.app.bdink.external.kollus.entity.KollusMediaLink;
 import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.message.controller.dto.AlimTalkText;
+import com.app.bdink.message.service.KakaoAlimtalkService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
@@ -15,16 +18,26 @@ import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SugangService {
+
+    @Value("${surem.test-numbe}")
+    private String testNumber;
+
+    private final KakaoAlimtalkService kakaoAlimtalkService;
 
     private final SugangRepository sugangRepository;
     private final LectureRepository lectureRepository;
@@ -63,7 +76,54 @@ public class SugangService {
                 .build();
 
         sugang = sugangRepository.save(sugang);
+
+        // 알림톡 발송
+        String instructorName = classRoomEntity.getInstructor().getMember().getName();
+        String className = classRoomEntity.getTitle();
+
+        String sugangDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
+        String count = String.valueOf(currentSugangCount);
+
+//        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
+        String phoneNumber = testNumber;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
+                sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
+                        .subscribe(
+                                response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
+                                error -> log.error("알림톡 발송 요청 실패", error)
+                        );
+            }
+        });
+
         return SugangInfoDto.of(sugang);
+    }
+
+    private String formatPhoneNumber(String localNumber) {
+        if (localNumber == null || localNumber.trim().isEmpty()) {
+            log.warn("전화번호가 null이거나 비어있습니다.");
+            return "";
+        }
+        if (!localNumber.startsWith("0")) {
+            log.warn("유효하지 않은 전화번호 형식입니다: {}", localNumber);
+            return localNumber;
+        }
+        String cleanedNumber = localNumber.replaceAll("-", "");
+        return "82-" + cleanedNumber.substring(1);
+    }
+
+    private Mono<RspTemplate<String>> sendAlimtalkToInstructor(
+            String instructorName, String className, String sugangDate, String count, String phoneNumber
+    ) {
+        AlimTalkText alimTalkText = new AlimTalkText(instructorName, className, sugangDate, count);
+
+        return kakaoAlimtalkService.sendAlimTalk(phoneNumber, alimTalkText)
+                .doOnSuccess(response -> log.info(">>> 알림톡 발송 WebClient 요청 성공: {}", response))
+                .doOnError(error -> log.error(">>> 알림톡 발송 WebClient 요청 실패: {}", error.getMessage()));
     }
 
     @Transactional

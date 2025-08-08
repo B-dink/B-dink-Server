@@ -18,4 +18,6 @@ public interface SugangRepository extends JpaRepository<Sugang, Long> {
     Optional<Sugang> findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity);
     
     List<Sugang> findByMemberAndSugangStatus(Member member, SugangStatus sugangStatus);
+
+    long countByClassRoomEntity(ClassRoomEntity classRoomEntity);
 }
