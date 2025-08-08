@@ -34,9 +34,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SugangService {
 
-    @Value("${surem.test-number}")
-    private String testNumber;
-
     private final KakaoAlimtalkService kakaoAlimtalkService;
 
     private final SugangRepository sugangRepository;
@@ -87,8 +84,7 @@ public class SugangService {
         long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
         String count = String.valueOf(currentSugangCount);
 
-//        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
-        String phoneNumber = testNumber;
+        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
