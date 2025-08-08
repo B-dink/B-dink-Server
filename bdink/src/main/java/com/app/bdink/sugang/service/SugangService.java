@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SugangService {
 
-    @Value("${surem.test-numbe}")
+    @Value("${surem.test-number}")
     private String testNumber;
 
     private final KakaoAlimtalkService kakaoAlimtalkService;
@@ -78,6 +78,7 @@ public class SugangService {
         sugang = sugangRepository.save(sugang);
 
         // 알림톡 발송
+        Integer price = classRoomEntity.getPriceDetail().getOriginPrice();
         String instructorName = classRoomEntity.getInstructor().getMember().getName();
         String className = classRoomEntity.getTitle();
 
@@ -92,6 +93,9 @@ public class SugangService {
             @Override
             public void afterCommit() {
                 log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
+                if (price == 0) {
+                    return;
+                }
                 sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
                         .subscribe(
                                 response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
