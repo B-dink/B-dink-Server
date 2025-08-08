@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SugangService {
 
-    @Value("${surem.test-numbe}")
+    @Value("${surem.test-number}")
     private String testNumber;
 
     private final KakaoAlimtalkService kakaoAlimtalkService;
