@@ -13,6 +13,7 @@ import com.app.bdink.message.controller.dto.AlimTalkText;
 import com.app.bdink.message.service.KakaoAlimtalkService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
+import com.app.bdink.sugang.controller.dto.response.SugangClassRoomListInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
@@ -144,6 +145,15 @@ public class SugangService {
                 })
                 .toList();
         return sugangClassRoomInfos;
+    }
+
+    @Transactional
+    public List<SugangClassRoomListInfo> getSugangClassRoomListInfo(Member member) {
+        updateAllSugangProgress(member);
+        List<Sugang> sugangs = sugangRepository.findByMemberAndSugangStatus(member, SugangStatus.PAYMENT_COMPLETED);
+        return sugangs.stream()
+                .map(SugangClassRoomListInfo::of)
+                .toList();
     }
 
     @Transactional

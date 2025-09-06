@@ -9,6 +9,7 @@ import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
+import com.app.bdink.sugang.controller.dto.response.SugangClassRoomListInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
 import com.app.bdink.sugang.service.SugangService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +51,21 @@ public class SugangController {
     }
 
     @GetMapping("/all")
-    @Operation(method = "GET", description = "결제 완료된 수강신청 클래스룸 목록입니다. 진행률까지 포함되어있습니다.")
+    @Operation(method = "GET", description = "결제 완료된 수강신청 Lecture 목록입니다. 진행률까지 포함되어있습니다.")
     public RspTemplate<List<SugangClassRoomInfo>> getSugangClassRoom(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         Member member = memberService.findById(memberId);
         List<SugangClassRoomInfo> sugangClassRoomInfo = sugangService.getSugangClassRoomInfo(member);
 
         return RspTemplate.success(Success.GET_SUGANG_CLASSROOM_SUCCESS, sugangClassRoomInfo.isEmpty() ? null : sugangClassRoomInfo);
+    }
+
+    @GetMapping("/all/classroom")
+    @Operation(method = "GET", description = "결제 완료된 클래스룸 목록입니다.")
+    public RspTemplate<List<SugangClassRoomListInfo>> getSugangClassRoomList(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Member member = memberService.findById(memberId);
+        List<SugangClassRoomListInfo> sugangClassRoomListInfo = sugangService.getSugangClassRoomListInfo(member);
+        return RspTemplate.success(Success.GET_SUGANG_CLASSROOM_SUCCESS, sugangClassRoomListInfo.isEmpty() ? null : sugangClassRoomListInfo);
     }
 }
