@@ -15,6 +15,7 @@ public enum Success {
     SEND_ALIMTALK_SUCCESS(HttpStatus.CREATED, "알림톡 전송 성공"),
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
     CREATE_SUGANG_SUCCESS(HttpStatus.CREATED, "수강 생성 성공"),
+    CREATE_CENTER_SUCCESS(HttpStatus.CREATED, "센터 생성 성공"),
 
     CREATE_CLASSROOM_SUCCESS(HttpStatus.CREATED, "클래스룸 생성 성공"),
     CREATE_REVIEW_SUCCESS(HttpStatus.CREATED, "리뷰 생성 성공"),
@@ -64,6 +65,7 @@ public enum Success {
     GET_CHAPTER_SUCCESS(HttpStatus.OK, "chapter 조회 성공"),
     GET_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 조회 성공"),
     GET_LECTURE_SUCCESS(HttpStatus.OK, "강의 조회 성공"),
+    GET_CENTER_SUCCESS(HttpStatus.OK, "센터 조회 성공"),
 
 
 
@@ -88,6 +90,7 @@ public enum Success {
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
     UPDATE_SCHEDULE_SUCCESS(HttpStatus.OK, "스케줄 수정 성공"),
+    UPDATE_CENTER_SUCCESS(HttpStatus.OK, "센터 정보 수정 성공"),
 
 
     GET_CATEORY_SUCCESS(HttpStatus.OK, "세부 카테고리 조회 성공"),
@@ -149,6 +152,7 @@ public enum Success {
     DELETE_QUESTION_SUCCESS(HttpStatus.NO_CONTENT, "질문 삭제 성공"),
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
     DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
+    DELETE_CENTER_SUCCESS(HttpStatus.NO_CONTENT, "센터 정보 삭제 성공"),
 
 
     ;
