@@ -22,19 +22,19 @@ public class CenterController {
         return RspTemplate.success(Success.CREATE_CENTER_SUCCESS, centerService.saveCenter(centerInfoDto));
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     @Operation(method="GET", description = "센터를 조회합니다.")
     public RspTemplate<?> getCenter(@PathVariable Long id) {
         return RspTemplate.success(Success.GET_CENTER_SUCCESS, centerService.getCenterInfo(id));
     }
 
-    @PatchMapping
+    @PatchMapping("/{id}")
     @Operation(method = "PATCH", description = "센터 정보를 수정합니다.")
     public RspTemplate<?> updateCenter(@PathVariable Long id, @RequestBody CenterInfoDto centerInfoDto) {
         return RspTemplate.success(Success.UPDATE_CENTER_SUCCESS, centerService.updateCenter(id, centerInfoDto));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @Operation(method = "DELETE", description = "센터 정보를 삭제합니다. 어떤 센터와 계약 체결에 대한 정보를 유지하기 위해 softdelete로 진행됩니다.")
     RspTemplate<?> deleteCenter(@PathVariable Long id) {
         return RspTemplate.success(Success.DELETE_CENTER_SUCCESS, centerService.deleteCenter(id));
