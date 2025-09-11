@@ -1,3 +1,4 @@
+/*
 package com.app.bdink.message.entity;
 
 import com.app.bdink.message.controller.dto.TokenData;
@@ -23,3 +24,4 @@ public class AlimtalkToken {
         this.token = dto.accessToken();
     }
 }
+*/

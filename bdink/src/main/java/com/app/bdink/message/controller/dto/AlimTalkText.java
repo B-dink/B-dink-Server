@@ -1,3 +1,4 @@
+/*
 package com.app.bdink.message.controller.dto;
 
 import lombok.AllArgsConstructor;
@@ -12,3 +13,4 @@ public class AlimTalkText {
     String date;
     String count;
 }
+*/
