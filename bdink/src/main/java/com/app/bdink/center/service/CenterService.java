@@ -2,6 +2,7 @@ package com.app.bdink.center.service;
 
 import com.app.bdink.center.controller.dto.CenterStatus;
 import com.app.bdink.center.controller.dto.request.CenterInfoDto;
+import com.app.bdink.center.controller.dto.response.CenterAllListDto;
 import com.app.bdink.center.controller.dto.response.CenterResponseDto;
 import com.app.bdink.center.entity.Center;
 import com.app.bdink.center.repository.CenterRepository;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -25,15 +27,16 @@ public class CenterService {
     }
 
     @Transactional
-    public CenterInfoDto saveCenter(CenterInfoDto dto) {
-        Center center = Center.builder()
-                .name(dto.centerName())
-                .address(dto.centerAddress())
-                .qrToken(dto.centerQrToken())
-                .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
-                .build();
-        center = centerRepository.save(center);
-        return CenterInfoDto.of(center);
+    public String saveCenter(CenterInfoDto dto) {
+        Long id = centerRepository.save(
+                Center.builder()
+                        .name(dto.centerName())
+                        .address(dto.centerAddress())
+                        .qrToken(dto.centerQrToken())
+                        .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
+                        .build()
+        ).getId();
+        return id.toString();
     }
 
     @Transactional
@@ -59,5 +62,14 @@ public class CenterService {
         center.updateStatus(CenterStatus.TERMINATED);
         centerRepository.save(center);
         return CenterResponseDto.of(center);
+    }
+
+    public List<CenterAllListDto> getAllInProgressCenters() {
+        List<Center> inProgressCenters = centerRepository.findByStatus(CenterStatus.IN_PROGRESS);
+
+        // 엔티티 목록을 DTO 목록으로 변환하여 반환
+        return inProgressCenters.stream()
+                .map(CenterAllListDto::of)
+                .toList();
     }
 }
