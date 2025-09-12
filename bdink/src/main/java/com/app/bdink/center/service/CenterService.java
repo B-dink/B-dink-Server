@@ -57,11 +57,10 @@ public class CenterService {
     }
 
     @Transactional
-    public CenterResponseDto deleteCenter(Long id) {
+    public void deleteCenter(Long id) {
         Center center = findById(id);
         center.updateStatus(CenterStatus.TERMINATED);
         centerRepository.save(center);
-        return CenterResponseDto.of(center);
     }
 
     public List<CenterAllListDto> getAllInProgressCenters() {
