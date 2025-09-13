@@ -128,6 +128,7 @@ public enum Error {
     UN_AUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증을 안한 유저입니다."),
     UNAUTHORIZED_KEY(HttpStatus.UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
     INVALID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    INVALID_QR_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 QR토큰입니다."),
 
     /**
      * 402 PAYMENT REQUIRED
