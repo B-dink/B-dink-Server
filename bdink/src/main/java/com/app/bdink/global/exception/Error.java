@@ -58,6 +58,7 @@ public enum Error {
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
     EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
     EXIST_USERKEY(HttpStatus.BAD_REQUEST, "이미 유저키가 존재합니다."),
+    EXIST_SUGANG(HttpStatus.BAD_REQUEST, "이미 수강신청한 강의 입니다."),
     NOT_EXIST_USERKEY(HttpStatus.BAD_REQUEST, "남아있는 사용자 키가 없습니다. 사용자키를 새로 추가해주세요."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
