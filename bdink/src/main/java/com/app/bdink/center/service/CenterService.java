@@ -81,16 +81,6 @@ public class CenterService {
     }
 
     public String verifyQrCode(Member member, CenterQrDto centerQrDto){
-        /**
-         * dto에 있는 내용을 가져오기
-         * 가져온 데이터를 통해서 center찾기
-         * center에 있는 qrToken과 비교
-         * 1. 인증 성공
-         * 1-2. 해당 클래스룸 수강처리 해주기
-         * 1-3. 클래스룸 id return값으로 보내주기
-         * 2. 인증 실패
-         * 2-1. 인증 실패 에러 핸들링을 통해 다시 넘겨주기
-         */
         Center center = findById(centerQrDto.centerId());
         if (center.getQrToken().equals(centerQrDto.qrToken())) {
             ClassRoomEntity classRoomEntity =  classRoomService.findById(centerQrDto.classroomId());
