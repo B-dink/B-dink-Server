@@ -2,12 +2,18 @@ package com.app.bdink.center.service;
 
 import com.app.bdink.center.controller.dto.CenterStatus;
 import com.app.bdink.center.controller.dto.request.CenterInfoDto;
+import com.app.bdink.center.controller.dto.request.CenterQrDto;
 import com.app.bdink.center.controller.dto.response.CenterAllListDto;
 import com.app.bdink.center.controller.dto.response.CenterResponseDto;
 import com.app.bdink.center.entity.Center;
 import com.app.bdink.center.repository.CenterRepository;
+import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.sugang.controller.dto.SugangStatus;
+import com.app.bdink.sugang.service.SugangService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CenterService {
 
+    private final SugangService sugangService;
+    private final ClassRoomService classRoomService;
     private final CenterRepository centerRepository;
 
     public Center findById(Long id) {
@@ -70,5 +78,25 @@ public class CenterService {
         return inProgressCenters.stream()
                 .map(CenterAllListDto::of)
                 .toList();
+    }
+
+    public String verifyQrCode(Member member, CenterQrDto centerQrDto){
+        /**
+         * dto에 있는 내용을 가져오기
+         * 가져온 데이터를 통해서 center찾기
+         * center에 있는 qrToken과 비교
+         * 1. 인증 성공
+         * 1-2. 해당 클래스룸 수강처리 해주기
+         * 1-3. 클래스룸 id return값으로 보내주기
+         * 2. 인증 실패
+         * 2-1. 인증 실패 에러 핸들링을 통해 다시 넘겨주기
+         */
+        Center center = findById(centerQrDto.centerId());
+        if (center.getQrToken().equals(centerQrDto.qrToken())) {
+            ClassRoomEntity classRoomEntity =  classRoomService.findById(centerQrDto.classroomId());
+            sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
+            return classRoomEntity.getId().toString();
+        }
+        throw new CustomException(Error.INVALID_QR_TOKEN_EXCEPTION, Error.INVALID_QR_TOKEN_EXCEPTION.getMessage());
     }
 }
