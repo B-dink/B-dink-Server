@@ -67,6 +67,7 @@ public enum Success {
     GET_LECTURE_SUCCESS(HttpStatus.OK, "강의 조회 성공"),
     GET_CENTER_SUCCESS(HttpStatus.OK, "센터 조회 성공"),
     GET_ALLCENTER_SUCCESS(HttpStatus.OK, "계약중인 모든 센터 조회 성공"),
+    CHECK_QR_SUCCESS(HttpStatus.OK, "QR코드 인증 성공"),
 
 
 
