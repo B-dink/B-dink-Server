@@ -63,7 +63,9 @@ public class SugangService {
         log.info("수강 스테이터스 : {}", sugangStatus);
 
         //수강 중복처리
-        findByMemberAndClassRoomEntity(member, classRoomEntity);
+        verifyDuplicateSugang(member, classRoomEntity);
+
+        log.info("테스트용 로그");
 
         Sugang sugang = Sugang.builder()
                 .classRoomEntity(classRoomEntity)
@@ -189,8 +191,12 @@ public class SugangService {
     }
 
     // 사용자가 이미 수강을 했는지 검사하는 메서드
-    public Sugang findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity) {
-        return sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
-                .orElseThrow(() -> new CustomException(Error.EXIST_SUGANG, Error.EXIST_SUGANG.getMessage()));
+    public void verifyDuplicateSugang(Member member, ClassRoomEntity classRoomEntity) {
+        // member와 classRoomEntity로 이미 수강 정보가 존재하는지 확인합니다.
+        sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
+                .ifPresent(sugang -> {
+                    // 수강 정보가 존재하면 CustomException을 던져 중복 처리합니다.
+                    throw new CustomException(Error.EXIST_SUGANG, Error.EXIST_SUGANG.getMessage());
+                });
     }
 }
