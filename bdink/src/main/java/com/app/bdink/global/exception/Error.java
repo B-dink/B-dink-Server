@@ -24,6 +24,8 @@ public enum Error {
     NOT_FOUND_SUGANG(HttpStatus.NOT_FOUND, "찾을 수 없는 수강입니다."),
     NOT_FOUND_SUGANGLIST(HttpStatus.NOT_FOUND, "수강 신청이 되어있지 않은 유저입니다."),
 
+    NOT_FOUND_CENTER(HttpStatus.NOT_FOUND, "찾을 수 없는 센터입니다."),
+
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
     NOT_FOUND_CLASSROOM(HttpStatus.NOT_FOUND, "찾을 수 없는 강의실입니다."),
@@ -56,6 +58,7 @@ public enum Error {
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
     EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
     EXIST_USERKEY(HttpStatus.BAD_REQUEST, "이미 유저키가 존재합니다."),
+    EXIST_SUGANG(HttpStatus.BAD_REQUEST, "이미 수강신청한 강의 입니다."),
     NOT_EXIST_USERKEY(HttpStatus.BAD_REQUEST, "남아있는 사용자 키가 없습니다. 사용자키를 새로 추가해주세요."),
 
     BAD_REQUEST_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일형식이 잘못된 것 같습니다."),
@@ -126,6 +129,7 @@ public enum Error {
     UN_AUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증을 안한 유저입니다."),
     UNAUTHORIZED_KEY(HttpStatus.UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
     INVALID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    INVALID_QR_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 QR토큰입니다."),
 
     /**
      * 402 PAYMENT REQUIRED

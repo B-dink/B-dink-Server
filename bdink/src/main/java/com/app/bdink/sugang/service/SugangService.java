@@ -49,11 +49,6 @@ public class SugangService {
         return sugangRepository.findAllByMember(member);
     }
 
-    public Sugang findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity) {
-        return sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
-    }
-
     @Transactional(readOnly = true)
     public List<SugangInfoDto> getSugangLecture(Member member) {
         //todo: 환불일경우 status complete만 다시 필터하는 기능
@@ -66,6 +61,10 @@ public class SugangService {
     @Transactional
     public SugangInfoDto createSugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
         log.info("수강 스테이터스 : {}", sugangStatus);
+
+        //수강 중복처리
+        findByMemberAndClassRoomEntity(member, classRoomEntity);
+
         Sugang sugang = Sugang.builder()
                 .classRoomEntity(classRoomEntity)
                 .member(member)
@@ -187,5 +186,11 @@ public class SugangService {
         log.info("progress2 : {}", sugang.getProgressPercent());
         sugangRepository.save(sugang);
         log.info("progress3 : {}", sugang.getProgressPercent());
+    }
+
+    // 사용자가 이미 수강을 했는지 검사하는 메서드
+    public Sugang findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity) {
+        return sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
+                .orElseThrow(() -> new CustomException(Error.EXIST_SUGANG, Error.EXIST_SUGANG.getMessage()));
     }
 }

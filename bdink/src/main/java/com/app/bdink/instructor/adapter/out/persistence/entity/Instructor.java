@@ -1,5 +1,6 @@
 package com.app.bdink.instructor.adapter.out.persistence.entity;
 
+import com.app.bdink.center.entity.Center;
 import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.member.entity.Member;
@@ -20,6 +21,10 @@ public class Instructor extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY) // ManyToOne 관계 설정
+    @JoinColumn(name = "center_id") // 외래키 컬럼
+    private Center center; // Center 엔티티 참조 필드 추가
 
     @OneToOne
     @JoinColumn(name = "member_id")
