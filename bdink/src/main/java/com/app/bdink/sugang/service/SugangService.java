@@ -9,10 +9,11 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.message.controller.dto.AlimTalkText;
-import com.app.bdink.message.service.KakaoAlimtalkService;
+//import com.app.bdink.message.controller.dto.AlimTalkText;
+//import com.app.bdink.message.service.KakaoAlimtalkService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
+import com.app.bdink.sugang.controller.dto.response.SugangClassRoomListInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangInfoDto;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
@@ -33,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SugangService {
 
-    private final KakaoAlimtalkService kakaoAlimtalkService;
+//    private final KakaoAlimtalkService kakaoAlimtalkService;
 
     private final SugangRepository sugangRepository;
     private final LectureRepository lectureRepository;
@@ -48,11 +49,6 @@ public class SugangService {
         return sugangRepository.findAllByMember(member);
     }
 
-    public Sugang findByMemberAndClassRoomEntity(Member member, ClassRoomEntity classRoomEntity) {
-        return sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
-    }
-
     @Transactional(readOnly = true)
     public List<SugangInfoDto> getSugangLecture(Member member) {
         //todo: 환불일경우 status complete만 다시 필터하는 기능
@@ -65,6 +61,12 @@ public class SugangService {
     @Transactional
     public SugangInfoDto createSugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
         log.info("수강 스테이터스 : {}", sugangStatus);
+
+        //수강 중복처리
+        verifyDuplicateSugang(member, classRoomEntity);
+
+        log.info("테스트용 로그");
+
         Sugang sugang = Sugang.builder()
                 .classRoomEntity(classRoomEntity)
                 .member(member)
@@ -73,31 +75,31 @@ public class SugangService {
 
         sugang = sugangRepository.save(sugang);
 
-        // 알림톡 발송
-        Integer price = classRoomEntity.getPriceDetail().getOriginPrice();
-        String instructorName = classRoomEntity.getInstructor().getMember().getName();
-        String className = classRoomEntity.getTitle();
-
-        String sugangDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-        long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
-        String count = String.valueOf(currentSugangCount);
-
-        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
-                if (price == 0) {
-                    return;
-                }
-                sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
-                        .subscribe(
-                                response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
-                                error -> log.error("알림톡 발송 요청 실패", error)
-                        );
-            }
-        });
+//        // 알림톡 발송
+//        Integer price = classRoomEntity.getPriceDetail().getOriginPrice();
+//        String instructorName = classRoomEntity.getInstructor().getMember().getName();
+//        String className = classRoomEntity.getTitle();
+//
+//        String sugangDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
+//        String count = String.valueOf(currentSugangCount);
+//
+//        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
+//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//            @Override
+//            public void afterCommit() {
+//                log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
+//                if (price == 0) {
+//                    return;
+//                }
+//                sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
+//                        .subscribe(
+//                                response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
+//                                error -> log.error("알림톡 발송 요청 실패", error)
+//                        );
+//            }
+//        });
 
         return SugangInfoDto.of(sugang);
     }
@@ -115,15 +117,15 @@ public class SugangService {
         return "82-" + cleanedNumber.substring(1);
     }
 
-    private Mono<RspTemplate<String>> sendAlimtalkToInstructor(
-            String instructorName, String className, String sugangDate, String count, String phoneNumber
-    ) {
-        AlimTalkText alimTalkText = new AlimTalkText(instructorName, className, sugangDate, count);
-
-        return kakaoAlimtalkService.sendAlimTalk(phoneNumber, alimTalkText)
-                .doOnSuccess(response -> log.info(">>> 알림톡 발송 WebClient 요청 성공: {}", response))
-                .doOnError(error -> log.error(">>> 알림톡 발송 WebClient 요청 실패: {}", error.getMessage()));
-    }
+//    private Mono<RspTemplate<String>> sendAlimtalkToInstructor(
+//            String instructorName, String className, String sugangDate, String count, String phoneNumber
+//    ) {
+//        AlimTalkText alimTalkText = new AlimTalkText(instructorName, className, sugangDate, count);
+//
+//        return kakaoAlimtalkService.sendAlimTalk(phoneNumber, alimTalkText)
+//                .doOnSuccess(response -> log.info(">>> 알림톡 발송 WebClient 요청 성공: {}", response))
+//                .doOnError(error -> log.error(">>> 알림톡 발송 WebClient 요청 실패: {}", error.getMessage()));
+//    }
 
     @Transactional
     public List<SugangClassRoomInfo> getSugangClassRoomInfo(Member member) {
@@ -144,6 +146,15 @@ public class SugangService {
                 })
                 .toList();
         return sugangClassRoomInfos;
+    }
+
+    @Transactional
+    public List<SugangClassRoomListInfo> getSugangClassRoomListInfo(Member member) {
+        updateAllSugangProgress(member);
+        List<Sugang> sugangs = sugangRepository.findByMemberAndSugangStatus(member, SugangStatus.PAYMENT_COMPLETED);
+        return sugangs.stream()
+                .map(SugangClassRoomListInfo::of)
+                .toList();
     }
 
     @Transactional
@@ -177,5 +188,15 @@ public class SugangService {
         log.info("progress2 : {}", sugang.getProgressPercent());
         sugangRepository.save(sugang);
         log.info("progress3 : {}", sugang.getProgressPercent());
+    }
+
+    // 사용자가 이미 수강을 했는지 검사하는 메서드
+    public void verifyDuplicateSugang(Member member, ClassRoomEntity classRoomEntity) {
+        // member와 classRoomEntity로 이미 수강 정보가 존재하는지 확인합니다.
+        sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
+                .ifPresent(sugang -> {
+                    // 수강 정보가 존재하면 CustomException을 던져 중복 처리합니다.
+                    throw new CustomException(Error.EXIST_SUGANG, Error.EXIST_SUGANG.getMessage());
+                });
     }
 }

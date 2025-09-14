@@ -18,6 +18,9 @@ public class SwaggerConfig {
     @Value("${prod-server-url}")
     private String prodServerUrl;
 
+    @Value("${dev-server-url}")
+    private String devServerUrl;
+
     @Bean
     public OpenAPI openAPI() {
         SecurityScheme apiKey = new SecurityScheme()
@@ -43,9 +46,14 @@ public class SwaggerConfig {
     }
 
     private List<Server> servers() {
-        return List.of(new Server()
-            .url(prodServerUrl)
-            .description("Configured Server")
-        );
+        Server prodServer = new Server()
+                .url(prodServerUrl)
+                .description("Configured Server");
+
+        Server devServer = new Server()
+                .url(devServerUrl)
+                .description("Development Server");
+
+        return List.of(prodServer, devServer);
     }
 }
