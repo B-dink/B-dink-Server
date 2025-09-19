@@ -278,7 +278,6 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         }
     }
 
-//    @NotNull
     private InAppPurchase getInAppPurchase(PurchaseRequest request, AppleReceiptResponse appleReceiptResponse) {
         log.debug("Extracting in-app purchase data from receipt - requestedProductId: {}", request.productId());
 
@@ -293,7 +292,7 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         log.debug("In-app purchase data extracted - receiptProductId: {}, transactionId: {}",
                 inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
 
-        if (!request.productId().equals(inAppPurchase.getProductId())) {
+        if (!request.productId().equals(inAppPurchase.getProductId()) && appleReceiptResponse.getStatus() != 21007) {
             log.error("Product mismatch - requested: {}, receipt: {}",
                     request.productId(), inAppPurchase.getProductId());
             throw new PaymentFailedException(Error.PRODUCT_MISMATCH,
