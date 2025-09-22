@@ -5,6 +5,7 @@ import com.app.bdink.center.controller.dto.request.CenterQrDto;
 import com.app.bdink.center.controller.dto.response.CenterAllListDto;
 import com.app.bdink.center.service.CenterService;
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -26,12 +28,20 @@ public class CenterController {
     private final CenterService centerService;
     private final MemberUtilService memberUtilService;
     private final MemberService memberService;
+    private final S3Service s3Service;
 
     @PostMapping
     @Operation(method = "GET", description = "센터를 생성합니다.")
-    public RspTemplate<?> createCenter(@RequestBody CenterInfoDto centerInfoDto) {
+    public RspTemplate<?> createCenter(@RequestBody CenterInfoDto centerInfoDto,
+                                       @RequestPart(value = "centerImage", required = false) MultipartFile centerImage) {
 
-        String centerId = centerService.saveCenter(centerInfoDto);
+        String profileImageUrl = null;
+
+        if (centerImage !=null && !centerImage.isEmpty()){
+            profileImageUrl = s3Service.uploadImageOrMedia("image/", centerImage);
+        }
+
+        String centerId = centerService.saveCenter(centerInfoDto, profileImageUrl);
         return RspTemplate.success(Success.CREATE_CENTER_SUCCESS, CreateIdDto.from(centerId));
     }
 

@@ -35,13 +35,15 @@ public class CenterService {
     }
 
     @Transactional
-    public String saveCenter(CenterInfoDto dto) {
+    public String saveCenter(CenterInfoDto dto, String profileImageUrl) {
         Long id = centerRepository.save(
                 Center.builder()
                         .name(dto.centerName())
                         .address(dto.centerAddress())
                         .qrToken(dto.centerQrToken())
-                        .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
+//                        .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
+                        // 센터 이미지 생성
+                        .profileImage(profileImageUrl)
                         .build()
         ).getId();
         return id.toString();
@@ -53,7 +55,7 @@ public class CenterService {
         center.updateName(dto.centerName());
         center.updateAddress(dto.centerAddress());
         center.updateQrToken(dto.centerQrToken());
-        center.updateQrTokenExpiredAt(dto.centerQrTokenExpiredAt());
+//        center.updateQrTokenExpiredAt(dto.centerQrTokenExpiredAt());
         center = centerRepository.save(center);
         return CenterInfoDto.of(center);
     }

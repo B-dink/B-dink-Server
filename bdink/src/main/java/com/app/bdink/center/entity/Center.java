@@ -13,7 +13,6 @@ public class Center extends BaseTimeEntity {
      * Center는 instructor의 상위 개념.
      * Center와 instructor는 1 : N의 관계
      */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -28,19 +27,22 @@ public class Center extends BaseTimeEntity {
     @Column(name = "qrToken")
     private String qrToken;
 
-    @Column(name = "qrTokenExpiredAt")
-    private Long qrTokenExpiredAt;
+//    @Column(name = "qrTokenExpiredAt")
+//    private Long qrTokenExpiredAt;
+
+    @Column(name = "profileImage")
+    private String profileImage;
 
     @Enumerated(EnumType.STRING) // Enum 값을 문자열로 저장 (예: "CONTRACTING", "TERMINATED")
     private CenterStatus status;
 
-
     @Builder
-    public Center(String name, String address, String qrToken, Long qrTokenExpiredAt) {
+    public Center(String name, String address, String qrToken, Long qrTokenExpiredAt, String profileImage) {
         this.name = name;
         this.address = address;
         this.qrToken = qrToken;
-        this.qrTokenExpiredAt = qrTokenExpiredAt;
+//        this.qrTokenExpiredAt = qrTokenExpiredAt;
+        this.profileImage = profileImage;
         this.status = CenterStatus.IN_PROGRESS;
     }
 
@@ -57,9 +59,9 @@ public class Center extends BaseTimeEntity {
         this.qrToken = qrToken;
     }
 
-    public void updateQrTokenExpiredAt(Long qrTokenExpiredAt) {
-        this.qrTokenExpiredAt = qrTokenExpiredAt;
-    }
+//    public void updateQrTokenExpiredAt(Long qrTokenExpiredAt) {
+//        this.qrTokenExpiredAt = qrTokenExpiredAt;
+//    }
 
     public void updateStatus(CenterStatus status) {
         this.status = status;
