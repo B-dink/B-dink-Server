@@ -24,8 +24,8 @@ public class Center extends BaseTimeEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "qrToken")
-    private String qrToken;
+//    @Column(name = "qrToken")
+//    private String qrToken;
 
 //    @Column(name = "qrTokenExpiredAt")
 //    private Long qrTokenExpiredAt;
@@ -37,10 +37,10 @@ public class Center extends BaseTimeEntity {
     private CenterStatus status;
 
     @Builder
-    public Center(String name, String address, String qrToken, String profileImage) {
+    public Center(String name, String address, String profileImage) {
         this.name = name;
         this.address = address;
-        this.qrToken = qrToken;
+//        this.qrToken = qrToken;
 //        this.qrTokenExpiredAt = qrTokenExpiredAt;
         this.profileImage = profileImage;
         this.status = CenterStatus.IN_PROGRESS;
@@ -55,9 +55,9 @@ public class Center extends BaseTimeEntity {
         this.address = address;
     }
 
-    public void updateQrToken(String qrToken) {
-        this.qrToken = qrToken;
-    }
+//    public void updateQrToken(String qrToken) {
+//        this.qrToken = qrToken;
+//    }
 
 //    public void updateQrTokenExpiredAt(Long qrTokenExpiredAt) {
 //        this.qrTokenExpiredAt = qrTokenExpiredAt;

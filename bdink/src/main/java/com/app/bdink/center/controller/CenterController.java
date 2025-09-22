@@ -26,8 +26,6 @@ import java.util.List;
 @Tag(name = "센터 API", description = "센터와 관련된 API들 입니다.")
 public class CenterController {
     private final CenterService centerService;
-    private final MemberUtilService memberUtilService;
-    private final MemberService memberService;
     private final S3Service s3Service;
 
     @PostMapping
@@ -71,13 +69,13 @@ public class CenterController {
         return RspTemplate.success(Success.GET_ALLCENTER_SUCCESS, centerAllListDtos);
     }
 
-    @PostMapping("/verify")
-    @Operation(method = "POST", description = "QR코드 검증 api입니다.")
-    public RspTemplate<?> checkCenter(Principal principal, @RequestBody CenterQrDto centerQrDto){
-        Long memberId = memberUtilService.getMemberId(principal);
-        Member member = memberService.findById(memberId);
-        String classRoomId = centerService.verifyQrCode(member, centerQrDto);
-        return RspTemplate.success(Success.CHECK_QR_SUCCESS, CreateIdDto.from(classRoomId));
-    }
+//    @PostMapping("/verify")
+//    @Operation(method = "POST", description = "QR코드 검증 api입니다.")
+//    public RspTemplate<?> checkCenter(Principal principal, @RequestBody CenterQrDto centerQrDto){
+//        Long memberId = memberUtilService.getMemberId(principal);
+//        Member member = memberService.findById(memberId);
+//        String classRoomId = centerService.verifyQrCode(member, centerQrDto);
+//        return RspTemplate.success(Success.CHECK_QR_SUCCESS, CreateIdDto.from(classRoomId));
+//    }
 
 }

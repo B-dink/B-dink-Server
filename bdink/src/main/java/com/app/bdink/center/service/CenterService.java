@@ -40,7 +40,7 @@ public class CenterService {
                 Center.builder()
                         .name(dto.centerName())
                         .address(dto.centerAddress())
-                        .qrToken(dto.centerQrToken())
+//                        .qrToken(dto.centerQrToken())
 //                        .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
                         // 센터 이미지 생성
                         .profileImage(profileImageUrl)
@@ -54,7 +54,7 @@ public class CenterService {
         Center center = findById(id);
         center.updateName(dto.centerName());
         center.updateAddress(dto.centerAddress());
-        center.updateQrToken(dto.centerQrToken());
+//        center.updateQrToken(dto.centerQrToken());
 //        center.updateQrTokenExpiredAt(dto.centerQrTokenExpiredAt());
         center = centerRepository.save(center);
         return CenterInfoDto.of(center);
@@ -82,13 +82,13 @@ public class CenterService {
                 .toList();
     }
 
-    public String verifyQrCode(Member member, CenterQrDto centerQrDto){
-        Center center = findById(centerQrDto.centerId());
-        if (center.getQrToken().equals(centerQrDto.qrToken())) {
-            ClassRoomEntity classRoomEntity =  classRoomService.findById(centerQrDto.classroomId());
-            sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
-            return classRoomEntity.getId().toString();
-        }
-        throw new CustomException(Error.INVALID_QR_TOKEN_EXCEPTION, Error.INVALID_QR_TOKEN_EXCEPTION.getMessage());
-    }
+//    public String verifyQrCode(Member member, CenterQrDto centerQrDto){
+//        Center center = findById(centerQrDto.centerId());
+//        if (center.getQrToken().equals(centerQrDto.qrToken())) {
+//            ClassRoomEntity classRoomEntity =  classRoomService.findById(centerQrDto.classroomId());
+//            sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
+//            return classRoomEntity.getId().toString();
+//        }
+//        throw new CustomException(Error.INVALID_QR_TOKEN_EXCEPTION, Error.INVALID_QR_TOKEN_EXCEPTION.getMessage());
+//    }
 }
