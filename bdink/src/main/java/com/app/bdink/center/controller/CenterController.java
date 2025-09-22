@@ -1,16 +1,12 @@
 package com.app.bdink.center.controller;
 
 import com.app.bdink.center.controller.dto.request.CenterInfoDto;
-import com.app.bdink.center.controller.dto.request.CenterQrDto;
 import com.app.bdink.center.controller.dto.response.CenterAllListDto;
 import com.app.bdink.center.service.CenterService;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.service.MemberService;
-import com.app.bdink.member.util.MemberUtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

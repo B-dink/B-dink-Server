@@ -2,22 +2,19 @@ package com.app.bdink.center.service;
 
 import com.app.bdink.center.controller.dto.CenterStatus;
 import com.app.bdink.center.controller.dto.request.CenterInfoDto;
-import com.app.bdink.center.controller.dto.request.CenterQrDto;
 import com.app.bdink.center.controller.dto.response.CenterAllListDto;
 import com.app.bdink.center.controller.dto.response.CenterResponseDto;
 import com.app.bdink.center.entity.Center;
 import com.app.bdink.center.repository.CenterRepository;
-import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
-import com.app.bdink.member.entity.Member;
-import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.service.SugangService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -25,8 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CenterService {
 
-    private final SugangService sugangService;
-    private final ClassRoomService classRoomService;
     private final CenterRepository centerRepository;
 
     public Center findById(Long id) {
@@ -40,8 +35,6 @@ public class CenterService {
                 Center.builder()
                         .name(dto.centerName())
                         .address(dto.centerAddress())
-//                        .qrToken(dto.centerQrToken())
-//                        .qrTokenExpiredAt(dto.centerQrTokenExpiredAt())
                         // 센터 이미지 생성
                         .profileImage(profileImageUrl)
                         .build()
@@ -54,8 +47,6 @@ public class CenterService {
         Center center = findById(id);
         center.updateName(dto.centerName());
         center.updateAddress(dto.centerAddress());
-//        center.updateQrToken(dto.centerQrToken());
-//        center.updateQrTokenExpiredAt(dto.centerQrTokenExpiredAt());
         center = centerRepository.save(center);
         return CenterInfoDto.of(center);
     }
