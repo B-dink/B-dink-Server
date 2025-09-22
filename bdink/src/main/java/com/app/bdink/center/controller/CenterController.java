@@ -10,6 +10,7 @@ import com.app.bdink.global.template.RspTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +25,9 @@ public class CenterController {
     private final CenterService centerService;
     private final S3Service s3Service;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "GET", description = "센터를 생성합니다.")
-    public RspTemplate<?> createCenter(@RequestBody CenterInfoDto centerInfoDto,
+    public RspTemplate<?> createCenter(@RequestPart CenterInfoDto centerInfoDto,
                                        @RequestPart(value = "centerImage", required = false) MultipartFile centerImage) {
 
         String profileImageUrl = null;
