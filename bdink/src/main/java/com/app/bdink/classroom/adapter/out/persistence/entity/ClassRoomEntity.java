@@ -57,6 +57,9 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     private String subtitles;
 
+    @Column(name = "qrToken", nullable = true)
+    private String qrToken;
+
     //PROMOTION FLAG
     private int promotionOf;
 

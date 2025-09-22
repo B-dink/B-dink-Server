@@ -5,6 +5,7 @@ import com.app.bdink.bookmark.repository.BookmarkRepository;
 import com.app.bdink.chapter.domain.ChapterSummary;
 import com.app.bdink.chapter.repository.ChapterRepository;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomQrDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.ClassRoomRepositoryAdapter;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomDetailImage;
@@ -37,6 +38,7 @@ import com.app.bdink.review.service.ReviewService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.entity.Sugang;
 import com.app.bdink.sugang.repository.SugangRepository;
+import com.app.bdink.sugang.service.SugangService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -73,6 +75,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final BookmarkRepository bookmarkRepository;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
+    private final SugangService sugangService;
 
     public ClassRoomEntity findById(Long id) {
         return classRoomRepository.findById(id).orElseThrow(
@@ -355,6 +358,15 @@ public class ClassRoomService implements ClassRoomUseCase {
         Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByClassRoomAndMember(classRoom, member);
         Long bookmarkId = bookmarkOpt.map(Bookmark::getId).orElse(null);
         return bookmarkId;
+    }
+
+    public String verifyClassRoomQrToken(Member member ,ClassRoomQrDto classRoomQrDto) {
+        ClassRoomEntity classRoomEntity = classRoomRepository.findByQrToken(classRoomQrDto.classRoomQrToken())
+                .orElseThrow(() -> new CustomException(Error.INVALID_QR_TOKEN_EXCEPTION, Error.INVALID_QR_TOKEN_EXCEPTION.getMessage()));
+
+        sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
+
+        return classRoomEntity.getId().toString();
     }
 
     public String getTotalTimeFormatted(Long classRoomId) {
