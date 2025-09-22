@@ -37,7 +37,7 @@ public class Center extends BaseTimeEntity {
     private CenterStatus status;
 
     @Builder
-    public Center(String name, String address, String qrToken, Long qrTokenExpiredAt, String profileImage) {
+    public Center(String name, String address, String qrToken, String profileImage) {
         this.name = name;
         this.address = address;
         this.qrToken = qrToken;
