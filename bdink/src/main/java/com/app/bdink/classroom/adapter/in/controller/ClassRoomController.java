@@ -2,6 +2,7 @@ package com.app.bdink.classroom.adapter.in.controller;
 
 import com.app.bdink.bookmark.service.BookmarkService;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomQrDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
 import com.app.bdink.classroom.domain.Career;
@@ -178,5 +179,14 @@ public class ClassRoomController {
                 .collect(Collectors.toList());
 
         return RspTemplate.success(Success.GET_CLASSROOM_PROGRESS_SUCCESS, progressWithStatus);
+    }
+
+    @PostMapping("/verify")
+    @Operation(method = "POST", description = "QR코드를 통해 클래스룸 수강 신청을 합니다.")
+    public RspTemplate<?> verifyQrCode(Principal principal, @RequestBody ClassRoomQrDto classRoomQrDto) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Member member = memberService.findById(memberId);
+        String classRoomId = classRoomService.verifyClassRoomQrToken(member, classRoomQrDto);
+        return RspTemplate.success(Success.CHECK_QR_SUCCESS, CreateIdDto.from(classRoomId));
     }
 }
