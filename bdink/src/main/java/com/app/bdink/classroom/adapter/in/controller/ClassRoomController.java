@@ -2,6 +2,7 @@ package com.app.bdink.classroom.adapter.in.controller;
 
 import com.app.bdink.bookmark.service.BookmarkService;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomDto;
+import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomImagesDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.request.ClassRoomQrDto;
 import com.app.bdink.classroom.adapter.in.controller.dto.response.*;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
@@ -53,6 +54,8 @@ public class ClassRoomController {
     @Operation(method = "POST", description = "클래스룸을 생성합니다.")
     RspTemplate<?> createClassRoom(Principal memberId,
                                    @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+                                   @RequestPart(value = "promotionThumbnail") MultipartFile promotionThumbnail,
+                                   @RequestPart(value = "detailThumbnail") MultipartFile detailThumbnail,
                                    @RequestPart(value = "detailPageImage") List<MultipartFile> detailPageImages,
                                    @RequestPart(value = "intro-video") MultipartFile video,
                                    @RequestPart(value = "classRoomDto") ClassRoomDto classRoomDto) {
@@ -66,6 +69,8 @@ public class ClassRoomController {
         CreateClassRoomCommand command = CreateClassRoomCommand.of(
                 instructorUtilService.getInstructor(memberId),
                 s3Service.uploadImageOrMedia("image/", thumbnail),
+                s3Service.uploadImageOrMedia("image/", promotionThumbnail),
+                s3Service.uploadImageOrMedia("image/", detailThumbnail),
                 s3Service.uploadImageOrMedia("media/", video),
                 detailPageImageUrls,
                 classRoomDto
@@ -73,6 +78,8 @@ public class ClassRoomController {
 
         // usecase의 메소드 호출.
         String id = classRoomUseCase.createClassRoom(command);
+
+        //todo : 추가적으로 promotion, lecture, detail 썸네일 저장에 대한 로직 구현해야함 그런데 이거 클래스룸을 저장하는 로직이 왜 안보이지
 
         //흠.. 밑에 애도 이런식으로 바꿔야하는데.
         mediaService.createMedia(Long.parseLong(id), command.mediaKey(), null, command.thumbnailKey());

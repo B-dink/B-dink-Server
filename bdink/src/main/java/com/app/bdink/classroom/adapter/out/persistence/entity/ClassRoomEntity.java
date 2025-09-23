@@ -37,6 +37,17 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     private String thumbnail;
 
+    /**
+     * 일단 확인된 필요한건 4가지
+     * 프로모션 썸네일
+     * 강의 썸네일 -> 이걸 기존 thumbnail이라고 치자
+     * 디테일 썸네일
+     */
+
+    private String promotionThumbnail;
+
+    private String detailThumbnail;
+
     private String introLink;
 
     @Enumerated(EnumType.STRING)

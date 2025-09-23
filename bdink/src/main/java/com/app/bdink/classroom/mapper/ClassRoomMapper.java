@@ -14,6 +14,8 @@ public class ClassRoomMapper {
                 .title(command.classRoomDto().title())
                 .introduction(command.classRoomDto().introduction())
                 .thumbnail(command.thumbnailKey())
+                .thumbnail(command.promotionThumbnailKey())
+                .thumbnail(command.detailThumbnailKey())
                 .introLink(command.mediaKey())
                 .level(command.classRoomDto().level())
                 .build();
