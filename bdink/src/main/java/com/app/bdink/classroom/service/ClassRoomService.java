@@ -174,6 +174,7 @@ public class ClassRoomService implements ClassRoomUseCase {
         /**
          * 아래 코드는 기존 로직 > CAREER가 PROMOTION인 경우 다른 CAREER를 가질 수 없는 문제 발생
          * List<ClassRoomEntity> promotions = classRoomRepository.findAllByCareer(Career.PROMOTION);
+         * 임시로 23일경우 promotion으로 대체
          */
 
         List<ClassRoomEntity> promotions = classRoomRepository.findAllByPromotionOf(23);
@@ -288,7 +289,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 expiredDate,
                 getTotalTimeFormatted(classRoomEntity.getId()),
                 classRoomEntity.getSubtitles(),
-                classRoomEntity.getThumbnail(),
+                classRoomEntity.getDetailThumbnail(),
                 payment,
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
