@@ -11,7 +11,7 @@ public record PromotionDto(
     public static PromotionDto from(ClassRoomEntity classRoom){
         return new PromotionDto(
                 classRoom.getId(),
-                classRoom.getThumbnail(),
+                classRoom.getPromotionThumbnail(),
                 classRoom.getIntroLink()
         );
     }
