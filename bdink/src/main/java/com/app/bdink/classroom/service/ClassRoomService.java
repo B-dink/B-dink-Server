@@ -368,8 +368,18 @@ public class ClassRoomService implements ClassRoomUseCase {
         ClassRoomEntity classRoomEntity = classRoomRepository.findByQrToken(classRoomQrDto.classRoomQrToken())
                 .orElseThrow(() -> new CustomException(Error.INVALID_QR_TOKEN_EXCEPTION, Error.INVALID_QR_TOKEN_EXCEPTION.getMessage()));
 
-        sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
+        Optional<Sugang> sugangOpt = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity);
 
+        Sugang sugang = null;
+
+        if (sugangOpt.isPresent()) {
+            sugang = sugangOpt.get();
+            if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
+                log.warn("해당 클래스에 대해 결제 완료된 유저입니다.");
+                return classRoomEntity.getId().toString();
+            }
+        }
+        sugangService.createSugang(classRoomEntity, member, SugangStatus.PAYMENT_COMPLETED);
         return classRoomEntity.getId().toString();
     }
 
