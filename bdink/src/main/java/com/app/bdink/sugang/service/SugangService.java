@@ -60,12 +60,9 @@ public class SugangService {
 
     @Transactional
     public SugangInfoDto createSugang(ClassRoomEntity classRoomEntity, Member member, SugangStatus sugangStatus) {
-        log.info("수강 스테이터스 : {}", sugangStatus);
 
         //수강 중복처리
         verifyDuplicateSugang(member, classRoomEntity);
-
-        log.info("테스트용 로그");
 
         Sugang sugang = Sugang.builder()
                 .classRoomEntity(classRoomEntity)

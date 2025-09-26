@@ -6,8 +6,8 @@ import com.app.bdink.price.controller.dto.PriceDto;
 
 public record ClassRoomDto(
         String title,
-
         String introduction,
+        String otLink,
         String subtitles,
         PriceDto priceDto,
         Level level,

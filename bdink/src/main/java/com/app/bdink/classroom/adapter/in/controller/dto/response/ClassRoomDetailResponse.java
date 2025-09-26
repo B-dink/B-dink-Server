@@ -21,6 +21,7 @@ public record ClassRoomDetailResponse(
         String subtitles,
 
         String thumbnail,
+        String otLink,
 
         boolean payment,
 

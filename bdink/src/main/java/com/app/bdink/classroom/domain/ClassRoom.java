@@ -20,6 +20,12 @@ public class ClassRoom {
 
     private String thumbnail;
 
+    private String promotionThumbnail;
+
+    private String detailThumbnail;
+
+    private String otLink;
+
     private String introLink;
 
     @Enumerated(EnumType.STRING)
