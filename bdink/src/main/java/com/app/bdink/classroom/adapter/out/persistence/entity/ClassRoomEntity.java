@@ -80,11 +80,14 @@ public class ClassRoomEntity extends BaseTimeEntity {
     @Builder
     public ClassRoomEntity(final String title, final String introduction,
                            final String thumbnail, final String introLink,
+                           final String promotionThumbnail, final String detailThumbnail,
                            final String subtitles,
                            final Instructor instructor, final PriceDetail priceDetail, final Level level, final Career career) {
 
         this.title = title;
         this.thumbnail = thumbnail;
+        this.promotionThumbnail = promotionThumbnail;
+        this.detailThumbnail = detailThumbnail;
         this.instructor = instructor;
         this.introduction = introduction;
         this.priceDetail = priceDetail;
