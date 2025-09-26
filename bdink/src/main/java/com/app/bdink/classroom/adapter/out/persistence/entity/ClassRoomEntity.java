@@ -48,6 +48,8 @@ public class ClassRoomEntity extends BaseTimeEntity {
 
     private String detailThumbnail;
 
+    private String otLink;
+
     private String introLink;
 
     @Enumerated(EnumType.STRING)
@@ -81,6 +83,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
     public ClassRoomEntity(final String title, final String introduction,
                            final String thumbnail, final String introLink,
                            final String promotionThumbnail, final String detailThumbnail,
+                           final String otLink,
                            final String subtitles,
                            final Instructor instructor, final PriceDetail priceDetail, final Level level, final Career career) {
 
@@ -88,6 +91,7 @@ public class ClassRoomEntity extends BaseTimeEntity {
         this.thumbnail = thumbnail;
         this.promotionThumbnail = promotionThumbnail;
         this.detailThumbnail = detailThumbnail;
+        this.otLink = otLink;
         this.instructor = instructor;
         this.introduction = introduction;
         this.priceDetail = priceDetail;

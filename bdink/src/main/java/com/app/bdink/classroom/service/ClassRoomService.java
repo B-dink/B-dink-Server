@@ -251,6 +251,8 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         Sugang sugang = null;
 
+
+        //todo: 이쪽 에러케이스로 분류하지말고 그냥 내부에서 안되게 처리해야한다.
         if (sugangOpt.isPresent()) {
             sugang = sugangOpt.get();
             if (sugang.getSugangStatus() == SugangStatus.PAYMENT_COMPLETED) {
@@ -290,6 +292,7 @@ public class ClassRoomService implements ClassRoomUseCase {
                 getTotalTimeFormatted(classRoomEntity.getId()),
                 classRoomEntity.getSubtitles(),
                 classRoomEntity.getDetailThumbnail(),
+                classRoomEntity.getOtLink(),
                 payment,
                 classRoomEntity.getPriceDetail(),
                 classRoomEntity.getLevel(),
