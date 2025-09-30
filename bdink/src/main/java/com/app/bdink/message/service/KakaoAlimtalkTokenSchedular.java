@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.service;
 
 import com.app.bdink.message.controller.dto.TokenResponse;
@@ -35,4 +34,3 @@ public class KakaoAlimtalkTokenSchedular {
                 );
     }
 }
-*/

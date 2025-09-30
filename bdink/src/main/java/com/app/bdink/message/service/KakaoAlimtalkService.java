@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.service;
 
 import com.app.bdink.global.template.RspTemplate;
@@ -11,4 +10,3 @@ public interface KakaoAlimtalkService {
     Mono<RspTemplate<TokenResponse>> getAlimTalkToken();
     Mono<RspTemplate<String>> sendAlimTalk(String phoneNumber, AlimTalkText alimTalkText);
 }
-*/

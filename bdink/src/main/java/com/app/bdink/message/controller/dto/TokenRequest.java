@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,4 +9,3 @@ public record TokenRequest(
         @JsonProperty("secretKey")
         String secretKey
 ) {}
-*/
