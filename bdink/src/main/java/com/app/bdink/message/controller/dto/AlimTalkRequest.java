@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.controller.dto;
 
 public record AlimTalkRequest(
@@ -11,4 +10,3 @@ public record AlimTalkRequest(
         String reText,
         String text          // 메시지 내용 (필수)
 ) {}
-*/

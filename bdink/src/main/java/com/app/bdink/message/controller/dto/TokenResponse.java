@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,4 +12,3 @@ public record TokenResponse(
         @JsonProperty("data")
         TokenData data
 ) {}
-*/

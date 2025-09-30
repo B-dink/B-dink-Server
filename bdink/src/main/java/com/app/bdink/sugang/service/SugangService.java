@@ -9,8 +9,8 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
-//import com.app.bdink.message.controller.dto.AlimTalkText;
-//import com.app.bdink.message.service.KakaoAlimtalkService;
+import com.app.bdink.message.controller.dto.AlimTalkText;
+import com.app.bdink.message.service.KakaoAlimtalkService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomListInfo;
@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SugangService {
 
-//    private final KakaoAlimtalkService kakaoAlimtalkService;
+    private final KakaoAlimtalkService kakaoAlimtalkService;
 
     private final SugangRepository sugangRepository;
     private final LectureRepository lectureRepository;
@@ -75,31 +75,31 @@ public class SugangService {
 
         sugang = sugangRepository.save(sugang);
 
-//        // 알림톡 발송
-//        Integer price = classRoomEntity.getPriceDetail().getOriginPrice();
-//        String instructorName = classRoomEntity.getInstructor().getMember().getName();
-//        String className = classRoomEntity.getTitle();
-//
-//        String sugangDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-//
-//        long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
-//        String count = String.valueOf(currentSugangCount);
-//
-//        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
-//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-//            @Override
-//            public void afterCommit() {
-//                log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
-//                if (price == 0) {
-//                    return;
-//                }
-//                sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
-//                        .subscribe(
-//                                response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
-//                                error -> log.error("알림톡 발송 요청 실패", error)
-//                        );
-//            }
-//        });
+        // 알림톡 발송
+        Integer price = classRoomEntity.getPriceDetail().getOriginPrice();
+        String instructorName = classRoomEntity.getInstructor().getMember().getName();
+        String className = classRoomEntity.getTitle();
+
+        String sugangDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        long currentSugangCount = sugangRepository.countByClassRoomEntity(classRoomEntity);
+        String count = String.valueOf(currentSugangCount);
+
+        String phoneNumber = formatPhoneNumber(classRoomEntity.getInstructor().getMember().getPhoneNumber()); // 강사 번호로 수정
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                log.info("트랜잭션 커밋 완료. 강사에게 알림톡 발송을 시작합니다.");
+                if (price == 0) {
+                    return;
+                }
+                sendAlimtalkToInstructor(instructorName, className, sugangDate, count, phoneNumber)
+                        .subscribe(
+                                response -> log.info("알림톡 발송 요청 성공: {}", response.getMessage()),
+                                error -> log.error("알림톡 발송 요청 실패", error)
+                        );
+            }
+        });
 
         return SugangInfoDto.of(sugang);
     }
@@ -117,15 +117,15 @@ public class SugangService {
         return "82-" + cleanedNumber.substring(1);
     }
 
-//    private Mono<RspTemplate<String>> sendAlimtalkToInstructor(
-//            String instructorName, String className, String sugangDate, String count, String phoneNumber
-//    ) {
-//        AlimTalkText alimTalkText = new AlimTalkText(instructorName, className, sugangDate, count);
-//
-//        return kakaoAlimtalkService.sendAlimTalk(phoneNumber, alimTalkText)
-//                .doOnSuccess(response -> log.info(">>> 알림톡 발송 WebClient 요청 성공: {}", response))
-//                .doOnError(error -> log.error(">>> 알림톡 발송 WebClient 요청 실패: {}", error.getMessage()));
-//    }
+    private Mono<RspTemplate<String>> sendAlimtalkToInstructor(
+            String instructorName, String className, String sugangDate, String count, String phoneNumber
+    ) {
+        AlimTalkText alimTalkText = new AlimTalkText(instructorName, className, sugangDate, count);
+
+        return kakaoAlimtalkService.sendAlimTalk(phoneNumber, alimTalkText)
+                .doOnSuccess(response -> log.info(">>> 알림톡 발송 WebClient 요청 성공: {}", response))
+                .doOnError(error -> log.error(">>> 알림톡 발송 WebClient 요청 실패: {}", error.getMessage()));
+    }
 
     @Transactional
     public List<SugangClassRoomInfo> getSugangClassRoomInfo(Member member) {
