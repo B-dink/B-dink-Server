@@ -1,4 +1,3 @@
-/*
 package com.app.bdink.message.repository;
 
 import com.app.bdink.message.entity.AlimtalkToken;
@@ -12,4 +11,3 @@ public interface AlimtalkTokenRepository extends JpaRepository<AlimtalkToken, Lo
 
     Optional<AlimtalkToken> findTopByOrderByIdDesc();
 }
-*/
