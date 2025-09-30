@@ -1,7 +1,6 @@
 package com.app.bdink.payment.apple.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.classroom.service.ClassRoomService;
 import com.app.bdink.global.exception.model.PaymentFailedException;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
@@ -215,7 +214,6 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         try {
-            // 1. 프로덕션 시도
             log.debug("Attempting Apple production verification");
             ResponseEntity<AppleReceiptResponse> response = restTemplate.exchange(
                     PRODUCTION_URL,
@@ -233,9 +231,10 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
 
             log.debug("Apple production response received - status: {}", receiptResponse.getStatus());
 
-            // 2. 21007인 경우 샌드박스로 재시도
             if (receiptResponse.getStatus() == 21007) {
                 log.info("Production returned 21007, retrying with sandbox");
+
+                receiptResponse.setSandbox(true);
 
                 response = restTemplate.exchange(
                         SANDBOX_URL,
@@ -292,12 +291,17 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         log.debug("In-app purchase data extracted - receiptProductId: {}, transactionId: {}",
                 inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
 
-        if (!request.productId().equals(inAppPurchase.getProductId()) && appleReceiptResponse.getStatus() != 21007) {
-            log.error("Product mismatch - requested: {}, receipt: {}",
-                    request.productId(), inAppPurchase.getProductId());
-            throw new PaymentFailedException(Error.PRODUCT_MISMATCH,
-                    String.format("Product mismatch - requested: %s, receipt: %s",
-                            request.productId(), inAppPurchase.getProductId()));
+        if (!request.productId().equals(inAppPurchase.getProductId())) {
+            if (appleReceiptResponse.isSandbox()) {
+                log.warn("Product mismatch in sandbox environment (bypassing) - requested: {}, receipt: {}",
+                        request.productId(), inAppPurchase.getProductId());
+            } else {
+                log.error("Product mismatch - requested: {}, receipt: {}",
+                        request.productId(), inAppPurchase.getProductId());
+                throw new PaymentFailedException(Error.PRODUCT_MISMATCH,
+                        String.format("Product mismatch - requested: %s, receipt: %s",
+                                request.productId(), inAppPurchase.getProductId()));
+            }
         }
 
         log.debug("Product verification successful - productId: {}", request.productId());
