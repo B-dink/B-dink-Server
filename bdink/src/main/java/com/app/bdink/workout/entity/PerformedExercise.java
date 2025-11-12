@@ -27,5 +27,7 @@ public class PerformedExercise {
 
     @Builder
     public PerformedExercise(WorkOutSession workOutSession, Exercise exercise) {
+        this.workOutSession = workOutSession;
+        this.exercise = exercise;
     }
 }
