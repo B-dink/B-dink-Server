@@ -22,6 +22,7 @@ public enum Success {
     CREATE_CHAPTER_SUCCESS(HttpStatus.CREATED, "챕터 생성 성공"),
     CREATE_INSTRUCTOR_SUCCESS(HttpStatus.CREATED, "강사 생성 성공"),
     CREATE_LECTURE_SUCCESS(HttpStatus.CREATED, "강의 생성 성공"),
+    CREATE_EXERCISE_SUCCESS(HttpStatus.CREATED, "신규 운동종목 생성 성공"),
     CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
@@ -67,6 +68,7 @@ public enum Success {
     GET_LECTURE_SUCCESS(HttpStatus.OK, "강의 조회 성공"),
     GET_CENTER_SUCCESS(HttpStatus.OK, "센터 조회 성공"),
     GET_ALLCENTER_SUCCESS(HttpStatus.OK, "계약중인 모든 센터 조회 성공"),
+    GET_EXERCISEPART_SUCCESS(HttpStatus.OK, "파트별 운동종목 조회 성공"),
     CHECK_QR_SUCCESS(HttpStatus.OK, "QR코드 인증 성공"),
 
 
