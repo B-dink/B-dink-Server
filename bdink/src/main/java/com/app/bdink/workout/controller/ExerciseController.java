@@ -39,11 +39,7 @@ public class ExerciseController {
                 s3Service.uploadImageOrMedia("image/", exercisePicture),
                 exerciseReqDto
         );
-
-
-        exerciseService.createExercise(createExerciseDto.exerciseReqDto(), createExerciseDto.ExerciseVideoKey(), createExerciseDto.ExercisePictureKey());
-
-        return RspTemplate.success(Success.CREATE_EXERCISE_SUCCESS);
+        return RspTemplate.success(Success.CREATE_EXERCISE_SUCCESS, exerciseService.createExercise(createExerciseDto.exerciseReqDto(), createExerciseDto.ExerciseVideoKey(), createExerciseDto.ExercisePictureKey()));
     }
 
     @GetMapping("/part")
