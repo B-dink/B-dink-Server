@@ -85,6 +85,7 @@ public enum Success {
     UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
     UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
     UPDATE_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 수정 성공"),
+    UPDATE_EXERCISELIST_SUCCESS(HttpStatus.OK,"운동일지 수정 성공"),
 
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),

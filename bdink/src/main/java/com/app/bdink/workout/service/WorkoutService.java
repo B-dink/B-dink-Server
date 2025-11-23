@@ -133,4 +133,45 @@ public class WorkoutService {
         WorkOutSession session = findWorkoutSession(sessionId, member);
         workOutSessionRepository.delete(session);
     }
+
+    // 운동 기록 수정 메서드
+    @Transactional
+    public String updateWorkoutSession(Member member, Long sessionId, WorkoutSessionSaveReqDto requestDto){
+        WorkOutSession session = findWorkoutSession(sessionId, member);
+
+        /***
+         * 1. memo 수정
+         * 2. 기존 performedExercise + 세트 전부 삭제 (orphanRemoval)
+         * 3. 새로운 데이터로 다시 구성
+         */
+
+        session.changeMemo(requestDto.memo());
+
+        session.clearPerformedExercises();
+
+        for(PerformedExerciseSaveReqDto exerciseDto : requestDto.performedExercises()){
+            Exercise exercise = findById(exerciseDto.exerciseId());
+
+            PerformedExercise performedExercise = PerformedExercise.builder()
+                    .workOutSession(session)
+                    .exercise(exercise)
+                    .build();
+
+            session.addPerformedExercise(performedExercise);
+
+
+            for(WorkoutSetSaveReqDto setDto : exerciseDto.sets()){
+
+                WorkoutSet workoutSet = WorkoutSet.builder()
+                        .performedExercise(performedExercise)
+                        .setNumber(setDto.setNumber())
+                        .weight(setDto.weight())
+                        .reps(setDto.reps())
+                        .build();
+
+                performedExercise.addWorkoutSet(workoutSet);
+            }
+        }
+        return String.valueOf(session.getId());
+    }
 }

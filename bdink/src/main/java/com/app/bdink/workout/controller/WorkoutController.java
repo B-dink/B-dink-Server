@@ -40,4 +40,15 @@ public class WorkoutController {
 
         return RspTemplate.success(Success.DELETE_WORKOUT_SUCCESS, Success.DELETE_WORKOUT_SUCCESS.getMessage());
     }
+
+    @PutMapping("/{sessionId}")
+    @Operation(method = "PUT", description = "운동일지를 수정합니다.")
+    public RspTemplate<?> updateWorkoutSession(Principal principal,
+                                               @PathVariable Long sessionId,
+                                               @RequestBody WorkoutSessionSaveReqDto requestDto){
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        String updateId = workoutService.updateWorkoutSession(member, sessionId, requestDto);
+
+        return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, updateId);
+    }
 }
