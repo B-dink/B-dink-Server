@@ -4,11 +4,13 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.workout.controller.dto.ExercisePart;
+import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
+import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
 import com.app.bdink.workout.controller.dto.response.WorkoutCalendarResDto;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
@@ -20,10 +22,10 @@ import com.app.bdink.workout.repository.WorkOutSessionRepository;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.SessionIdGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,7 +47,7 @@ public class WorkoutService {
     }
 
     public WorkOutSession findWorkoutSession(Long id, Member member) {
-         return workOutSessionRepository.findByIdAndMember(id, member).orElseThrow(
+        return workOutSessionRepository.findByIdAndMember(id, member).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
         );
     }
@@ -53,7 +55,7 @@ public class WorkoutService {
     public String createExercise(ExerciseReqDto exerciseReqDto,
                                  String exerciseVideoUrl,
                                  String exercisePictureUrl
-                                 ) {
+    ) {
         Exercise exercise = exerciseRepository.save(
                 Exercise.builder()
                         .name(exerciseReqDto.ExerciseName())
@@ -81,7 +83,7 @@ public class WorkoutService {
             final String videoUrlKey,
             final String pictureUrlKey,
             final Long exerciseId
-    ){
+    ) {
         Exercise exercise = findById(exerciseId);
         exercise.modifyExercise(exerciseReqDto, videoUrlKey, pictureUrlKey);
 
@@ -90,7 +92,7 @@ public class WorkoutService {
 
     //기록완료 버튼을 눌렀을 때 호출되는 메서드
     @Transactional
-    public String saveWorkoutSession(Member member, WorkoutSessionSaveReqDto requestDto){
+    public String saveWorkoutSession(Member member, WorkoutSessionSaveReqDto requestDto) {
         /***
          * 1. WorkoutSession 생성 (운동일지)
          * 2. PerformedExercise + WorkoutSession 생성 (수행한 운동, 수행한 세트)
@@ -113,7 +115,7 @@ public class WorkoutService {
                             .build()
             );
 
-            for (WorkoutSetSaveReqDto setDto : exerciseDto.sets()){
+            for (WorkoutSetSaveReqDto setDto : exerciseDto.sets()) {
 
                 WorkoutSet workoutSet = workoutSetRepository.save(
                         WorkoutSet.builder()
@@ -132,14 +134,14 @@ public class WorkoutService {
 
     // 운동 기록 삭제 메서드
     @Transactional
-    public void deleteWorkoutSession(Member member, Long sessionId){
+    public void deleteWorkoutSession(Member member, Long sessionId) {
         WorkOutSession session = findWorkoutSession(sessionId, member);
         workOutSessionRepository.delete(session);
     }
 
     // 운동 기록 수정 메서드
     @Transactional
-    public String updateWorkoutSession(Member member, Long sessionId, WorkoutSessionSaveReqDto requestDto){
+    public String updateWorkoutSession(Member member, Long sessionId, WorkoutSessionSaveReqDto requestDto) {
         WorkOutSession session = findWorkoutSession(sessionId, member);
 
         /***
@@ -152,7 +154,7 @@ public class WorkoutService {
 
         session.clearPerformedExercises();
 
-        for(PerformedExerciseSaveReqDto exerciseDto : requestDto.performedExercises()){
+        for (PerformedExerciseSaveReqDto exerciseDto : requestDto.performedExercises()) {
             Exercise exercise = findById(exerciseDto.exerciseId());
 
             PerformedExercise performedExercise = PerformedExercise.builder()
@@ -163,7 +165,7 @@ public class WorkoutService {
             session.addPerformedExercise(performedExercise);
 
 
-            for(WorkoutSetSaveReqDto setDto : exerciseDto.sets()){
+            for (WorkoutSetSaveReqDto setDto : exerciseDto.sets()) {
 
                 WorkoutSet workoutSet = WorkoutSet.builder()
                         .performedExercise(performedExercise)
@@ -180,7 +182,7 @@ public class WorkoutService {
 
     // 월 별 운동일자 기록 조회
     @Transactional(readOnly = true)
-    public WorkoutCalendarResDto getWorkoutCalender(Member member, int year, int month){
+    public WorkoutCalendarResDto getWorkoutCalender(Member member, int year, int month) {
 
         LocalDate firstDay = LocalDate.of(year, month, 1);
         LocalDate firstDayNextMonth = firstDay.plusMonths(1);
@@ -199,5 +201,58 @@ public class WorkoutService {
                 .toList();
 
         return new WorkoutCalendarResDto(year, month, days);
+    }
+
+    // 볼륨 현황 계산
+    @Transactional(readOnly = true)
+    public VolumeStatusResDto getVolumeStatus(Member member, LocalDate baseDate) {
+
+        // 1. 이번 주(Mon~Sun) 계산
+        LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
+        //TODO: 이 부분에서 6으로 바꿔야할 수 도 테스트 후 확인
+        LocalDate thisWeekEnd = thisWeekStart.plusDays(7);
+
+        LocalDateTime weekStart = thisWeekStart.atStartOfDay();
+        LocalDateTime weekEnd = thisWeekEnd.atStartOfDay();
+
+        // 2. 오늘 날짜 범위
+        LocalDateTime todayStart = baseDate.atStartOfDay();
+        LocalDateTime todayEnd = baseDate.plusDays(1).atStartOfDay();
+
+        // 3. 주간 랭킹 리스트 조회
+        List<MemberWeeklyVolumeDto> ranking =
+                workoutSetRepository.findWeeklyVolumeRanking(weekStart, weekEnd);
+
+        //TODO: 총 참여자를 잡을 때 전체 유저 수로 변경될 가능성 존재
+        long totalParticipants = ranking.size();
+
+        // 4. 내 순위 + 내 주간 볼륨
+        //TODO : 기획적으로 랭킹에 없을 경우 0 or 전체 참여자 수 + 1 택
+        int rank = 0;
+        long myWeeklyVolume = 0;
+
+        for (int i = 0; i < ranking.size(); i++) {
+            MemberWeeklyVolumeDto dto = ranking.get(i);
+            if (dto.memberId().equals(member.getId())) {
+                rank = i + 1;                 // 리스트는 0부터, 랭킹은 1부터
+                myWeeklyVolume = dto.weeklyVolume();
+                break;
+            }
+        }
+
+        // 5. 오늘 볼륨 계산로직
+        Long todayVolume = workoutSetRepository.calculateVolumeForPeriod(
+                member, todayStart, todayEnd
+        );
+        if (todayVolume == null) {
+            todayVolume = 0L;
+        }
+
+        return new VolumeStatusResDto(
+                rank,
+                totalParticipants,
+                myWeeklyVolume,
+                todayVolume
+        );
     }
 }

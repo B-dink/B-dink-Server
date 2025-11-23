@@ -6,6 +6,7 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
+import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class WorkoutController {
     @PostMapping
     @Operation(method = "POST", description = "운동일지를 작성합니다.")
     public RspTemplate<?> createExerciseList(Principal principal,
-                                             @RequestBody WorkoutSessionSaveReqDto requestDto){
+                                             @RequestBody WorkoutSessionSaveReqDto requestDto) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         // workoutservice 계층에서 기록완료 메서드 사용
         return RspTemplate.success(Success.CREATE_EXERCISELIST_SUCCESS, workoutService.saveWorkoutSession(member, requestDto));
@@ -34,7 +36,7 @@ public class WorkoutController {
 
     @DeleteMapping("/{sessionId}")
     @Operation(method = "DELETE", description = "운동일지를 삭제합니다.")
-    public RspTemplate<?> deleteWorkoutSession(Principal principal, @PathVariable Long sessionId){
+    public RspTemplate<?> deleteWorkoutSession(Principal principal, @PathVariable Long sessionId) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         workoutService.deleteWorkoutSession(member, sessionId);
 
@@ -45,7 +47,7 @@ public class WorkoutController {
     @Operation(method = "PUT", description = "운동일지를 수정합니다.")
     public RspTemplate<?> updateWorkoutSession(Principal principal,
                                                @PathVariable Long sessionId,
-                                               @RequestBody WorkoutSessionSaveReqDto requestDto){
+                                               @RequestBody WorkoutSessionSaveReqDto requestDto) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         String updateId = workoutService.updateWorkoutSession(member, sessionId, requestDto);
 
@@ -56,9 +58,25 @@ public class WorkoutController {
     @Operation(method = "GET", description = "특정 월에 운동한 날짜들을 조회합니다.")
     public RspTemplate<?> getWorkoutCalendar(Principal principal,
                                              @RequestParam int year,
-                                             @RequestParam int month){
+                                             @RequestParam int month) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
         return RspTemplate.success(Success.GET_WORKOUT_CALENDAR_SUCCESS, workoutService.getWorkoutCalender(member, year, month));
+    }
+
+    @GetMapping("/volumeStatus")
+    @Operation(method = "GET", description = "볼륨 현황(주간 랭킹/ 주간 볼륨/오늘 볼륨)을 조회합니다.")
+    public RspTemplate<?> getVolumeStatus(Principal principal,
+                                          @RequestParam(required = false) String baseDate // yyyy-mm-dd
+    ) {
+        //TODO : BaseDate 같은 경우 직접 넣을지 아니면 0으로 두고. 오늘로 내부에서 결정할지 결정해야함..
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        //여기서 LocalDate.parse 구문은 "2025-11-24" 이러한 형식
+        LocalDate base = (baseDate == null) ? LocalDate.now() : LocalDate.parse(baseDate);
+
+        VolumeStatusResDto dto = workoutService.getVolumeStatus(member, base);
+
+        return RspTemplate.success(Success.GET_VOLUME_STATUS_SUCCESS, dto);
     }
 }
