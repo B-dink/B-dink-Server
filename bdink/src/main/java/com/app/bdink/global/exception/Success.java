@@ -23,6 +23,7 @@ public enum Success {
     CREATE_INSTRUCTOR_SUCCESS(HttpStatus.CREATED, "강사 생성 성공"),
     CREATE_LECTURE_SUCCESS(HttpStatus.CREATED, "강의 생성 성공"),
     CREATE_EXERCISE_SUCCESS(HttpStatus.CREATED, "신규 운동종목 생성 성공"),
+    CREATE_EXERCISELIST_SUCCESS(HttpStatus.CREATED, "운동일지 생성 성공"),
     CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
