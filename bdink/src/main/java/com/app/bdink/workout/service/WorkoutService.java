@@ -9,6 +9,7 @@ import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
+import com.app.bdink.workout.controller.dto.response.WorkoutCalendarResDto;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
 import com.app.bdink.workout.entity.WorkOutSession;
@@ -23,6 +24,8 @@ import org.apache.catalina.SessionIdGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -173,5 +176,28 @@ public class WorkoutService {
             }
         }
         return String.valueOf(session.getId());
+    }
+
+    // 월 별 운동일자 기록 조회
+    @Transactional(readOnly = true)
+    public WorkoutCalendarResDto getWorkoutCalender(Member member, int year, int month){
+
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        LocalDate firstDayNextMonth = firstDay.plusMonths(1);
+
+        LocalDateTime start = firstDay.atStartOfDay();
+        LocalDateTime end = firstDayNextMonth.atStartOfDay();
+
+        List<WorkOutSession> sessions =
+                workOutSessionRepository.findByMemberAndCreatedAtBetween(member, start, end);
+
+        // createdAt 기준 -> 날짜 추출, 중복 제거 및 정렬
+        List<Integer> days = sessions.stream()
+                .map(s -> s.getCreatedAt().toLocalDate().getDayOfMonth())
+                .distinct()
+                .sorted()
+                .toList();
+
+        return new WorkoutCalendarResDto(year, month, days);
     }
 }

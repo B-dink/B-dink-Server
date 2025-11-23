@@ -51,4 +51,14 @@ public class WorkoutController {
 
         return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, updateId);
     }
+
+    @GetMapping("/calendar")
+    @Operation(method = "GET", description = "특정 월에 운동한 날짜들을 조회합니다.")
+    public RspTemplate<?> getWorkoutCalendar(Principal principal,
+                                             @RequestParam int year,
+                                             @RequestParam int month){
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        return RspTemplate.success(Success.GET_WORKOUT_CALENDAR_SUCCESS, workoutService.getWorkoutCalender(member, year, month));
+    }
 }
