@@ -112,7 +112,7 @@ public class WorkoutService {
                                 .setNumber(setDto.setNumber())
                                 .weight(setDto.weight())
                                 .reps(setDto.reps())
-                                .restTime(setDto.restTime())
+//                                .restTime(setDto.restTime())
                                 .build()
                 );
             }
