@@ -35,7 +35,7 @@ public class ExerciseController {
 
         //create Exercise
         CreateExerciseDto createExerciseDto = CreateExerciseDto.of(
-                s3Service.uploadImageOrMedia("media/", exerciseVideo),
+                s3Service.uploadImageOrMedia("image/", exerciseVideo),
                 s3Service.uploadImageOrMedia("image/", exercisePicture),
                 exerciseReqDto
         );
@@ -56,7 +56,7 @@ public class ExerciseController {
             @RequestPart(value = "ExercisePicture") MultipartFile exercisePicture,
             @RequestPart(value = "ExerciseReqDto") ExerciseReqDto exerciseReqDto
     ){
-        String exerciseVideoKey = s3Service.uploadImageOrMedia("media/", exerciseVideo) ;
+        String exerciseVideoKey = s3Service.uploadImageOrMedia("image/", exerciseVideo) ;
         String exercisePictureKey = s3Service.uploadImageOrMedia("image/", exercisePicture) ;
 
         //수정 비즈니스로직 연결 필요
