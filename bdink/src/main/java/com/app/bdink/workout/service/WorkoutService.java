@@ -11,6 +11,7 @@ import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
 import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
+import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
 import com.app.bdink.workout.controller.dto.response.WorkoutCalendarResDto;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -253,6 +255,48 @@ public class WorkoutService {
                 totalParticipants,
                 myWeeklyVolume,
                 todayVolume
+        );
+    }
+
+    // 이번 주, 지난 주 볼륨 그래프 데이터 조회
+    @Transactional(readOnly = true)
+    public WeeklyVolumeGraphResDto getWeeklyVolumeGraph(Member member, LocalDate baseDate) {
+        LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
+        LocalDate lastWeekStart = thisWeekStart.minusWeeks(1);
+
+        List<Long> thisWeekVolumes = new ArrayList<>();
+        List<Long> lastWeekVolumes = new ArrayList<>();
+
+        // 2) 월~일 7일 동안 각각 볼륨 계산
+        for (int i = 0; i < 7; i++) {
+            // 이번 주 i일째 (월+0, 화+1, ...)
+            LocalDate thisDay = thisWeekStart.plusDays(i);
+            LocalDateTime thisStart = thisDay.atStartOfDay();
+            LocalDateTime thisEnd = thisDay.plusDays(1).atStartOfDay();
+
+            Long thisVolume = workoutSetRepository.calculateVolumeForPeriod(
+                    member, thisStart, thisEnd
+            );
+            if (thisVolume == null) thisVolume = 0L;
+            thisWeekVolumes.add(thisVolume);
+
+            // 지난 주 i일째
+            LocalDate lastDay = lastWeekStart.plusDays(i);
+            LocalDateTime lastStart = lastDay.atStartOfDay();
+            LocalDateTime lastEnd = lastDay.plusDays(1).atStartOfDay();
+
+            Long lastVolume = workoutSetRepository.calculateVolumeForPeriod(
+                    member, lastStart, lastEnd
+            );
+            if (lastVolume == null) lastVolume = 0L;
+            lastWeekVolumes.add(lastVolume);
+        }
+
+        return new WeeklyVolumeGraphResDto(
+                thisWeekStart,
+                lastWeekStart,
+                thisWeekVolumes,
+                lastWeekVolumes
         );
     }
 }

@@ -7,6 +7,7 @@ import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
+import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -78,5 +79,18 @@ public class WorkoutController {
         VolumeStatusResDto dto = workoutService.getVolumeStatus(member, base);
 
         return RspTemplate.success(Success.GET_VOLUME_STATUS_SUCCESS, dto);
+    }
+
+    @GetMapping("/volumeGraph")
+    @Operation(method = "GET", description = "지난주, 이번주 일별 볼륨 데이터를 조회합니다.")
+    public RspTemplate<?> getWeeklyVolumeGraph(Principal principal,
+                                               @RequestParam(required = false) String baseDate){
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        LocalDate base = (baseDate == null) ? LocalDate.now() : LocalDate.parse(baseDate);
+
+        WeeklyVolumeGraphResDto dto = workoutService.getWeeklyVolumeGraph(member, base);
+
+        return RspTemplate.success(Success.GET_VOLUME_GRAPH_SUCCESS, dto);
     }
 }
