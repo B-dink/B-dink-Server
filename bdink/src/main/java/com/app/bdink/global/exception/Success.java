@@ -160,6 +160,7 @@ public enum Success {
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
     DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
     DELETE_CENTER_SUCCESS(HttpStatus.NO_CONTENT, "센터 정보 삭제 성공"),
+    DELETE_WORKOUT_SUCCESS(HttpStatus.NO_CONTENT, "운동일지 정보 삭제 성공"),
 
 
     ;

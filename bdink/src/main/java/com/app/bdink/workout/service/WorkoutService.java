@@ -3,7 +3,6 @@ package com.app.bdink.workout.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
@@ -20,6 +19,7 @@ import com.app.bdink.workout.repository.WorkOutSessionRepository;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.SessionIdGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +38,12 @@ public class WorkoutService {
     public Exercise findById(Long id) {
         return exerciseRepository.findById(id).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_EXERCISE, Error.NOT_FOUND_EXERCISE.getMessage())
+        );
+    }
+
+    public WorkOutSession findWorkoutSession(Long id, Member member) {
+         return workOutSessionRepository.findByIdAndMember(id, member).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
         );
     }
 
@@ -119,5 +125,12 @@ public class WorkoutService {
 
         }
         return String.valueOf(session.getId());
+    }
+
+    // 운동 기록 삭제 메서드
+    @Transactional
+    public void deleteWorkoutSession(Member member, Long sessionId){
+        WorkOutSession session = findWorkoutSession(sessionId, member);
+        workOutSessionRepository.delete(session);
     }
 }

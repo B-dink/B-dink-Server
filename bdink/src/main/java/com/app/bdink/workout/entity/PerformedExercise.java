@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -25,9 +28,23 @@ public class PerformedExercise {
 //    @Column(name = "memo")
 //    private String memo;
 
+    @OneToMany(mappedBy = "performedExercise",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<WorkoutSet> workoutSets = new ArrayList<>();
+
     @Builder
     public PerformedExercise(WorkOutSession workOutSession, Exercise exercise) {
         this.workOutSession = workOutSession;
         this.exercise = exercise;
+    }
+
+    public void addWorkoutSet(WorkoutSet set){
+        this.workoutSets.add(set);
+    }
+
+    public void clearWorkoutSets(){
+        this.workoutSets.clear();
     }
 }

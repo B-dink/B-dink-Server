@@ -31,4 +31,13 @@ public class WorkoutController {
         // workoutservice 계층에서 기록완료 메서드 사용
         return RspTemplate.success(Success.CREATE_EXERCISELIST_SUCCESS, workoutService.saveWorkoutSession(member, requestDto));
     }
+
+    @DeleteMapping("/{sessionId}")
+    @Operation(method = "DELETE", description = "운동일지를 삭제합니다.")
+    public RspTemplate<?> deleteWorkoutSession(Principal principal, @PathVariable Long sessionId){
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+        workoutService.deleteWorkoutSession(member, sessionId);
+
+        return RspTemplate.success(Success.DELETE_WORKOUT_SUCCESS, Success.DELETE_WORKOUT_SUCCESS.getMessage());
+    }
 }
