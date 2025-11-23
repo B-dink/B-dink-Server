@@ -7,6 +7,7 @@ import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.request.CreateExerciseDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
+import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.service.ExerciseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,5 +47,20 @@ public class ExerciseController {
     @Operation(method = "GET", description = "부위별 운동종목을 조회합니다.")
     public RspTemplate<List<ExerciseResDto>> getPartExercise(@RequestParam ExercisePart exercisePart) {
         return RspTemplate.success(Success.GET_EXERCISEPART_SUCCESS, exerciseService.getPart(exercisePart));
+    }
+
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(method = "PUT", description = "운동좀목을 수정합니다.")
+    public RspTemplate<?> updateExercise(
+            @RequestParam Long exerciseId,
+            @RequestPart(value = "ExerciseVideo") MultipartFile exerciseVideo,
+            @RequestPart(value = "ExercisePicture") MultipartFile exercisePicture,
+            @RequestPart(value = "ExerciseReqDto") ExerciseReqDto exerciseReqDto
+    ){
+        String exerciseVideoKey = s3Service.uploadImageOrMedia("media/", exerciseVideo) ;
+        String exercisePictureKey = s3Service.uploadImageOrMedia("image/", exercisePicture) ;
+
+        //수정 비즈니스로직 연결 필요
+        return RspTemplate.success(Success.UPDATE_EXERCISE_SUCCESS, exerciseService.updateExerciseInfo(exerciseReqDto, exerciseVideoKey, exercisePictureKey, exerciseId));
     }
 }
