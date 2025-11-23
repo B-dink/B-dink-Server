@@ -1,5 +1,5 @@
 package com.app.bdink.workout.controller.dto.response;
-
+import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.entity.Exercise;
 
 public record ExerciseResDto(
@@ -7,7 +7,7 @@ public record ExerciseResDto(
         String ExerciseDescription,
         String ExerciseVideo,
         String ExercisePicture,
-        String ExercisePart
+        ExercisePart ExercisePart
 ) {
     public static ExerciseResDto of(final Exercise exercise) {
         return new ExerciseResDto(
@@ -15,7 +15,7 @@ public record ExerciseResDto(
                 exercise.getDescription(),
                 exercise.getVideoUrl(),
                 exercise.getPictureUrl(),
-                exercise.getPart().toString()
+                exercise.getPart()
         );
     }
 }
