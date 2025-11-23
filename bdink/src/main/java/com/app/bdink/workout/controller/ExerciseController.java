@@ -7,8 +7,7 @@ import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.request.CreateExerciseDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
-import com.app.bdink.workout.entity.Exercise;
-import com.app.bdink.workout.service.ExerciseService;
+import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ import java.util.List;
 @Tag(name = "일지작성 운동종목 API", description = "운동종목과 관련된 API들입니다. 운동종목 CRUD API입니다.")
 public class ExerciseController {
 
-    private final ExerciseService exerciseService;
+    private final WorkoutService exerciseService;
     private final S3Service s3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

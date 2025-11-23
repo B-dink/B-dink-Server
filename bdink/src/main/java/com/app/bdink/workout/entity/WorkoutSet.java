@@ -31,11 +31,12 @@ public class WorkoutSet {
     private int restTime;
 
     @Builder
-    public WorkoutSet(PerformedExercise performedExercise, int setNumber, int weight, int reps, int restTime) {
+    public WorkoutSet(PerformedExercise performedExercise, int setNumber, int weight, int reps) {
         this.performedExercise = performedExercise;
         this.setNumber = setNumber;
         this.weight = weight;
         this.reps = reps;
-        this.restTime = restTime;
+        // 휴식시간 default 0 < 추후에 develop 되면 사용
+        this.restTime = 0;
     }
 }

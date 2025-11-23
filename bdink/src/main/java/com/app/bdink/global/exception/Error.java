@@ -26,6 +26,7 @@ public enum Error {
 
     NOT_FOUND_CENTER(HttpStatus.NOT_FOUND, "찾을 수 없는 센터입니다."),
     NOT_FOUND_EXERCISE(HttpStatus.NOT_FOUND, "찾을 수 없는 운동종목입니다."),
+    NOT_FOUND_WORKOUTSESSION(HttpStatus.NOT_FOUND, "해당 회원의 운동일지를 찾을 수 없습니다."),
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),

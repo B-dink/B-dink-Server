@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -23,9 +26,27 @@ public class WorkOutSession extends BaseTimeEntity {
     @Column(name = "memo")
     private String memo;
 
+    @OneToMany(mappedBy = "workOutSession",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<PerformedExercise> performedExercises = new ArrayList<>();
+
     @Builder
     public WorkOutSession(Member member, String memo) {
         this.member = member;
         this.memo = memo;
+    }
+
+    public void changeMemo(String memo){
+        this.memo = memo;
+    }
+
+    public void addPerformedExercise(PerformedExercise pe){
+        this.performedExercises.add(pe);
+    }
+
+    public void clearPerformedExercises(){
+        this.performedExercises.clear();
     }
 }

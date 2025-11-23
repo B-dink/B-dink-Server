@@ -23,6 +23,7 @@ public enum Success {
     CREATE_INSTRUCTOR_SUCCESS(HttpStatus.CREATED, "강사 생성 성공"),
     CREATE_LECTURE_SUCCESS(HttpStatus.CREATED, "강의 생성 성공"),
     CREATE_EXERCISE_SUCCESS(HttpStatus.CREATED, "신규 운동종목 생성 성공"),
+    CREATE_EXERCISELIST_SUCCESS(HttpStatus.CREATED, "운동일지 생성 성공"),
     CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
@@ -84,6 +85,7 @@ public enum Success {
     UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
     UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
     UPDATE_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 수정 성공"),
+    UPDATE_EXERCISELIST_SUCCESS(HttpStatus.OK,"운동일지 수정 성공"),
 
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
@@ -159,6 +161,7 @@ public enum Success {
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
     DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
     DELETE_CENTER_SUCCESS(HttpStatus.NO_CONTENT, "센터 정보 삭제 성공"),
+    DELETE_WORKOUT_SUCCESS(HttpStatus.NO_CONTENT, "운동일지 정보 삭제 성공"),
 
 
     ;
