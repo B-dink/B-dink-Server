@@ -108,7 +108,7 @@ public enum Success {
     GET_DATE_SCHEDULE_SUCCESS(HttpStatus.OK, "날짜별 스케줄 조회 성공"),
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
     GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
-    GET_WORKOUT_CALENDAR_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
+    GET_WORKOUT_CALENDAR_SUCCESS(HttpStatus.OK, "운동 수행 날짜 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
