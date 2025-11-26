@@ -56,6 +56,8 @@ public enum Success {
     GET_KOLLUSMEDIA_SUCCESS(HttpStatus.OK,"개별 시청 기록 조회 성공"),
     GET_SUGANG_CLASSROOM_SUCCESS(HttpStatus.OK,"수강신청 클래스룸 목록 조회 성공"),
     GET_MYPAGE_SUCCESS(HttpStatus.OK,"MY PAGE 멤버 정보 조회 성공"),
+    GET_VOLUME_STATUS_SUCCESS(HttpStatus.OK,"주간 볼륨 현황 및 랭킹 조회 성공"),
+    GET_VOLUME_GRAPH_SUCCESS(HttpStatus.OK,"지난 주, 이번 주 일별 볼륨 조회 성공"),
 
 
 
@@ -106,6 +108,7 @@ public enum Success {
     GET_DATE_SCHEDULE_SUCCESS(HttpStatus.OK, "날짜별 스케줄 조회 성공"),
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
     GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
+    GET_WORKOUT_CALENDAR_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
