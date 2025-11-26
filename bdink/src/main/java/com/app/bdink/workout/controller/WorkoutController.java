@@ -67,14 +67,10 @@ public class WorkoutController {
 
     @GetMapping("/volumeStatus")
     @Operation(method = "GET", description = "볼륨 현황(주간 랭킹/ 주간 볼륨/오늘 볼륨)을 조회합니다.")
-    public RspTemplate<?> getVolumeStatus(Principal principal,
-                                          @RequestParam(required = false) String baseDate // yyyy-mm-dd
-    ) {
-        //TODO : BaseDate 같은 경우 직접 넣을지 아니면 0으로 두고. 오늘로 내부에서 결정할지 결정해야함..
+    public RspTemplate<?> getVolumeStatus(Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
-        //여기서 LocalDate.parse 구문은 "2025-11-24" 이러한 형식
-        LocalDate base = (baseDate == null) ? LocalDate.now() : LocalDate.parse(baseDate);
+        LocalDate base = LocalDate.now();
 
         VolumeStatusResDto dto = workoutService.getVolumeStatus(member, base);
 
@@ -83,11 +79,10 @@ public class WorkoutController {
 
     @GetMapping("/volumeGraph")
     @Operation(method = "GET", description = "지난주, 이번주 일별 볼륨 데이터를 조회합니다.")
-    public RspTemplate<?> getWeeklyVolumeGraph(Principal principal,
-                                               @RequestParam(required = false) String baseDate){
+    public RspTemplate<?> getWeeklyVolumeGraph(Principal principal){
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
-        LocalDate base = (baseDate == null) ? LocalDate.now() : LocalDate.parse(baseDate);
+        LocalDate base = LocalDate.now();
 
         WeeklyVolumeGraphResDto dto = workoutService.getWeeklyVolumeGraph(member, base);
 
