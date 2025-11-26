@@ -25,8 +25,8 @@ public class PerformedExercise {
     private Exercise exercise;
 
     //TODO: 현재 선택한 운동에 대해 개별 메모, 필요하면 사용할 수 도?
-//    @Column(name = "memo")
-//    private String memo;
+    @Column(name = "memo")
+    private String memo;
 
     @OneToMany(mappedBy = "performedExercise",
             cascade = CascadeType.ALL,
@@ -35,9 +35,10 @@ public class PerformedExercise {
     private List<WorkoutSet> workoutSets = new ArrayList<>();
 
     @Builder
-    public PerformedExercise(WorkOutSession workOutSession, Exercise exercise) {
+    public PerformedExercise(WorkOutSession workOutSession, Exercise exercise, String memo) {
         this.workOutSession = workOutSession;
         this.exercise = exercise;
+        this.memo = memo;
     }
 
     public void addWorkoutSet(WorkoutSet set){

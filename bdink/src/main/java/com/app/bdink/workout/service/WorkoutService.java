@@ -101,7 +101,7 @@ public class WorkoutService {
          */
         WorkOutSession session = workOutSessionRepository.save(
                 WorkOutSession.builder()
-                        .memo(requestDto.memo())
+                        .memo(requestDto.todayWorkoutName())
                         .member(member)
                         .build()
         );
@@ -114,6 +114,7 @@ public class WorkoutService {
                     PerformedExercise.builder()
                             .exercise(exercise)
                             .workOutSession(session)
+                            .memo(exerciseDto.memo())
                             .build()
             );
 
@@ -152,7 +153,7 @@ public class WorkoutService {
          * 3. 새로운 데이터로 다시 구성
          */
 
-        session.changeMemo(requestDto.memo());
+        session.changeMemo(requestDto.todayWorkoutName());
 
         session.clearPerformedExercises();
 
@@ -162,6 +163,7 @@ public class WorkoutService {
             PerformedExercise performedExercise = PerformedExercise.builder()
                     .workOutSession(session)
                     .exercise(exercise)
+                    .memo(exerciseDto.memo())
                     .build();
 
             session.addPerformedExercise(performedExercise);
