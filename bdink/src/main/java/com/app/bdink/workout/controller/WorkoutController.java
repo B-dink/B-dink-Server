@@ -7,6 +7,7 @@ import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
+import com.app.bdink.workout.controller.dto.response.WeeklyVolumeCompareResDto;
 import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
 import com.app.bdink.workout.controller.dto.response.WorkoutDailyDetailResDto;
 import com.app.bdink.workout.service.WorkoutService;
@@ -102,5 +103,17 @@ public class WorkoutController {
 
         return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS, dto);
 
+    }
+
+    @GetMapping("/volume/weeklyCompare")
+    @Operation(method = "GET", description = "지난주 대비 운동량을 조회합니다.")
+    public RspTemplate<?> getWorkoutVolume(Principal principal) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        LocalDate base = LocalDate.now();
+
+        WeeklyVolumeCompareResDto dto = workoutService.getWeeklyVolumeCompare(member, base);
+
+        return RspTemplate.success(Success.GET_ALLCENTER_SUCCESS, dto);
     }
 }

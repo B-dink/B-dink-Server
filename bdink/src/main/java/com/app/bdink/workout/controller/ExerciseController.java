@@ -43,6 +43,13 @@ public class ExerciseController {
         return RspTemplate.success(Success.CREATE_EXERCISE_SUCCESS, workoutService.createExercise(createExerciseDto.exerciseReqDto(), createExerciseDto.ExerciseVideoKey(), createExerciseDto.ExercisePictureKey()));
     }
 
+    @GetMapping("/{exerciseId}")
+    @Operation(method = "GET", description = "운동id를 통해 운동일지를 조회합니다.")
+    public RspTemplate<?> getExerciseList(@PathVariable Long exerciseId) {
+        ExerciseResDto dto = workoutService.getExerciseById(exerciseId);
+        return RspTemplate.success(Success.GET_EXERCISE_SUCCESS, dto);
+    }
+
     @GetMapping("/part")
     @Operation(method = "GET", description = "부위별 운동종목을 조회합니다.")
     public RspTemplate<List<ExerciseResDto>> getPartExercise(@RequestParam ExercisePart exercisePart) {
