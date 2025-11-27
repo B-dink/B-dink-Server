@@ -61,6 +61,7 @@ public enum Success {
     GET_MYPAGE_SUCCESS(HttpStatus.OK,"MY PAGE 멤버 정보 조회 성공"),
     GET_VOLUME_STATUS_SUCCESS(HttpStatus.OK,"주간 볼륨 현황 및 랭킹 조회 성공"),
     GET_VOLUME_GRAPH_SUCCESS(HttpStatus.OK,"지난 주, 이번 주 일별 볼륨 조회 성공"),
+    GET_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 조회 성공"),
 
 
 

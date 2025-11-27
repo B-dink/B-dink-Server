@@ -76,6 +76,12 @@ public class WorkoutService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ExerciseResDto getExerciseById(Long exerciseId) {
+        Exercise exercise = findById(exerciseId);
+        return ExerciseResDto.of(exercise);
+    }
+
     @Transactional
     public ExerciseResDto updateExerciseInfo(
             final ExerciseReqDto exerciseReqDto,
