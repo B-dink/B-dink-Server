@@ -11,4 +11,7 @@ import java.util.List;
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     // 부위별 운동 종목 조회
     List<Exercise> findAllByPart(ExercisePart part);
+
+    // part + keyword의 조합
+    List<Exercise> findByPartAndNameContainingIgnoreCase(ExercisePart part, String name);
 }

@@ -9,10 +9,7 @@ import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
-import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
-import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
-import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
-import com.app.bdink.workout.controller.dto.response.WorkoutCalendarResDto;
+import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
 import com.app.bdink.workout.entity.WorkOutSession;
@@ -300,5 +297,20 @@ public class WorkoutService {
                 thisWeekVolumes,
                 lastWeekVolumes
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExerciseSearchResDto> searchExercises(String keyword, ExercisePart part) {
+
+        if (keyword == null || keyword.isBlank()) {
+            throw new CustomException(Error.INVALID_SEARCH_EMPTY_EXCEPTION, Error.INVALID_SEARCH_EMPTY_EXCEPTION.getMessage());
+        }
+
+        List<Exercise> exercises =
+                exerciseRepository.findByPartAndNameContainingIgnoreCase(part, keyword);
+
+        return exercises.stream()
+                .map(ExerciseSearchResDto::of)
+                .toList();
     }
 }
