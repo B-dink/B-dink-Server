@@ -216,8 +216,7 @@ public class WorkoutService {
 
         // 1. 이번 주(Mon~Sun) 계산
         LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
-        //TODO: 이 부분에서 6으로 바꿔야할 수 도 테스트 후 확인
-        LocalDate thisWeekEnd = thisWeekStart.plusDays(7);
+        LocalDate thisWeekEnd = thisWeekStart.plusDays(6);
 
         LocalDateTime weekStart = thisWeekStart.atStartOfDay();
         LocalDateTime weekEnd = thisWeekEnd.atStartOfDay();
