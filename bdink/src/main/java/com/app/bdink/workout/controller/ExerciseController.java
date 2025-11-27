@@ -7,6 +7,7 @@ import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.request.CreateExerciseDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
+import com.app.bdink.workout.controller.dto.response.ExerciseSearchResDto;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +24,7 @@ import java.util.List;
 @Tag(name = "일지작성 운동종목 API", description = "운동종목과 관련된 API들입니다. 운동종목 CRUD API입니다.")
 public class ExerciseController {
 
-    private final WorkoutService exerciseService;
+    private final WorkoutService workoutService;
     private final S3Service s3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -39,13 +40,13 @@ public class ExerciseController {
                 s3Service.uploadImageOrMedia("image/", exercisePicture),
                 exerciseReqDto
         );
-        return RspTemplate.success(Success.CREATE_EXERCISE_SUCCESS, exerciseService.createExercise(createExerciseDto.exerciseReqDto(), createExerciseDto.ExerciseVideoKey(), createExerciseDto.ExercisePictureKey()));
+        return RspTemplate.success(Success.CREATE_EXERCISE_SUCCESS, workoutService.createExercise(createExerciseDto.exerciseReqDto(), createExerciseDto.ExerciseVideoKey(), createExerciseDto.ExercisePictureKey()));
     }
 
     @GetMapping("/part")
     @Operation(method = "GET", description = "부위별 운동종목을 조회합니다.")
     public RspTemplate<List<ExerciseResDto>> getPartExercise(@RequestParam ExercisePart exercisePart) {
-        return RspTemplate.success(Success.GET_EXERCISEPART_SUCCESS, exerciseService.getPart(exercisePart));
+        return RspTemplate.success(Success.GET_EXERCISEPART_SUCCESS, workoutService.getPart(exercisePart));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -55,11 +56,22 @@ public class ExerciseController {
             @RequestPart(value = "ExerciseVideo") MultipartFile exerciseVideo,
             @RequestPart(value = "ExercisePicture") MultipartFile exercisePicture,
             @RequestPart(value = "ExerciseReqDto") ExerciseReqDto exerciseReqDto
-    ){
-        String exerciseVideoKey = s3Service.uploadImageOrMedia("image/", exerciseVideo) ;
-        String exercisePictureKey = s3Service.uploadImageOrMedia("image/", exercisePicture) ;
+    ) {
+        String exerciseVideoKey = s3Service.uploadImageOrMedia("image/", exerciseVideo);
+        String exercisePictureKey = s3Service.uploadImageOrMedia("image/", exercisePicture);
 
         //수정 비즈니스로직 연결 필요
-        return RspTemplate.success(Success.UPDATE_EXERCISE_SUCCESS, exerciseService.updateExerciseInfo(exerciseReqDto, exerciseVideoKey, exercisePictureKey, exerciseId));
+        return RspTemplate.success(Success.UPDATE_EXERCISE_SUCCESS, workoutService.updateExerciseInfo(exerciseReqDto, exerciseVideoKey, exercisePictureKey, exerciseId));
+    }
+
+    @GetMapping("/search")
+    @Operation(method = "GET", description = "운동 이름과 운동종목 부위로 운동종목을 검색합니다.")
+    public RspTemplate<List<ExerciseSearchResDto>> searchExercise(
+            @RequestParam ExercisePart part,
+            @RequestParam String keyword
+    ) {
+        List<ExerciseSearchResDto> result = workoutService.searchExercises(keyword, part);
+        return RspTemplate.success(Success.SEARCH_EXERCISE_SUCCESS, result);
+
     }
 }
