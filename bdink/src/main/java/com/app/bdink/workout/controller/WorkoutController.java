@@ -114,6 +114,6 @@ public class WorkoutController {
 
         WeeklyVolumeCompareResDto dto = workoutService.getWeeklyVolumeCompare(member, base);
 
-        return RspTemplate.success(Success.GET_ALLCENTER_SUCCESS, dto);
+        return RspTemplate.success(Success.GET_WEEKLY_COMPARE_VOLUME_SUCCESS, dto);
     }
 }
