@@ -313,4 +313,55 @@ public class WorkoutService {
                 .map(ExerciseSearchResDto::of)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public WorkoutDailyDetailResDto getWorkoutDailyDetail(Member member, LocalDate date) {
+
+        //시작일자 부터 다음날짜 사이의 모든 운동일지를 조회
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+
+        List<WorkOutSession> sessions = workOutSessionRepository
+                .findByMemberAndCreatedAtBetween(member, start, end);
+
+        if (sessions.isEmpty()) {
+            throw new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage());
+        }
+
+        // 하루에 한 개의 운동일지만 작성 가능.
+        WorkOutSession session = sessions.get(0);
+
+        String dateString = session.getCreatedAt().toLocalDate().toString();
+        String workoutName = session.getMemo();
+
+        List<WorkoutDailyExerciseResDto> exercises = session.getPerformedExercises().stream()
+                .map(pe ->
+                        {
+                            Exercise exercise = pe.getExercise();
+
+                            List<WorkoutDailySetResDto> sets = pe.getWorkoutSets().stream()
+                                    .map(ws -> new WorkoutDailySetResDto(
+                                            ws.getSetNumber(),
+                                            ws.getReps(),
+                                            ws.getWeight()))
+                                    .toList();
+                            return new WorkoutDailyExerciseResDto(
+                                    exercise.getId(),
+                                    exercise.getName(),
+                                    exercise.getPictureUrl(),
+                                    pe.getMemo(),
+                                    sets
+                            );
+                        }
+
+                )
+                .toList();
+
+        return new WorkoutDailyDetailResDto(
+                dateString,
+                workoutName,
+                exercises
+        );
+
+    }
 }

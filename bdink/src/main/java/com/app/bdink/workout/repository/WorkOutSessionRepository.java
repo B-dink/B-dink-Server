@@ -12,6 +12,6 @@ public interface WorkOutSessionRepository extends JpaRepository<WorkOutSession, 
     Optional<WorkOutSession> findByIdAndMember(Long id, Member member);
 
     List<WorkOutSession> findByMemberAndCreatedAtBetween(Member member,
-                                                         LocalDateTime strat,
+                                                         LocalDateTime start,
                                                          LocalDateTime end);
 }

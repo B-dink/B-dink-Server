@@ -23,6 +23,7 @@ public class Exercise {
     @Column(name = "description")
     private String description;
 
+    // video에서 움짤로 바뀜에 따라 mp4 -> jpg로 변경
     @Column(name = "video_url")
     private String videoUrl;
 

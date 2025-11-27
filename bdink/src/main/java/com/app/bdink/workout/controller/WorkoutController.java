@@ -8,10 +8,12 @@ import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
 import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
+import com.app.bdink.workout.controller.dto.response.WorkoutDailyDetailResDto;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -79,7 +81,7 @@ public class WorkoutController {
 
     @GetMapping("/volumeGraph")
     @Operation(method = "GET", description = "지난주, 이번주 일별 볼륨 데이터를 조회합니다.")
-    public RspTemplate<?> getWeeklyVolumeGraph(Principal principal){
+    public RspTemplate<?> getWeeklyVolumeGraph(Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
         LocalDate base = LocalDate.now();
@@ -87,5 +89,18 @@ public class WorkoutController {
         WeeklyVolumeGraphResDto dto = workoutService.getWeeklyVolumeGraph(member, base);
 
         return RspTemplate.success(Success.GET_VOLUME_GRAPH_SUCCESS, dto);
+    }
+
+    @GetMapping("/day")
+    @Operation(method = "GET", description = "선택한 날짜의 운동일지 상세 정보를 조회합니다.")
+    public RspTemplate<?> getWorkoutDay(Principal principal,
+                                        @RequestParam
+                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        WorkoutDailyDetailResDto dto = workoutService.getWorkoutDailyDetail(member, date);
+
+        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS, dto);
+
     }
 }
