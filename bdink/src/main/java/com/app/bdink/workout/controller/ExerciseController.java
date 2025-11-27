@@ -8,7 +8,6 @@ import com.app.bdink.workout.controller.dto.request.CreateExerciseDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseSearchResDto;
-import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
