@@ -12,6 +12,7 @@ public enum Success {
      * 201 CREATED
      */
     CREATE_ALIMETALK_TOKEN_SUCCESS(HttpStatus.CREATED, "알림톡 토큰 생성 성공"),
+    CREATE_ROUTINE_SUCCESS(HttpStatus.CREATED, "추천 운동 루틴 생성 성공"),
     SEND_ALIMTALK_SUCCESS(HttpStatus.CREATED, "알림톡 전송 성공"),
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
     CREATE_SUGANG_SUCCESS(HttpStatus.CREATED, "수강 생성 성공"),
@@ -47,6 +48,7 @@ public enum Success {
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     GET_YOUTUBE_VIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 조회 성공"),
+    GET_ROUTINE_DETAIL_SUCCESS(HttpStatus.OK, "추천 운동 루틴 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
     NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
@@ -89,6 +91,7 @@ public enum Success {
     UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
     UPDATE_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 수정 성공"),
     UPDATE_EXERCISELIST_SUCCESS(HttpStatus.OK,"운동일지 수정 성공"),
+    UPDATE_ROUTINE_SUCCESS(HttpStatus.OK,"추천 운동루틴 업데이트 성공"),
 
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
@@ -167,6 +170,7 @@ public enum Success {
     DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
     DELETE_CENTER_SUCCESS(HttpStatus.NO_CONTENT, "센터 정보 삭제 성공"),
     DELETE_WORKOUT_SUCCESS(HttpStatus.NO_CONTENT, "운동일지 정보 삭제 성공"),
+    DELETE_ROUTINE_SUCCESS(HttpStatus.NO_CONTENT, "추천 운동루틴 삭제 성공"),
 
 
     ;
