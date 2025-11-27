@@ -369,4 +369,56 @@ public class WorkoutService {
         );
 
     }
+
+    @Transactional(readOnly = true)
+    public WeeklyVolumeCompareResDto getWeeklyVolumeCompare(Member member, LocalDate baseDate){
+        // 1. 이번 주(Mon~Sun) 계산
+        LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
+        LocalDate thisWeekEnd = thisWeekStart.plusDays(6);
+
+        // 2. 지난 주(Mon~Sun) 계산
+        LocalDate lastWeekStart = thisWeekStart.minusWeeks(1);
+        LocalDate lastWeekEnd   = thisWeekStart.minusDays(1);
+
+        long thisWeekVolume = calcWeekVolume(member, thisWeekStart, thisWeekEnd);
+        long lastWeekVolume = calcWeekVolume(member, lastWeekStart, lastWeekEnd);
+
+        long diffVolume = thisWeekVolume - lastWeekVolume;
+
+        double percent;
+
+        if (lastWeekVolume == 0) {
+            percent = (thisWeekVolume == 0) ? 0 : 100;
+        } else {
+            percent = (thisWeekVolume - lastWeekVolume) * 100.0 / lastWeekVolume;
+        }
+
+        //절대값으로 계산
+        int percentRounded = (int) Math.round(Math.abs(percent));
+        // 지난 주 보다 향상 > true, 하락 or 동일 false
+        boolean increased = diffVolume > 0;
+
+        return new WeeklyVolumeCompareResDto(
+                lastWeekVolume,
+                thisWeekVolume,
+                diffVolume,
+                percentRounded,
+                increased
+        );
+
+    }
+
+    private long calcWeekVolume(Member member, LocalDate start, LocalDate end) {
+        LocalDateTime from = start.atStartOfDay();
+        LocalDateTime to   = end.plusDays(1).atStartOfDay(); // end 포함
+
+        List<WorkOutSession> sessions =
+                workOutSessionRepository.findByMemberAndCreatedAtBetween(member, from, to);
+
+        return sessions.stream()
+                .flatMap(s -> s.getPerformedExercises().stream())
+                .flatMap(pe -> pe.getWorkoutSets().stream())
+                .mapToLong(ws -> (long) ws.getWeight() * ws.getReps())
+                .sum();
+    }
 }
