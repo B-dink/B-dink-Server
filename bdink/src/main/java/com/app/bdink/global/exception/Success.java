@@ -116,6 +116,8 @@ public enum Success {
     GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
     GET_WORKOUT_CALENDAR_SUCCESS(HttpStatus.OK, "운동 수행 날짜 조회 성공"),
     GET_WORKOUT_SESSION_DETAIL_SUCCESS(HttpStatus.OK, "운동일지 상세 정보 조회 성공"),
+    GET_EXERCISE_VERSION_SUCCESS(HttpStatus.OK, "운동종목 버전 조회 성공"),
+    GET_EXERCISE_ALL_SUCCESS(HttpStatus.OK, "모든 운동종목 정보 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
