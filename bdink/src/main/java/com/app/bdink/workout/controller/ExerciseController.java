@@ -90,4 +90,11 @@ public class ExerciseController {
         ExerciseVersionResDto resDto = new ExerciseVersionResDto(version);
         return RspTemplate.success(Success.GET_EXERCISE_VERSION_SUCCESS, resDto);
     }
+
+    @GetMapping("/all")
+    @Operation(method = "GET", description = "모든 운동종목 정보를 조회합니다.")
+    public RspTemplate<?> getExerciseAll(){
+        return RspTemplate.success(Success.GET_EXERCISE_ALL_SUCCESS, workoutService.getExerciseList());
+    }
+
 }

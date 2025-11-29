@@ -438,4 +438,11 @@ public class WorkoutService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return date.format(formatter);
     }
+
+    @Transactional(readOnly = true)
+    public List<ExerciseResDto> getExerciseList(){
+        return exerciseRepository.findAll().stream()
+                .map(ExerciseResDto::of)
+                .toList();
+    }
 }
