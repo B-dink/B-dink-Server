@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -420,5 +421,21 @@ public class WorkoutService {
                 .flatMap(pe -> pe.getWorkoutSets().stream())
                 .mapToLong(ws -> (long) ws.getWeight() * ws.getReps())
                 .sum();
+    }
+
+    //Version
+    @Transactional(readOnly = true)
+    public String getExerciseVersion(){
+        LocalDateTime lastUpdatedAt = exerciseRepository.findLastUpdatedAt()
+                .orElse(null);
+
+        if (lastUpdatedAt == null){
+            // 운동 종목이 하나도 없을 경우
+            return "0000.00.00";
+        }
+
+        LocalDate date = lastUpdatedAt.toLocalDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return date.format(formatter);
     }
 }

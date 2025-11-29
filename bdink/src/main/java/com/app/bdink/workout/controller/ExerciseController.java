@@ -8,6 +8,7 @@ import com.app.bdink.workout.controller.dto.request.CreateExerciseDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseResDto;
 import com.app.bdink.workout.controller.dto.response.ExerciseSearchResDto;
+import com.app.bdink.workout.controller.dto.response.ExerciseVersionResDto;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,5 +81,13 @@ public class ExerciseController {
         List<ExerciseSearchResDto> result = workoutService.searchExercises(keyword, part);
         return RspTemplate.success(Success.SEARCH_EXERCISE_SUCCESS, result);
 
+    }
+
+    @GetMapping("/version")
+    @Operation(method = "GET", description = "DB에 마지막으로 운동종목 데이터가 변경된 시점을 기준으로 합니다.")
+    public RspTemplate<?> getExerciseVersion(){
+        String version = workoutService.getExerciseVersion();
+        ExerciseVersionResDto resDto = new ExerciseVersionResDto(version);
+        return RspTemplate.success(Success.GET_EXERCISE_VERSION_SUCCESS, resDto);
     }
 }

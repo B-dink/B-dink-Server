@@ -3,9 +3,12 @@ package com.app.bdink.workout.repository;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.entity.Exercise;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
@@ -14,4 +17,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 
     // part + keyword의 조합
     List<Exercise> findByPartAndNameContainingIgnoreCase(ExercisePart part, String name);
+
+    @Query("select max(e.updatedAt) from Exercise e")
+    Optional<LocalDateTime> findLastUpdatedAt();
 }
