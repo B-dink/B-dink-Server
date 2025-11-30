@@ -371,15 +371,16 @@ public class WorkoutService {
 
     }
 
+    //지난주 볼륨 비교 및 지난달 운동 횟수 비교 로직
     @Transactional(readOnly = true)
-    public WeeklyVolumeCompareResDto getWeeklyVolumeCompare(Member member, LocalDate baseDate){
+    public WeeklyVolumeCompareResDto getWeeklyVolumeCompare(Member member, LocalDate baseDate) {
         // 1. 이번 주(Mon~Sun) 계산
         LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
         LocalDate thisWeekEnd = thisWeekStart.plusDays(6);
 
         // 2. 지난 주(Mon~Sun) 계산
         LocalDate lastWeekStart = thisWeekStart.minusWeeks(1);
-        LocalDate lastWeekEnd   = thisWeekStart.minusDays(1);
+        LocalDate lastWeekEnd = thisWeekStart.minusDays(1);
 
         long thisWeekVolume = calcWeekVolume(member, thisWeekStart, thisWeekEnd);
         long lastWeekVolume = calcWeekVolume(member, lastWeekStart, lastWeekEnd);
@@ -399,19 +400,48 @@ public class WorkoutService {
         // 지난 주 보다 향상 > true, 하락 or 동일 false
         boolean increased = diffVolume > 0;
 
+        // 월간 운동 횟수 비교 계산
+        MonthlyWorkoutCountCompareResDto monDto = calcMonthlyWorkoutCompare(member, baseDate);
+
         return new WeeklyVolumeCompareResDto(
                 lastWeekVolume,
                 thisWeekVolume,
                 diffVolume,
                 percentRounded,
-                increased
+                increased,
+                monDto
         );
 
     }
 
+
+    //Version
+    @Transactional(readOnly = true)
+    public String getExerciseVersion() {
+        LocalDateTime lastUpdatedAt = exerciseRepository.findLastUpdatedAt()
+                .orElse(null);
+
+        if (lastUpdatedAt == null) {
+            // 운동 종목이 하나도 없을 경우
+            return "0000.00.00";
+        }
+
+        LocalDate date = lastUpdatedAt.toLocalDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return date.format(formatter);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExerciseResDto> getExerciseList() {
+        return exerciseRepository.findAll().stream()
+                .map(ExerciseResDto::of)
+                .toList();
+    }
+
+    // 이번주 볼륨 계산 로직
     private long calcWeekVolume(Member member, LocalDate start, LocalDate end) {
         LocalDateTime from = start.atStartOfDay();
-        LocalDateTime to   = end.plusDays(1).atStartOfDay(); // end 포함
+        LocalDateTime to = end.plusDays(1).atStartOfDay(); // end 포함
 
         List<WorkOutSession> sessions =
                 workOutSessionRepository.findByMemberAndCreatedAtBetween(member, from, to);
@@ -423,26 +453,62 @@ public class WorkoutService {
                 .sum();
     }
 
-    //Version
-    @Transactional(readOnly = true)
-    public String getExerciseVersion(){
-        LocalDateTime lastUpdatedAt = exerciseRepository.findLastUpdatedAt()
-                .orElse(null);
+    // 이번달 운동 횟수 계산 로직
+    private int calcThisMonthWorkoutCount(Member member, LocalDate baseDate) {
+        LocalDate firstDayThisMonth = baseDate.withDayOfMonth(1);
+        LocalDate firstDayNextMonth = firstDayThisMonth.plusMonths(1);
 
-        if (lastUpdatedAt == null){
-            // 운동 종목이 하나도 없을 경우
-            return "0000.00.00";
-        }
+        LocalDateTime from = firstDayThisMonth.atStartOfDay();
+        LocalDateTime to = firstDayNextMonth.atStartOfDay();
 
-        LocalDate date = lastUpdatedAt.toLocalDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        return date.format(formatter);
+        return workOutSessionRepository.findByMemberAndCreatedAtBetween(member, from, to).size();
     }
 
-    @Transactional(readOnly = true)
-    public List<ExerciseResDto> getExerciseList(){
-        return exerciseRepository.findAll().stream()
-                .map(ExerciseResDto::of)
-                .toList();
+    // 저번달 운동 횟수 계산 로직
+    private int calcLastMonthWorkoutCount(Member member, LocalDate baseDate) {
+        LocalDate firstDayLastMonth = baseDate.withDayOfMonth(1).minusMonths(1);
+        LocalDate firstDayNextMonth = firstDayLastMonth.plusMonths(1);
+
+        LocalDateTime from = firstDayLastMonth.atStartOfDay();
+        LocalDateTime to = firstDayNextMonth.atStartOfDay();
+
+        return workOutSessionRepository.findByMemberAndCreatedAtBetween(member, from, to).size();
+    }
+
+    // 운동 횟수 계산 로직
+    private MonthlyWorkoutCountCompareResDto calcMonthlyWorkoutCompare(Member member, LocalDate baseDate) {
+        // 운동 횟수 계산 로직
+        int thisMonthWorkoutCount = calcThisMonthWorkoutCount(member, baseDate);
+        int lastMonthWorkoutCount = calcLastMonthWorkoutCount(member, baseDate);
+
+        int diffCount = thisMonthWorkoutCount - lastMonthWorkoutCount;
+
+        double monthPercent;
+
+        if (lastMonthWorkoutCount == 0) {
+            // 이번달 운동 횟수가 0일 경우
+            monthPercent = (thisMonthWorkoutCount == 0) ? 0 : 100;
+        } else {
+            // 변화율 = 변화량 * 100/저번달 운동 횟수
+            monthPercent = diffCount * 100.0 / lastMonthWorkoutCount;
+        }
+
+        //변화율 절댓값
+        int montPercentRounded = (int) Math.round(Math.abs(monthPercent));
+
+        // 향상 or 감소
+        boolean monthIncreased = diffCount > 0;
+
+        // 이번달 총 일 수
+        int daysInThisMonth = baseDate.withDayOfMonth(1).lengthOfMonth();
+
+        return new MonthlyWorkoutCountCompareResDto(
+                thisMonthWorkoutCount,
+                lastMonthWorkoutCount,
+                diffCount,
+                montPercentRounded,
+                monthIncreased,
+                daysInThisMonth
+        );
     }
 }

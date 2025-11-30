@@ -5,6 +5,7 @@ public record WeeklyVolumeCompareResDto(
         long thisWeekVolume,
         long diffVolume,
         int percentChange, // 변화율의 절댓값
-        boolean increased // true (증가), false(감소 or 동일)
+        boolean increased, // true (증가), false(감소 or 동일)
+        MonthlyWorkoutCountCompareResDto monthlyWorkoutCount
 ) {
 }

@@ -106,7 +106,7 @@ public class WorkoutController {
     }
 
     @GetMapping("/volume/weeklyCompare")
-    @Operation(method = "GET", description = "지난주 대비 운동량을 조회합니다.")
+    @Operation(method = "GET", description = "지난주 대비 운동량 및 운동횟수를 조회합니다.")
     public RspTemplate<?> getWorkoutVolume(Principal principal) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
 
