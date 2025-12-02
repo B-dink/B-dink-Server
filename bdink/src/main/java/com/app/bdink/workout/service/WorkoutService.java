@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -414,29 +415,64 @@ public class WorkoutService {
 
     }
 
-
-    //Version
-    @Transactional(readOnly = true)
-    public String getExerciseVersion() {
-        LocalDateTime lastUpdatedAt = exerciseRepository.findLastUpdatedAt()
-                .orElse(null);
-
-        if (lastUpdatedAt == null) {
-            // 운동 종목이 하나도 없을 경우
-            return "0000.00.00";
-        }
-
-        LocalDate date = lastUpdatedAt.toLocalDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        return date.format(formatter);
-    }
-
     @Transactional(readOnly = true)
     public List<ExerciseResDto> getExerciseList() {
         return exerciseRepository.findAll().stream()
                 .map(ExerciseResDto::of)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public ExerciseVersionResDto getExerciseFromVersion(String version){
+
+        LocalDate clientVersionDate = LocalDate.parse(version);
+
+        Optional<LocalDate> optionalLastDate = exerciseRepository.findLastCreatedAtDate();
+
+        // 서버에 Data가 없는 경우
+        if (optionalLastDate.isEmpty()) {
+            // 서버 기준 최신 버전도 없으니 클라 버전 그대로 돌려주고, 업데이트 없음
+            return new ExerciseVersionResDto(
+                    version,
+                    false,   // 변경된 운동 없음
+                    List.of()
+            );
+        }
+
+        LocalDate lastCreatedDate = optionalLastDate.get();
+        String latestVersion = lastCreatedDate.toString();
+
+        // 클라 버전이 서버 버전보다 높은 경우
+        if (!clientVersionDate.isBefore(lastCreatedDate)) {
+            // clientVersionDate >= lastCreatedDate
+            return new ExerciseVersionResDto(
+                    latestVersion,
+                    false,
+                    List.of()
+            );
+        }
+
+        // 클라 버전의 다음날부터(lastCreatedDate까지 포함)
+        LocalDate startDate = clientVersionDate.plusDays(1);
+        LocalDate endDate = lastCreatedDate;
+
+        LocalDateTime from = startDate.atStartOfDay();
+        LocalDateTime to   = endDate.plusDays(1).atStartOfDay();
+
+        List<Exercise> exercises =
+                exerciseRepository.findAllByCreatedAtBetween(from, to);
+
+        List<ExerciseResDto> exerciseDtos = exercises.stream()
+                .map(ExerciseResDto::of)
+                .toList();
+
+        return new ExerciseVersionResDto(
+                latestVersion,
+                true,
+                exerciseDtos
+        );
+    }
+
 
     // 이번주 볼륨 계산 로직
     private long calcWeekVolume(Member member, LocalDate start, LocalDate end) {

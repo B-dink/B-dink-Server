@@ -83,18 +83,17 @@ public class ExerciseController {
 
     }
 
-    @GetMapping("/version")
-    @Operation(method = "GET", description = "DB에 마지막으로 운동종목 데이터가 변경된 시점을 기준으로 합니다.")
-    public RspTemplate<?> getExerciseVersion(){
-        String version = workoutService.getExerciseVersion();
-        ExerciseVersionResDto resDto = new ExerciseVersionResDto(version);
-        return RspTemplate.success(Success.GET_EXERCISE_VERSION_SUCCESS, resDto);
-    }
-
     @GetMapping("/all")
     @Operation(method = "GET", description = "모든 운동종목 정보를 조회합니다.")
     public RspTemplate<?> getExerciseAll(){
         return RspTemplate.success(Success.GET_EXERCISE_ALL_SUCCESS, workoutService.getExerciseList());
+    }
+
+    @GetMapping("/version")
+    @Operation(method = "GET", description = "버전을 체크해 운동종목 정보를 조회합니다.")
+    public RspTemplate<?> getExerciseVersion(@RequestParam String version){
+        ExerciseVersionResDto dto = workoutService.getExerciseFromVersion(version);
+        return RspTemplate.success(Success.GET_EXERCISE_VERSION_SUCCESS, dto);
     }
 
 }
