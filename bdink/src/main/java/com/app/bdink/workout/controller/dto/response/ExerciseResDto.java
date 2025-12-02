@@ -3,6 +3,7 @@ import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.entity.Exercise;
 
 public record ExerciseResDto(
+        Long ExerciseId,
         String ExerciseName,
         String ExerciseDescription,
         String ExerciseVideo,
@@ -11,6 +12,7 @@ public record ExerciseResDto(
 ) {
     public static ExerciseResDto of(final Exercise exercise) {
         return new ExerciseResDto(
+                exercise.getId(),
                 exercise.getName(),
                 exercise.getDescription(),
                 exercise.getVideoUrl(),
