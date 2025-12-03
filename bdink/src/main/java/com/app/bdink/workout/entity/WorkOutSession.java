@@ -23,8 +23,13 @@ public class WorkOutSession extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    // Session Name
     @Column(name = "memo")
     private String memo;
+
+    //Session Memo
+    @Column(name = "workoutMemo")
+    private String workoutMemo;
 
     @OneToMany(mappedBy = "workOutSession",
             cascade = CascadeType.ALL,
@@ -33,13 +38,18 @@ public class WorkOutSession extends BaseTimeEntity {
     private List<PerformedExercise> performedExercises = new ArrayList<>();
 
     @Builder
-    public WorkOutSession(Member member, String memo) {
+    public WorkOutSession(Member member, String memo, String workoutMemo) {
         this.member = member;
         this.memo = memo;
+        this.workoutMemo = workoutMemo;
     }
 
     public void changeMemo(String memo){
         this.memo = memo;
+    }
+
+    public void changeWorkoutMemo(String workoutMemo){
+        this.workoutMemo = workoutMemo;
     }
 
     public void addPerformedExercise(PerformedExercise pe){

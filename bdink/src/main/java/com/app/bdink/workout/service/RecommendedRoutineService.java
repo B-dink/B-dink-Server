@@ -97,7 +97,6 @@ public class RecommendedRoutineService {
                             ex.getId(),
                             ex.getName(),
                             ex.getPictureUrl(),
-                            re.getMemo(),
                             sets
                     );
                 })

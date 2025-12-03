@@ -6,7 +6,6 @@ public record WorkoutDailyExerciseResDto(
         Long exerciseId,
         String exerciseName,
         String pictureUrl,
-        String memo,
         List<WorkoutDailySetResDto> sets
 ) {
 }

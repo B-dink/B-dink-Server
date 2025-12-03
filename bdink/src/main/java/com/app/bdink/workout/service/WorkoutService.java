@@ -107,6 +107,7 @@ public class WorkoutService {
         WorkOutSession session = workOutSessionRepository.save(
                 WorkOutSession.builder()
                         .memo(requestDto.todayWorkoutName())
+                        .workoutMemo(requestDto.workoutMemo())
                         .member(member)
                         .build()
         );
@@ -159,6 +160,8 @@ public class WorkoutService {
          */
 
         session.changeMemo(requestDto.todayWorkoutName());
+
+        session.changeWorkoutMemo(requestDto.workoutMemo());
 
         session.clearPerformedExercises();
 
@@ -340,6 +343,7 @@ public class WorkoutService {
 
         String dateString = session.getCreatedAt().toLocalDate().toString();
         String workoutName = session.getMemo();
+        String workoutMemo = session.getWorkoutMemo();
 
         List<WorkoutDailyExerciseResDto> exercises = session.getPerformedExercises().stream()
                 .map(pe ->
@@ -356,7 +360,6 @@ public class WorkoutService {
                                     exercise.getId(),
                                     exercise.getName(),
                                     exercise.getPictureUrl(),
-                                    pe.getMemo(),
                                     sets
                             );
                         }
@@ -367,6 +370,7 @@ public class WorkoutService {
         return new WorkoutDailyDetailResDto(
                 dateString,
                 workoutName,
+                workoutMemo,
                 session.getId(),
                 exercises
         );

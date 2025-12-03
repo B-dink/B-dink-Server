@@ -24,8 +24,8 @@ public class RoutineExercise {
     @ManyToOne(fetch = FetchType.LAZY)
     private Exercise exercise;
 
-    @Column(name = "memo")
-    private String memo;
+//    @Column(name = "memo")
+//    private String memo;
 
     @Column(name = "orderIndex")
     private int orderIndex;
@@ -38,7 +38,7 @@ public class RoutineExercise {
     @Builder
     public RoutineExercise(Exercise exercise, String memo, int orderIndex) {
         this.exercise = exercise;
-        this.memo = memo;
+//        this.memo = memo;
         this.orderIndex = orderIndex;
     }
 

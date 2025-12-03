@@ -4,6 +4,7 @@ import java.util.List;
 
 public record WorkoutSessionSaveReqDto(
         String todayWorkoutName,
+        String workoutMemo,
         List<PerformedExerciseSaveReqDto> performedExercises
 ) {
 }

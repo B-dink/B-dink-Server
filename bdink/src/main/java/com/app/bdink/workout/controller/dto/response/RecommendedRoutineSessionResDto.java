@@ -6,7 +6,7 @@ public record RecommendedRoutineSessionResDto(
         Long exerciseId,
         String exerciseName,
         String pictureUrl,
-        String memo,
+//        String memo,
         List<RecommendedRoutineSetResDto> sets
 ) {
 }
