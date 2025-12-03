@@ -5,6 +5,7 @@ import java.util.List;
 public record WorkoutDailyDetailResDto(
         String date,
         String workoutName,
+        long sessionId,
         List<WorkoutDailyExerciseResDto> sessions
 ) {
 }

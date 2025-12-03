@@ -367,6 +367,7 @@ public class WorkoutService {
         return new WorkoutDailyDetailResDto(
                 dateString,
                 workoutName,
+                session.getId(),
                 exercises
         );
 
