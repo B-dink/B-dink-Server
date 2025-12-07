@@ -49,6 +49,7 @@ public enum Success {
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     GET_YOUTUBE_VIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 조회 성공"),
     GET_ROUTINE_DETAIL_SUCCESS(HttpStatus.OK, "추천 운동 루틴 조회 성공"),
+    GET_ROUTINE_ALL_SUCCESS(HttpStatus.OK, "모든 추천 운동 루틴 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
     NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),

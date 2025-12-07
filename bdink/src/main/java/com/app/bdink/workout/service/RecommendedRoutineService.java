@@ -5,9 +5,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.workout.controller.dto.request.RecommendedRoutineSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.RoutineExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.RoutineSetTemplateSaveReqDto;
-import com.app.bdink.workout.controller.dto.response.RecommendedRoutineDetailResDto;
-import com.app.bdink.workout.controller.dto.response.RecommendedRoutineSessionResDto;
-import com.app.bdink.workout.controller.dto.response.RecommendedRoutineSetResDto;
+import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.RecommendedRoutine;
 import com.app.bdink.workout.entity.RoutineExercise;
@@ -103,6 +101,13 @@ public class RecommendedRoutineService {
                 .toList();
 
         return new RecommendedRoutineDetailResDto(routine.getTitle(), routine.getThumbnailUrl(),sessions);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecommendedRoutineAllResDto> getRoutineAll(){
+        return routineRepo.findAll().stream()
+                .map(RecommendedRoutineAllResDto::of)
+                .toList();
     }
 
     // 내부 빌더 로직

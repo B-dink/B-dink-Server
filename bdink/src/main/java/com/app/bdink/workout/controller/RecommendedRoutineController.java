@@ -53,9 +53,15 @@ public class RecommendedRoutineController {
     // DETAIL – 추천 카드 눌렀을 때
     @GetMapping("/{routineId}")
     @Operation(summary = "추천 운동루틴 상세 조회",
-            description = "추천 운동루틴 카드 클릭 시 운동일지 상세 포맷으로 반환할 시 필요한 API입니다.")
+            description = "routineId를 통해 추천 운동루틴을 조회하는 API입니다.")
     public RspTemplate<?> getRoutineDetail(@PathVariable Long routineId) {
         RecommendedRoutineDetailResDto dto = recommendedRoutineService.getRoutineDetail(routineId);
         return RspTemplate.success(Success.GET_ROUTINE_DETAIL_SUCCESS, dto);
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "모든 추천 운동루틴 조회", description = "모든 추천 운동루틴을 조회합니다.")
+    public RspTemplate<?> getRoutineAll(){
+        return RspTemplate.success(Success.GET_ROUTINE_ALL_SUCCESS, recommendedRoutineService.getRoutineAll());
     }
 }
