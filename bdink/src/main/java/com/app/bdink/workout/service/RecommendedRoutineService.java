@@ -102,7 +102,7 @@ public class RecommendedRoutineService {
                 })
                 .toList();
 
-        return new RecommendedRoutineDetailResDto(routine.getTitle(), sessions);
+        return new RecommendedRoutineDetailResDto(routine.getTitle(), routine.getThumbnailUrl(),sessions);
     }
 
     // 내부 빌더 로직

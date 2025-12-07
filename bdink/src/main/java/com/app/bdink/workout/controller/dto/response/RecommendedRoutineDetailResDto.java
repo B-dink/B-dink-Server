@@ -4,6 +4,7 @@ import java.util.List;
 
 public record RecommendedRoutineDetailResDto(
         String workoutName,
+        String RoutineThumbnailUrl,
         List<RecommendedRoutineSessionResDto> sessions
 ) {
 }
