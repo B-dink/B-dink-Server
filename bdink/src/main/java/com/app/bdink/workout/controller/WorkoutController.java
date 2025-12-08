@@ -7,10 +7,7 @@ import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
-import com.app.bdink.workout.controller.dto.response.VolumeStatusResDto;
-import com.app.bdink.workout.controller.dto.response.WeeklyVolumeCompareResDto;
-import com.app.bdink.workout.controller.dto.response.WeeklyVolumeGraphResDto;
-import com.app.bdink.workout.controller.dto.response.WorkoutDailyDetailResDto;
+import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -122,9 +119,8 @@ public class WorkoutController {
     @Operation(method = "POST", description = "AI 메모로 운동일지 정보 DTO를 생성합니다.")
     public RspTemplate<?> createWorkoutSessionByAi(@RequestBody AiWorkoutMemoReqDto reqDto){
 
-        WorkoutSessionSaveReqDto dto = workoutService.convertMemoTextToRequestDto(reqDto);
+        AiMemoResDto dto = workoutService.convertMemoTextToRequestDto(reqDto);
 
         return RspTemplate.success(Success.CREATE_AI_MEMO_SUCCESS, dto);
-
     }
 }

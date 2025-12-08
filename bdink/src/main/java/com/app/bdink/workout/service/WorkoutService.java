@@ -435,14 +435,14 @@ public class WorkoutService {
     }
 
     // LLM memoText 변환 로직
-    public WorkoutSessionSaveReqDto convertMemoTextToRequestDto(AiWorkoutMemoReqDto dto) {
+    public AiMemoResDto convertMemoTextToRequestDto(AiWorkoutMemoReqDto dto) {
 
         // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
         AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
 
         // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
-        List<PerformedExerciseSaveReqDto> performedExercises = parsed.exercises().stream()
-                .map(this::mapToPerformedExerciseSaveReqDto)
+        List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
+                .map(this::mapToExerciseResDto)
                 .filter(Objects::nonNull)
                 .toList();
 
@@ -451,22 +451,23 @@ public class WorkoutService {
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
 
         // 4) workoutMemo is null
-        return new WorkoutSessionSaveReqDto(
+        return new AiMemoResDto(
                 todayWorkoutName,
                 null,
-                performedExercises
+                workoutExercises
         );
 
     }
 
-    private PerformedExerciseSaveReqDto mapToPerformedExerciseSaveReqDto(AiParsedExerciseDto dto){
+    private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto){
         Exercise exercise = findFirstSimilarOrNull(dto.exerciseName());
 
         if (exercise == null) return null;
 
-        return new PerformedExerciseSaveReqDto(
+        return new WorkoutDailyExerciseResDto(
                 exercise.getId(),
-                null,
+                exercise.getName(),
+                exercise.getPictureUrl(),
                 //TODO: 이쪽 리스토로 출력이 안되면 다시 확인하기
                 dto.sets()
         );
