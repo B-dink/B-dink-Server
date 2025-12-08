@@ -29,6 +29,8 @@ public enum Error {
     NOT_FOUND_EXERCISE(HttpStatus.NOT_FOUND, "찾을 수 없는 운동종목입니다."),
     NOT_FOUND_RECOMMENDED_EXERCISE(HttpStatus.NOT_FOUND, "찾을 수 없는 추천 운동루틴 입니다."),
     NOT_FOUND_WORKOUTSESSION(HttpStatus.NOT_FOUND, "해당 회원의 운동일지를 찾을 수 없습니다."),
+    NOT_FOUND_OPENAI(HttpStatus.NOT_FOUND, "OpenAI Chat API 응답이 비어있어 찾을 수 없습니다."),
+    FAILED_PARSE_OPENAI(HttpStatus.NOT_FOUND, "OpenAI AI 메모 파싱 실패"),
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),

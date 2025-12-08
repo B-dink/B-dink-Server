@@ -31,6 +31,7 @@ public enum Success {
     CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
     CREATE_PAYMENT_SUCCESS(HttpStatus.CREATED, "결제 성공"),
     CREATE_YOUTUBEVIDEO_SUCCESS(HttpStatus.CREATED, "유튜브 비디오 생성 성공"),
+    CREATE_AI_MEMO_SUCCESS(HttpStatus.CREATED, "AI 메모 DTO 생성 성공"),
 
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
