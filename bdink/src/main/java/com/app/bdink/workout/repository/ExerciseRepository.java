@@ -40,4 +40,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    // ai 메모장 mvp
+    List<Exercise> findByNameContainingIgnoreCase(String keyword);
 }

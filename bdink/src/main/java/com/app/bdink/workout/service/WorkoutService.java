@@ -3,6 +3,10 @@ package com.app.bdink.workout.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
+import com.app.bdink.openai.parser.AiParsedExerciseDto;
+import com.app.bdink.openai.parser.AiParsedWorkoutDto;
+import com.app.bdink.openai.service.OpenAiChatService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
@@ -26,9 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,6 +45,7 @@ public class WorkoutService {
     private final PerformedExerciseRepository performedExerciseRepository;
     private final WorkOutSessionRepository workOutSessionRepository;
     private final WorkoutSetRepository workoutSetRepository;
+    private final OpenAiChatService openAiChatService;
 
 
     public Exercise findById(Long id) {
@@ -426,6 +433,60 @@ public class WorkoutService {
                 .map(ExerciseResDto::of)
                 .toList();
     }
+
+    // LLM memoText 변환 로직
+    public WorkoutSessionSaveReqDto convertMemoTextToRequestDto(AiWorkoutMemoReqDto dto) {
+
+        // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
+        AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
+
+        // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
+        List<PerformedExerciseSaveReqDto> performedExercises = parsed.exercises().stream()
+                .map(this::mapToPerformedExerciseSaveReqDto)
+                .filter(Objects::nonNull)
+                .toList();
+
+        // 3) workoutName custom
+        String todayWorkoutName = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
+
+        // 4) workoutMemo is null
+        return new WorkoutSessionSaveReqDto(
+                todayWorkoutName,
+                null,
+                performedExercises
+        );
+
+    }
+
+    private PerformedExerciseSaveReqDto mapToPerformedExerciseSaveReqDto(AiParsedExerciseDto dto){
+        Exercise exercise = findFirstSimilarOrNull(dto.exerciseName());
+
+        if (exercise == null) return null;
+
+        return new PerformedExerciseSaveReqDto(
+                exercise.getId(),
+                null,
+                //TODO: 이쪽 리스토로 출력이 안되면 다시 확인하기
+                dto.sets()
+        );
+    }
+
+    // LLM을 위한 프로토타입 로직 (ai 메모장)
+    public Exercise findFirstSimilarOrNull(String rawName){
+        if(rawName == null || rawName.isBlank()) return null;
+
+        String keyword = rawName.trim();
+
+        List<Exercise> likeExercises = exerciseRepository.findByNameContainingIgnoreCase(keyword);
+
+        // 매칭이 안될 경우 null
+        if(likeExercises.isEmpty()) return null;
+
+        // mvp 단계이기 때문에 여러개 중 한 개만 사용
+        return likeExercises.get(0);
+    }
+
 
     @Transactional(readOnly = true)
     public ExerciseVersionResDto getExerciseFromVersion(String version){
