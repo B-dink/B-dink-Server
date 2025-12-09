@@ -3,6 +3,7 @@ package com.app.bdink.workout.service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
 import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
@@ -46,6 +47,7 @@ public class WorkoutService {
     private final WorkOutSessionRepository workOutSessionRepository;
     private final WorkoutSetRepository workoutSetRepository;
     private final OpenAiChatService openAiChatService;
+    private final MemberRepository memberRepository;
 
 
     public Exercise findById(Long id) {
@@ -241,8 +243,8 @@ public class WorkoutService {
         List<MemberWeeklyVolumeDto> ranking =
                 workoutSetRepository.findWeeklyVolumeRanking(weekStart, weekEnd);
 
-        //TODO: 총 참여자를 잡을 때 전체 유저 수로 변경될 가능성 존재
-        long totalParticipants = ranking.size();
+        // 총 참여자 -> 전체 member 수 + 1000
+        long totalParticipants = memberRepository.count()+1000;
 
         // 4. 내 순위 + 내 주간 볼륨
         //TODO : 기획적으로 랭킹에 없을 경우 0 or 전체 참여자 수 + 1 택
