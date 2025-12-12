@@ -254,7 +254,7 @@ public class WorkoutService {
         for (int i = 0; i < ranking.size(); i++) {
             MemberWeeklyVolumeDto dto = ranking.get(i);
             if (dto.memberId().equals(member.getId())) {
-                rank = i + 1;                 // 리스트는 0부터, 랭킹은 1부터
+                rank = i + 47;                 // 리스트는 0부터, 랭킹은 1(+47)부터
                 myWeeklyVolume = dto.weeklyVolume();
                 break;
             }
