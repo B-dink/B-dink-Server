@@ -18,6 +18,7 @@ public enum Error {
     NOT_FOUND_USER_EXCEPTION(HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다."),
     NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND, "찾을 수 없는 질문입니다."),
     NOT_FOUND_REPORT_TYPE(HttpStatus.NOT_FOUND, "찾을 수 없는 신고유형입니다."),
+    NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, "추천 루틴을 찾을 수 없습니다."),
 
     NOT_FOUND_ANSWER(HttpStatus.NOT_FOUND, "찾을 수 없는 답변입니다."),
     NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "찾을 수 없는 북마크입니다."),
@@ -25,6 +26,11 @@ public enum Error {
     NOT_FOUND_SUGANGLIST(HttpStatus.NOT_FOUND, "수강 신청이 되어있지 않은 유저입니다."),
 
     NOT_FOUND_CENTER(HttpStatus.NOT_FOUND, "찾을 수 없는 센터입니다."),
+    NOT_FOUND_EXERCISE(HttpStatus.NOT_FOUND, "찾을 수 없는 운동종목입니다."),
+    NOT_FOUND_RECOMMENDED_EXERCISE(HttpStatus.NOT_FOUND, "찾을 수 없는 추천 운동루틴 입니다."),
+    NOT_FOUND_WORKOUTSESSION(HttpStatus.NOT_FOUND, "해당 회원의 운동일지를 찾을 수 없습니다."),
+    NOT_FOUND_OPENAI(HttpStatus.NOT_FOUND, "OpenAI Chat API 응답이 비어있어 찾을 수 없습니다."),
+    FAILED_PARSE_OPENAI(HttpStatus.NOT_FOUND, "OpenAI AI 메모 파싱 실패"),
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "찾을 수 없는 리뷰입니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "찾을 수 없는 일정입니다."),
@@ -130,6 +136,7 @@ public enum Error {
     UNAUTHORIZED_KEY(HttpStatus.UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
     INVALID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     INVALID_QR_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "유효하지 않은 QR토큰입니다."),
+    INVALID_SEARCH_EMPTY_EXCEPTION(HttpStatus.UNAUTHORIZED, "검색어는 비어 있을 수 없습니다."),
 
     /**
      * 402 PAYMENT REQUIRED

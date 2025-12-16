@@ -12,6 +12,7 @@ public enum Success {
      * 201 CREATED
      */
     CREATE_ALIMETALK_TOKEN_SUCCESS(HttpStatus.CREATED, "알림톡 토큰 생성 성공"),
+    CREATE_ROUTINE_SUCCESS(HttpStatus.CREATED, "추천 운동 루틴 생성 성공"),
     SEND_ALIMTALK_SUCCESS(HttpStatus.CREATED, "알림톡 전송 성공"),
     CREATE_BOOKMARK_SUCCESS(HttpStatus.CREATED, "북마크 생성 성공"),
     CREATE_SUGANG_SUCCESS(HttpStatus.CREATED, "수강 생성 성공"),
@@ -22,12 +23,15 @@ public enum Success {
     CREATE_CHAPTER_SUCCESS(HttpStatus.CREATED, "챕터 생성 성공"),
     CREATE_INSTRUCTOR_SUCCESS(HttpStatus.CREATED, "강사 생성 성공"),
     CREATE_LECTURE_SUCCESS(HttpStatus.CREATED, "강의 생성 성공"),
+    CREATE_EXERCISE_SUCCESS(HttpStatus.CREATED, "신규 운동종목 생성 성공"),
+    CREATE_EXERCISELIST_SUCCESS(HttpStatus.CREATED, "운동일지 생성 성공"),
     CREATE_ANSWER_SUCCESS(HttpStatus.CREATED, "답변 생성 성공"),
     CREATE_QUESTION_SUCCESS(HttpStatus.CREATED, "질문 생성 성공"),
     CREATE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "스케줄 생성 성공"),
     CREATE_PRESIGNURL_SUCCESS(HttpStatus.CREATED, "presignUrl 생성 성공"),
     CREATE_PAYMENT_SUCCESS(HttpStatus.CREATED, "결제 성공"),
     CREATE_YOUTUBEVIDEO_SUCCESS(HttpStatus.CREATED, "유튜브 비디오 생성 성공"),
+    CREATE_AI_MEMO_SUCCESS(HttpStatus.CREATED, "AI 메모 DTO 생성 성공"),
 
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 
@@ -45,15 +49,23 @@ public enum Success {
     GET_QUESTION_BY_CLASS_SUCCESS(HttpStatus.OK, "클래스 별 질문 조회 성공"),
     GET_QUESTION_DETAIL_SUCCESS(HttpStatus.OK, "질문 디테일 조회 성공"),
     GET_YOUTUBE_VIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 조회 성공"),
+    GET_ROUTINE_DETAIL_SUCCESS(HttpStatus.OK, "추천 운동 루틴 조회 성공"),
+    GET_ROUTINE_ALL_SUCCESS(HttpStatus.OK, "모든 추천 운동 루틴 조회 성공"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 체크 성공"),
     NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
     GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
+    SEARCH_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 검색 성공"),
 
     GET_KOLLUSMEDIA_SUCCESS(HttpStatus.OK,"개별 시청 기록 조회 성공"),
     GET_SUGANG_CLASSROOM_SUCCESS(HttpStatus.OK,"수강신청 클래스룸 목록 조회 성공"),
     GET_MYPAGE_SUCCESS(HttpStatus.OK,"MY PAGE 멤버 정보 조회 성공"),
+    GET_VOLUME_STATUS_SUCCESS(HttpStatus.OK,"주간 볼륨 현황 및 랭킹 조회 성공"),
+    GET_VOLUME_GRAPH_SUCCESS(HttpStatus.OK,"지난 주, 이번 주 일별 볼륨 조회 성공"),
+    GET_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 조회 성공"),
+    GET_WEEKLY_COMPARE_VOLUME_SUCCESS(HttpStatus.OK,"주간 볼륨 비교 API 조회 성공"),
+
 
 
 
@@ -67,6 +79,7 @@ public enum Success {
     GET_LECTURE_SUCCESS(HttpStatus.OK, "강의 조회 성공"),
     GET_CENTER_SUCCESS(HttpStatus.OK, "센터 조회 성공"),
     GET_ALLCENTER_SUCCESS(HttpStatus.OK, "계약중인 모든 센터 조회 성공"),
+    GET_EXERCISEPART_SUCCESS(HttpStatus.OK, "파트별 운동종목 조회 성공"),
     CHECK_QR_SUCCESS(HttpStatus.OK, "QR코드 인증 성공"),
 
 
@@ -80,6 +93,9 @@ public enum Success {
     UPDATE_YOUTUBEVIDEO_SUCCESS(HttpStatus.OK, "유튜브 비디오 수정 성공"),
     UPDATE_PHONE_SUCCESS(HttpStatus.OK, "폰번호 수정 성공"),
     UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호 재설정 성공"),
+    UPDATE_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 수정 성공"),
+    UPDATE_EXERCISELIST_SUCCESS(HttpStatus.OK,"운동일지 수정 성공"),
+    UPDATE_ROUTINE_SUCCESS(HttpStatus.OK,"추천 운동루틴 업데이트 성공"),
 
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
@@ -100,6 +116,10 @@ public enum Success {
     GET_DATE_SCHEDULE_SUCCESS(HttpStatus.OK, "날짜별 스케줄 조회 성공"),
     GET_SCHEDULE_BY_CATEGORY_SUCCESS(HttpStatus.OK, "카테고리 별 스케줄 조회 성공"),
     GET_SUGANG_SUCCESS(HttpStatus.OK, "수강 조회 성공"),
+    GET_WORKOUT_CALENDAR_SUCCESS(HttpStatus.OK, "운동 수행 날짜 조회 성공"),
+    GET_WORKOUT_SESSION_DETAIL_SUCCESS(HttpStatus.OK, "운동일지 상세 정보 조회 성공"),
+    GET_EXERCISE_VERSION_SUCCESS(HttpStatus.OK, "운동종목 버전 조회 성공"),
+    GET_EXERCISE_ALL_SUCCESS(HttpStatus.OK, "모든 운동종목 정보 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
@@ -155,6 +175,8 @@ public enum Success {
     DELETE_SCHEDULE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄 삭제 성공"),
     DELETE_YOUTUBEVIDEO_SUCCESS(HttpStatus.NO_CONTENT, "유튜브 비디오 삭제 성공"),
     DELETE_CENTER_SUCCESS(HttpStatus.NO_CONTENT, "센터 정보 삭제 성공"),
+    DELETE_WORKOUT_SUCCESS(HttpStatus.NO_CONTENT, "운동일지 정보 삭제 성공"),
+    DELETE_ROUTINE_SUCCESS(HttpStatus.NO_CONTENT, "추천 운동루틴 삭제 성공"),
 
 
     ;
