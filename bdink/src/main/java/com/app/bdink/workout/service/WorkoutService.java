@@ -7,6 +7,7 @@ import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
 import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
+import com.app.bdink.openai.service.AiMemoInputLogService;
 import com.app.bdink.openai.service.OpenAiChatService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
@@ -47,6 +48,7 @@ public class WorkoutService {
     private final WorkOutSessionRepository workOutSessionRepository;
     private final WorkoutSetRepository workoutSetRepository;
     private final OpenAiChatService openAiChatService;
+    private final AiMemoInputLogService aiMemoInputLogService;
     private final MemberRepository memberRepository;
 
 
@@ -439,25 +441,42 @@ public class WorkoutService {
     // LLM memoText 변환 로직
     public AiMemoResDto convertMemoTextToRequestDto(AiWorkoutMemoReqDto dto) {
 
-        // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
-        AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
+        try {
+            // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
+            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
 
-        // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
-        List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
-                .map(this::mapToExerciseResDto)
-                .filter(Objects::nonNull)
-                .toList();
+            // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
+            List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
+                    .map(this::mapToExerciseResDto)
+                    .filter(Objects::nonNull)
+                    .toList();
 
-        // 3) workoutName custom
-        String todayWorkoutName = LocalDate.now(ZoneId.of("Asia/Seoul"))
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
+            // 3) workoutName custom
+            String todayWorkoutName = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
 
-        // 4) workoutMemo is null
-        return new AiMemoResDto(
-                todayWorkoutName,
-                null,
-                workoutExercises
-        );
+            // 4) workoutMemo is null
+            AiMemoResDto result = new AiMemoResDto(
+                    todayWorkoutName,
+                    null,
+                    workoutExercises
+            );
+
+            try {
+                // 성공 케이스 입력 로그 저장
+                aiMemoInputLogService.logSuccess(null, dto.memoText(), parsed, workoutExercises);
+            } catch (Exception ignored) {
+            }
+
+            return result;
+        } catch (CustomException e) {
+            try {
+                // 실패 케이스 입력 로그 저장
+                aiMemoInputLogService.logFailure(null, dto.memoText(), e.getError());
+            } catch (Exception ignored) {
+            }
+            throw e;
+        }
 
     }
 
