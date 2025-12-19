@@ -34,6 +34,7 @@ public class AiMemoInputLogService {
             List<WorkoutDailyExerciseResDto> matchedExercises
     ) {
         // 성공 로그: 마스킹 + 해시 + 파싱 결과 + 매칭 결과 저장
+        // member가 null일 수 있어 비로그인 입력도 저장 가능
         String masked = maskSensitiveText(rawText);
         String hash = hashText(rawText);
 
@@ -58,6 +59,7 @@ public class AiMemoInputLogService {
 
     public void logFailure(Member member, String rawText, Error error) {
         // 실패 로그: 마스킹 + 해시 + 에러 코드 저장
+        // 에러 코드만 기록하고 파싱 결과는 저장하지 않음
         String masked = maskSensitiveText(rawText);
         String hash = hashText(rawText);
 
@@ -83,6 +85,7 @@ public class AiMemoInputLogService {
 
     private String maskSensitiveText(String rawText) {
         // 민감정보 마스킹(이메일/전화번호)만 수행
+        // 입력이 null이면 그대로 null 반환
         if (rawText == null) {
             return null;
         }
@@ -94,6 +97,7 @@ public class AiMemoInputLogService {
 
     private String hashText(String rawText) {
         // 원문 해시(SHA-256) 생성
+        // rawText가 null이면 해시 생성하지 않음
         if (rawText == null) {
             return null;
         }

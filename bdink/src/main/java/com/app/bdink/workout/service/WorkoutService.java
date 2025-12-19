@@ -8,6 +8,7 @@ import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
 import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
 import com.app.bdink.openai.service.AiMemoInputLogService;
+import com.app.bdink.openai.service.ExerciseEmbeddingService;
 import com.app.bdink.openai.service.OpenAiChatService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
@@ -49,6 +50,7 @@ public class WorkoutService {
     private final WorkoutSetRepository workoutSetRepository;
     private final OpenAiChatService openAiChatService;
     private final AiMemoInputLogService aiMemoInputLogService;
+    private final ExerciseEmbeddingService exerciseEmbeddingService;
     private final MemberRepository memberRepository;
 
 
@@ -77,6 +79,7 @@ public class WorkoutService {
                         .part(exerciseReqDto.ExercisePart())
                         .build()
         );
+        exerciseEmbeddingService.upsertEmbedding(exercise);
         return String.valueOf(exercise.getId());
     }
 
@@ -104,6 +107,7 @@ public class WorkoutService {
     ) {
         Exercise exercise = findById(exerciseId);
         exercise.modifyExercise(exerciseReqDto, videoUrlKey, pictureUrlKey);
+        exerciseEmbeddingService.upsertEmbedding(exercise);
 
         return ExerciseResDto.of(exercise);
     }
@@ -464,6 +468,7 @@ public class WorkoutService {
 
             try {
                 // 성공 케이스 입력 로그 저장
+                // 비로그인 요청을 고려해 member는 null로 저장
                 aiMemoInputLogService.logSuccess(null, dto.memoText(), parsed, workoutExercises);
             } catch (Exception ignored) {
             }
@@ -472,6 +477,7 @@ public class WorkoutService {
         } catch (CustomException e) {
             try {
                 // 실패 케이스 입력 로그 저장
+                // 파싱 실패 등 실패 케이스는 errorCode만 기록
                 aiMemoInputLogService.logFailure(null, dto.memoText(), e.getError());
             } catch (Exception ignored) {
             }
