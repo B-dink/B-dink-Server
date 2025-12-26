@@ -9,6 +9,7 @@ import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
 import com.app.bdink.openai.service.AiMemoInputLogService;
 import com.app.bdink.openai.service.ExerciseEmbeddingService;
+import com.app.bdink.openai.service.ExerciseRagRetrievalService;
 import com.app.bdink.openai.service.OpenAiChatService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
@@ -36,9 +37,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -51,6 +55,7 @@ public class WorkoutService {
     private final OpenAiChatService openAiChatService;
     private final AiMemoInputLogService aiMemoInputLogService;
     private final ExerciseEmbeddingService exerciseEmbeddingService;
+    private final ExerciseRagRetrievalService exerciseRagRetrievalService;
     private final MemberRepository memberRepository;
 
 
@@ -447,7 +452,8 @@ public class WorkoutService {
 
         try {
             // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
-            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
+            String ragHintText = buildRagHintText(dto.memoText(), 10);
+            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText(), ragHintText);
 
             // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
             List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
@@ -487,7 +493,7 @@ public class WorkoutService {
     }
 
     private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto){
-        Exercise exercise = findFirstSimilarOrNull(dto.exerciseName());
+        Exercise exercise = findExerciseByIdOrName(dto.exerciseId(), dto.exerciseName());
 
         if (exercise == null) return null;
 
@@ -513,6 +519,43 @@ public class WorkoutService {
 
         // mvp 단계이기 때문에 여러개 중 한 개만 사용
         return likeExercises.get(0);
+    }
+
+    private Exercise findExerciseByIdOrName(Long exerciseId, String exerciseName) {
+        // LLM이 반환한 exerciseId가 우선, 없으면 기존 이름 매칭 사용
+        if (exerciseId != null) {
+            return exerciseRepository.findById(exerciseId).orElse(null);
+        }
+        return findFirstSimilarOrNull(exerciseName);
+    }
+
+    private String buildRagHintText(String memoText, int topN) {
+        // RAG 후보를 가져와 프롬프트에 넣을 텍스트로 구성
+        List<Long> ids = exerciseRagRetrievalService.retrieveTopCandidates(memoText, topN).stream()
+                .map(result -> result.exerciseId())
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (ids.isEmpty()) {
+            return "(없음)";
+        }
+
+        Map<Long, Exercise> exerciseMap = exerciseRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Exercise::getId, e -> e, (a, b) -> a, HashMap::new));
+
+        return ids.stream()
+                .map(exerciseMap::get)
+                .filter(Objects::nonNull)
+                .map(this::formatRagHintLine)
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String formatRagHintLine(Exercise exercise) {
+        // 최소한의 정보만 전달해 후보 선택을 돕는다
+        if (exercise.getPart() == null) {
+            return "id:" + exercise.getId() + " name:" + exercise.getName();
+        }
+        return "id:" + exercise.getId() + " name:" + exercise.getName() + " part:" + exercise.getPart().name();
     }
 
 
