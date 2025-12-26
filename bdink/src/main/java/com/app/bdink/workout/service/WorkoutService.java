@@ -28,6 +28,7 @@ import com.app.bdink.workout.repository.WorkOutSessionRepository;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,9 @@ public class WorkoutService {
     private final ExerciseEmbeddingService exerciseEmbeddingService;
     private final ExerciseRagRetrievalService exerciseRagRetrievalService;
     private final MemberRepository memberRepository;
+
+    @Value("${ai-memo.rag.distance-threshold}")
+    private double ragDistanceThreshold;
 
 
     public Exercise findById(Long id) {
@@ -532,6 +536,7 @@ public class WorkoutService {
     private String buildRagHintText(String memoText, int topN) {
         // RAG 후보를 가져와 프롬프트에 넣을 텍스트로 구성
         List<Long> ids = exerciseRagRetrievalService.retrieveTopCandidates(memoText, topN).stream()
+                .filter(result -> result.distance() <= ragDistanceThreshold)
                 .map(result -> result.exerciseId())
                 .filter(Objects::nonNull)
                 .toList();
@@ -552,10 +557,27 @@ public class WorkoutService {
 
     private String formatRagHintLine(Exercise exercise) {
         // 최소한의 정보만 전달해 후보 선택을 돕는다
-        if (exercise.getPart() == null) {
-            return "id:" + exercise.getId() + " name:" + exercise.getName();
+        String aliases = null;
+        if (exercise.getAliases() != null && !exercise.getAliases().isEmpty()) {
+            aliases = exercise.getAliases().stream()
+                    .map(alias -> alias.getAlias())
+                    .filter(value -> value != null && !value.isBlank())
+                    .collect(Collectors.joining(", "));
         }
-        return "id:" + exercise.getId() + " name:" + exercise.getName() + " part:" + exercise.getPart().name();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("id:").append(exercise.getId())
+                .append(" name:").append(exercise.getName());
+
+        if (exercise.getPart() != null) {
+            builder.append(" part:").append(exercise.getPart().name());
+        }
+
+        if (aliases != null && !aliases.isBlank()) {
+            builder.append(" aliases:").append(aliases);
+        }
+
+        return builder.toString();
     }
 
 

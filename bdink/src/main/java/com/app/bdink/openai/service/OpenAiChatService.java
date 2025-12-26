@@ -100,7 +100,7 @@ public class OpenAiChatService {
                    - sets: 배열
                    - setNumber, weight, reps: 모두 정수(Number) 타입
                    - setNumber는 1부터 시작해서 세트 순서대로 1씩 증가시켜라.
-                   - 후보 리스트에 있는 운동만 선택하고, 없다면 exerciseId는 null로 둬라.
+                   - 후보 리스트에 있는 운동만 선택하고, 없다면 exerciseId와 exerciseName을 null로 둬라.
                 
                 4. 사용자가 여러 줄로 운동을 적었다면, 각 줄을 하나의 exercise로 판단해라.
                 예시:
@@ -143,7 +143,7 @@ public class OpenAiChatService {
                         - 응답 전체가 '{' 로 시작해서 '}' 로 끝나는 유효한 JSON 객체여야 한다.
                         - 클라이언트는 네 응답을 그대로 파싱해서 ObjectMapper.readValue(...)에 넣을 것이다.
                         - 그러므로 유효하지 않은 JSON을 반환하면 안 된다.
-                        - 후보 리스트에 없는 운동은 선택하지 말고 exerciseId는 null로 둬라.
+                        - 후보 리스트에 없는 운동은 선택하지 말고 exerciseId와 exerciseName을 null로 둬라.
                         """
         );
 
