@@ -11,7 +11,7 @@ create table if not exists exercise_embedding (
   embedding_vector vector(1536)
 );
 
-create index if not exists idx_exercise_embedding_exercise_id
+create unique index if not exists ux_exercise_embedding_exercise_id
   on exercise_embedding (exercise_id);
 
 -- Approximate nearest neighbor index (optional, tune later)

@@ -39,5 +39,6 @@ application.yml
 application.yaml
 *.yml
 *.yaml
+!docker-compose.yml
 .DS_Store
 *.p8
