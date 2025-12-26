@@ -29,10 +29,21 @@ public class ExerciseEmbeddingBackfillRunner implements CommandLineRunner {
         // 임베딩 레코드가 없는 기존 Exercise만 1회성 백필
         List<Exercise> exercises = exerciseRepository.findAll();
         int created = 0;
+        int updated = 0;
+        int skipped = 0;
 
         for (Exercise exercise : exercises) {
-            if (exerciseEmbeddingRepository.existsByExerciseId(exercise.getId())) {
-                // 이미 생성된 임베딩은 중복 생성하지 않음
+            var existing = exerciseEmbeddingRepository.findByExerciseId(exercise.getId());
+            if (existing.isPresent()) {
+                String vector = existing.get().getEmbeddingVector();
+                if (vector != null && !vector.isBlank()) {
+                    // 벡터가 이미 존재하면 스킵
+                    skipped++;
+                    continue;
+                }
+                // 벡터가 비어 있으면 재생성
+                exerciseEmbeddingService.upsertEmbedding(exercise);
+                updated++;
                 continue;
             }
             exerciseEmbeddingService.upsertEmbedding(exercise);
@@ -40,6 +51,6 @@ public class ExerciseEmbeddingBackfillRunner implements CommandLineRunner {
         }
 
         // 실행 횟수/생성량 확인용 로그
-        log.info("Exercise embedding backfill done. created={}", created);
+        log.info("Exercise embedding backfill done. created={}, updated={}, skipped={}", created, updated, skipped);
     }
 }

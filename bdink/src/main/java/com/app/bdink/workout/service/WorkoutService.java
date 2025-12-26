@@ -5,6 +5,7 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
+import com.app.bdink.openai.dto.response.PgvectorSearchResult;
 import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
 import com.app.bdink.openai.service.AiMemoInputLogService;
@@ -38,17 +39,22 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WorkoutService {
+    private static final int RAG_PER_LINE_TOP_N = 5;
     private final ExerciseRepository exerciseRepository;
     private final PerformedExerciseRepository performedExerciseRepository;
     private final WorkOutSessionRepository workOutSessionRepository;
@@ -457,7 +463,11 @@ public class WorkoutService {
         try {
             // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
             String ragHintText = buildRagHintText(dto.memoText(), 10);
-            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText(), ragHintText);
+            List<String> memoLines = exerciseRagRetrievalService.splitMemoLinesForParsing(dto.memoText());
+            String normalizedMemoText = memoLines.isEmpty()
+                    ? dto.memoText()
+                    : String.join("\n", memoLines);
+            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(normalizedMemoText, ragHintText);
 
             // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
             List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
@@ -535,11 +545,78 @@ public class WorkoutService {
 
     private String buildRagHintText(String memoText, int topN) {
         // RAG 후보를 가져와 프롬프트에 넣을 텍스트로 구성
-        List<Long> ids = exerciseRagRetrievalService.retrieveTopCandidates(memoText, topN).stream()
-                .filter(result -> result.distance() <= ragDistanceThreshold)
+        int perLineTopN = Math.min(RAG_PER_LINE_TOP_N, topN);
+        List<List<PgvectorSearchResult>> grouped = exerciseRagRetrievalService
+                .retrieveTopCandidatesByLineGrouped(memoText, perLineTopN);
+
+        Set<Long> guaranteedIds = new LinkedHashSet<>();
+        Map<Long, PgvectorSearchResult> bestById = new HashMap<>();
+
+        for (List<PgvectorSearchResult> results : grouped) {
+            PgvectorSearchResult best = null;
+            for (PgvectorSearchResult result : results) {
+                if (result == null || result.exerciseId() == null) {
+                    continue;
+                }
+                if (best == null || result.distance() < best.distance()) {
+                    best = result;
+                }
+                PgvectorSearchResult existing = bestById.get(result.exerciseId());
+                if (existing == null || result.distance() < existing.distance()) {
+                    bestById.put(result.exerciseId(), result);
+                }
+            }
+            if (best != null && best.exerciseId() != null) {
+                guaranteedIds.add(best.exerciseId());
+            }
+        }
+
+        int lineCount = grouped.size();
+        int maxTotal = Math.max(topN, lineCount * perLineTopN);
+
+        List<PgvectorSearchResult> ordered = bestById.values().stream()
+                .sorted(Comparator.comparingDouble(PgvectorSearchResult::distance))
+                .toList();
+
+        List<PgvectorSearchResult> limitedResults = new ArrayList<>();
+        Set<Long> addedIds = new HashSet<>();
+        for (Long id : guaranteedIds) {
+            PgvectorSearchResult result = bestById.get(id);
+            if (result != null && addedIds.add(id)) {
+                limitedResults.add(result);
+            }
+        }
+        for (PgvectorSearchResult result : ordered) {
+            if (limitedResults.size() >= maxTotal) {
+                break;
+            }
+            if (result.exerciseId() != null && addedIds.add(result.exerciseId())) {
+                limitedResults.add(result);
+            }
+        }
+        if (log.isInfoEnabled()) {
+            String summary = limitedResults.stream()
+                    .map(result -> "id:" + result.exerciseId() + " dist:" + String.format("%.4f", result.distance()))
+                    .collect(Collectors.joining(", "));
+            log.info(
+                    "RAG candidates: perLineTopN={}, lineCount={}, maxTotal={}, threshold={}, guaranteedIds={}, results=[{}]",
+                    perLineTopN,
+                    lineCount,
+                    maxTotal,
+                    ragDistanceThreshold,
+                    guaranteedIds,
+                    summary
+            );
+        }
+
+        List<Long> ids = limitedResults.stream()
+                .filter(result -> result.distance() <= ragDistanceThreshold || guaranteedIds.contains(result.exerciseId()))
                 .map(result -> result.exerciseId())
                 .filter(Objects::nonNull)
                 .toList();
+        if (log.isInfoEnabled()) {
+            log.info("RAG candidates after threshold: count={}, ids={}", ids.size(), ids);
+        }
 
         if (ids.isEmpty()) {
             return "(없음)";

@@ -101,6 +101,9 @@ public class OpenAiChatService {
                    - setNumber, weight, reps: 모두 정수(Number) 타입
                    - setNumber는 1부터 시작해서 세트 순서대로 1씩 증가시켜라.
                    - 후보 리스트에 있는 운동만 선택하고, 없다면 exerciseId와 exerciseName을 null로 둬라.
+                   - 후보 리스트가 비어있지 않다면, 이름 또는 aliases가 입력에 포함되는 후보를 반드시 선택해라.
+                   - 입력이 후보 이름/aliases의 일부이거나, 후보가 입력의 일부인 경우도 매칭으로 판단해라.
+                   - 이름/aliases 비교는 공백, 하이픈, 대소문자를 무시한다.
                 
                 4. 사용자가 여러 줄로 운동을 적었다면, 각 줄을 하나의 exercise로 판단해라.
                 예시:
@@ -144,6 +147,7 @@ public class OpenAiChatService {
                         - 클라이언트는 네 응답을 그대로 파싱해서 ObjectMapper.readValue(...)에 넣을 것이다.
                         - 그러므로 유효하지 않은 JSON을 반환하면 안 된다.
                         - 후보 리스트에 없는 운동은 선택하지 말고 exerciseId와 exerciseName을 null로 둬라.
+                        - 후보가 존재하면 가장 유사한 운동을 반드시 선택해라.
                         """
         );
 

@@ -23,12 +23,12 @@ public class ExerciseEmbedding extends BaseTimeEntity {
 
     // 임베딩용 텍스트(원문)
     @Lob
-    @Column(name = "embedding_text")
+    @Column(name = "embedding_text", columnDefinition = "LONGTEXT")
     private String embeddingText;
 
     // pgvector 환경에서는 마이그레이션으로 vector 컬럼으로 교체
     @Lob
-    @Column(name = "embedding_vector")
+    @Column(name = "embedding_vector", columnDefinition = "LONGTEXT")
     private String embeddingVector;
 
     @Builder

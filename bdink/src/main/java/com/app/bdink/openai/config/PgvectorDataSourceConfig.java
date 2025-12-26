@@ -1,5 +1,6 @@
 package com.app.bdink.openai.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,7 @@ public class PgvectorDataSourceConfig {
     }
 
     @Bean(name = "pgvectorJdbcTemplate")
-    public JdbcTemplate pgvectorJdbcTemplate(DataSource pgvectorDataSource) {
+    public JdbcTemplate pgvectorJdbcTemplate(@Qualifier("pgvectorDataSource") DataSource pgvectorDataSource) {
         return new JdbcTemplate(pgvectorDataSource);
     }
 }
