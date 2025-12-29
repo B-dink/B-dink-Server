@@ -22,6 +22,9 @@ public class OpenAiConfig {
     @Value("${openai.chat-model}")
     private String chatModel;
 
+    @Value("${openai.embedding-model}")
+    private String embeddingModel;
+
 
     @Bean
     public WebClient openAiWebClient() {
@@ -32,4 +35,3 @@ public class OpenAiConfig {
                 .build();
     }
 }
-
