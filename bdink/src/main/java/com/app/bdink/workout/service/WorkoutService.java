@@ -49,12 +49,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WorkoutService {
-    private static final int RAG_PER_LINE_TOP_N = 5;
+    @Value("${ai-memo.rag.per-line-topn.short:10}")
+    private int ragPerLineTopNShort;
+
+    @Value("${ai-memo.rag.per-line-topn.medium:7}")
+    private int ragPerLineTopNMedium;
+
+    @Value("${ai-memo.rag.per-line-topn.long:5}")
+    private int ragPerLineTopNLong;
+
     private final ExerciseRepository exerciseRepository;
     private final PerformedExerciseRepository performedExerciseRepository;
     private final WorkOutSessionRepository workOutSessionRepository;
@@ -462,16 +471,21 @@ public class WorkoutService {
 
         try {
             // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
-            String ragHintText = buildRagHintText(dto.memoText(), 10);
+            RagHint ragHint = buildRagHint(dto.memoText(), 10);
             List<String> memoLines = exerciseRagRetrievalService.splitMemoLinesForParsing(dto.memoText());
             String normalizedMemoText = memoLines.isEmpty()
                     ? dto.memoText()
                     : String.join("\n", memoLines);
-            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(normalizedMemoText, ragHintText);
+            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(normalizedMemoText, ragHint.text());
 
             // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
-            List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
-                    .map(this::mapToExerciseResDto)
+            List<Long> fallbackIds = ragHint.bestIdsByLine();
+            List<WorkoutDailyExerciseResDto> workoutExercises = IntStream.range(0, parsed.exercises().size())
+                    .mapToObj(index -> {
+                        AiParsedExerciseDto exercise = parsed.exercises().get(index);
+                        Long fallbackId = index < fallbackIds.size() ? fallbackIds.get(index) : null;
+                        return mapToExerciseResDto(exercise, fallbackId);
+                    })
                     .filter(Objects::nonNull)
                     .toList();
 
@@ -506,8 +520,13 @@ public class WorkoutService {
 
     }
 
-    private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto){
-        Exercise exercise = findExerciseByIdOrName(dto.exerciseId(), dto.exerciseName());
+    private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto, Long fallbackExerciseId){
+        Long resolvedId = dto.exerciseId() != null ? dto.exerciseId() : fallbackExerciseId;
+        if (dto.exerciseId() == null && fallbackExerciseId != null) {
+            log.info("LLM exerciseId missing. Fallback to RAG top1 id={}", fallbackExerciseId);
+        }
+
+        Exercise exercise = findExerciseByIdOrName(resolvedId, dto.exerciseName());
 
         if (exercise == null) return null;
 
@@ -543,14 +562,17 @@ public class WorkoutService {
         return findFirstSimilarOrNull(exerciseName);
     }
 
-    private String buildRagHintText(String memoText, int topN) {
+    private RagHint buildRagHint(String memoText, int topN) {
         // RAG 후보를 가져와 프롬프트에 넣을 텍스트로 구성
-        int perLineTopN = Math.min(RAG_PER_LINE_TOP_N, topN);
+        List<String> lines = exerciseRagRetrievalService.splitMemoLinesForParsing(memoText);
+        int lineCount = lines.size();
+        int perLineTopN = Math.min(resolvePerLineTopN(lineCount), topN);
         List<List<PgvectorSearchResult>> grouped = exerciseRagRetrievalService
                 .retrieveTopCandidatesByLineGrouped(memoText, perLineTopN);
 
         Set<Long> guaranteedIds = new LinkedHashSet<>();
         Map<Long, PgvectorSearchResult> bestById = new HashMap<>();
+        List<Long> bestIdsByLine = new ArrayList<>();
 
         for (List<PgvectorSearchResult> results : grouped) {
             PgvectorSearchResult best = null;
@@ -568,10 +590,12 @@ public class WorkoutService {
             }
             if (best != null && best.exerciseId() != null) {
                 guaranteedIds.add(best.exerciseId());
+                bestIdsByLine.add(best.exerciseId());
+            } else {
+                bestIdsByLine.add(null);
             }
         }
 
-        int lineCount = grouped.size();
         int maxTotal = Math.max(topN, lineCount * perLineTopN);
 
         List<PgvectorSearchResult> ordered = bestById.values().stream()
@@ -619,17 +643,31 @@ public class WorkoutService {
         }
 
         if (ids.isEmpty()) {
-            return "(없음)";
+            return new RagHint("(없음)", bestIdsByLine);
         }
 
         Map<Long, Exercise> exerciseMap = exerciseRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(Exercise::getId, e -> e, (a, b) -> a, HashMap::new));
 
-        return ids.stream()
+        String ragHintText = ids.stream()
                 .map(exerciseMap::get)
                 .filter(Objects::nonNull)
                 .map(this::formatRagHintLine)
                 .collect(Collectors.joining("\n"));
+        return new RagHint(ragHintText, bestIdsByLine);
+    }
+
+    private record RagHint(String text, List<Long> bestIdsByLine) {
+    }
+
+    private int resolvePerLineTopN(int lineCount) {
+        if (lineCount <= 2) {
+            return ragPerLineTopNShort;
+        }
+        if (lineCount <= 4) {
+            return ragPerLineTopNMedium;
+        }
+        return ragPerLineTopNLong;
     }
 
     private String formatRagHintLine(Exercise exercise) {

@@ -24,7 +24,7 @@ public class AiMemoInputLog extends BaseTimeEntity {
 
     // 마스킹된 사용자 입력 원문
     @Lob
-    @Column(name = "raw_text_masked")
+    @Column(name = "raw_text_masked", columnDefinition = "LONGTEXT")
     private String rawTextMasked;
 
     // 원문 해시(SHA-256)로 중복/분석용
@@ -32,11 +32,11 @@ public class AiMemoInputLog extends BaseTimeEntity {
     private String rawTextHash;
 
     // LLM 파싱 결과(JSON)
-    @Column(name = "parsed_result_json", columnDefinition = "json")
+    @Column(name = "parsed_result_json", columnDefinition = "LONGTEXT")
     private String parsedResultJson;
 
     // 최종 매칭된 exerciseId 목록(JSON)
-    @Column(name = "matched_exercise_ids", columnDefinition = "json")
+    @Column(name = "matched_exercise_ids", columnDefinition = "LONGTEXT")
     private String matchedExerciseIdsJson;
 
     // 처리 성공 여부
