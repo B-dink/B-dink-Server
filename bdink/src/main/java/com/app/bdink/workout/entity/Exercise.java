@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -34,6 +37,12 @@ public class Exercise extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ExercisePart part;
 
+    // 수동 alias(별칭) 목록
+    @OneToMany(mappedBy = "exercise",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<ExerciseAlias> aliases = new ArrayList<>();
+
     @Builder
     public Exercise(String name, String description, String videoUrl, String pictureUrl, ExercisePart part) {
         this.name = name;
@@ -49,6 +58,17 @@ public class Exercise extends BaseTimeEntity {
         this.videoUrl = updateVideoUrl(videoKey);
         this.pictureUrl = updatePictureUrl(pictureKey);
         this.part = updatePart(exerciseReqDto.ExercisePart());
+    }
+
+    public void addAlias(ExerciseAlias alias) {
+        // 별칭 추가 시 연관관계 설정
+        this.aliases.add(alias);
+        alias.setExercise(this);
+    }
+
+    public void clearAliases() {
+        // 모든 별칭 삭제 (orphanRemoval로 제거)
+        this.aliases.clear();
     }
 
     public String updateName(final String name){

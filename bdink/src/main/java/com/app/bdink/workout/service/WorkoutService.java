@@ -5,8 +5,12 @@ import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.repository.MemberRepository;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
+import com.app.bdink.openai.dto.response.PgvectorSearchResult;
 import com.app.bdink.openai.parser.AiParsedExerciseDto;
 import com.app.bdink.openai.parser.AiParsedWorkoutDto;
+import com.app.bdink.openai.service.AiMemoInputLogService;
+import com.app.bdink.openai.service.ExerciseEmbeddingService;
+import com.app.bdink.openai.service.ExerciseRagRetrievalService;
 import com.app.bdink.openai.service.OpenAiChatService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
@@ -25,6 +29,7 @@ import com.app.bdink.workout.repository.WorkOutSessionRepository;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,20 +39,43 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WorkoutService {
+    @Value("${ai-memo.rag.per-line-topn.short:10}")
+    private int ragPerLineTopNShort;
+
+    @Value("${ai-memo.rag.per-line-topn.medium:7}")
+    private int ragPerLineTopNMedium;
+
+    @Value("${ai-memo.rag.per-line-topn.long:5}")
+    private int ragPerLineTopNLong;
+
     private final ExerciseRepository exerciseRepository;
     private final PerformedExerciseRepository performedExerciseRepository;
     private final WorkOutSessionRepository workOutSessionRepository;
     private final WorkoutSetRepository workoutSetRepository;
     private final OpenAiChatService openAiChatService;
+    private final AiMemoInputLogService aiMemoInputLogService;
+    private final ExerciseEmbeddingService exerciseEmbeddingService;
+    private final ExerciseRagRetrievalService exerciseRagRetrievalService;
     private final MemberRepository memberRepository;
+
+    @Value("${ai-memo.rag.distance-threshold}")
+    private double ragDistanceThreshold;
 
 
     public Exercise findById(Long id) {
@@ -75,6 +103,7 @@ public class WorkoutService {
                         .part(exerciseReqDto.ExercisePart())
                         .build()
         );
+        exerciseEmbeddingService.upsertEmbedding(exercise);
         return String.valueOf(exercise.getId());
     }
 
@@ -102,6 +131,7 @@ public class WorkoutService {
     ) {
         Exercise exercise = findById(exerciseId);
         exercise.modifyExercise(exerciseReqDto, videoUrlKey, pictureUrlKey);
+        exerciseEmbeddingService.upsertEmbedding(exercise);
 
         return ExerciseResDto.of(exercise);
     }
@@ -439,30 +469,64 @@ public class WorkoutService {
     // LLM memoText 변환 로직
     public AiMemoResDto convertMemoTextToRequestDto(AiWorkoutMemoReqDto dto) {
 
-        // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
-        AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(dto.memoText());
+        try {
+            // 1) LLM 파싱 로직 memeText -> 운동, 세트 정보
+            RagHint ragHint = buildRagHint(dto.memoText(), 10);
+            List<String> memoLines = exerciseRagRetrievalService.splitMemoLinesForParsing(dto.memoText());
+            String normalizedMemoText = memoLines.isEmpty()
+                    ? dto.memoText()
+                    : String.join("\n", memoLines);
+            AiParsedWorkoutDto parsed = openAiChatService.parsedWorkoutDtoDto(normalizedMemoText, ragHint.text());
 
-        // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
-        List<WorkoutDailyExerciseResDto> workoutExercises = parsed.exercises().stream()
-                .map(this::mapToExerciseResDto)
-                .filter(Objects::nonNull)
-                .toList();
+            // 2) exerciseName 기준으로 DB Exercise 찾기 (초기모델, LIKE -> first)
+            List<Long> fallbackIds = ragHint.bestIdsByLine();
+            List<WorkoutDailyExerciseResDto> workoutExercises = IntStream.range(0, parsed.exercises().size())
+                    .mapToObj(index -> {
+                        AiParsedExerciseDto exercise = parsed.exercises().get(index);
+                        Long fallbackId = index < fallbackIds.size() ? fallbackIds.get(index) : null;
+                        return mapToExerciseResDto(exercise, fallbackId);
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
 
-        // 3) workoutName custom
-        String todayWorkoutName = LocalDate.now(ZoneId.of("Asia/Seoul"))
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
+            // 3) workoutName custom
+            String todayWorkoutName = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 운동일지"));
 
-        // 4) workoutMemo is null
-        return new AiMemoResDto(
-                todayWorkoutName,
-                null,
-                workoutExercises
-        );
+            // 4) workoutMemo is null
+            AiMemoResDto result = new AiMemoResDto(
+                    todayWorkoutName,
+                    null,
+                    workoutExercises
+            );
+
+            try {
+                // 성공 케이스 입력 로그 저장
+                // 비로그인 요청을 고려해 member는 null로 저장
+                aiMemoInputLogService.logSuccess(null, dto.memoText(), parsed, workoutExercises);
+            } catch (Exception ignored) {
+            }
+
+            return result;
+        } catch (CustomException e) {
+            try {
+                // 실패 케이스 입력 로그 저장
+                // 파싱 실패 등 실패 케이스는 errorCode만 기록
+                aiMemoInputLogService.logFailure(null, dto.memoText(), e.getError());
+            } catch (Exception ignored) {
+            }
+            throw e;
+        }
 
     }
 
-    private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto){
-        Exercise exercise = findFirstSimilarOrNull(dto.exerciseName());
+    private WorkoutDailyExerciseResDto mapToExerciseResDto(AiParsedExerciseDto dto, Long fallbackExerciseId){
+        Long resolvedId = dto.exerciseId() != null ? dto.exerciseId() : fallbackExerciseId;
+        if (dto.exerciseId() == null && fallbackExerciseId != null) {
+            log.info("LLM exerciseId missing. Fallback to RAG top1 id={}", fallbackExerciseId);
+        }
+
+        Exercise exercise = findExerciseByIdOrName(resolvedId, dto.exerciseName());
 
         if (exercise == null) return null;
 
@@ -488,6 +552,147 @@ public class WorkoutService {
 
         // mvp 단계이기 때문에 여러개 중 한 개만 사용
         return likeExercises.get(0);
+    }
+
+    private Exercise findExerciseByIdOrName(Long exerciseId, String exerciseName) {
+        // LLM이 반환한 exerciseId가 우선, 없으면 기존 이름 매칭 사용
+        if (exerciseId != null) {
+            return exerciseRepository.findById(exerciseId).orElse(null);
+        }
+        return findFirstSimilarOrNull(exerciseName);
+    }
+
+    private RagHint buildRagHint(String memoText, int topN) {
+        // RAG 후보를 가져와 프롬프트에 넣을 텍스트로 구성
+        List<String> lines = exerciseRagRetrievalService.splitMemoLinesForParsing(memoText);
+        int lineCount = lines.size();
+        int perLineTopN = Math.min(resolvePerLineTopN(lineCount), topN);
+        List<List<PgvectorSearchResult>> grouped = exerciseRagRetrievalService
+                .retrieveTopCandidatesByLineGrouped(memoText, perLineTopN);
+
+        Set<Long> guaranteedIds = new LinkedHashSet<>();
+        Map<Long, PgvectorSearchResult> bestById = new HashMap<>();
+        List<Long> bestIdsByLine = new ArrayList<>();
+
+        for (List<PgvectorSearchResult> results : grouped) {
+            PgvectorSearchResult best = null;
+            for (PgvectorSearchResult result : results) {
+                if (result == null || result.exerciseId() == null) {
+                    continue;
+                }
+                if (best == null || result.distance() < best.distance()) {
+                    best = result;
+                }
+                PgvectorSearchResult existing = bestById.get(result.exerciseId());
+                if (existing == null || result.distance() < existing.distance()) {
+                    bestById.put(result.exerciseId(), result);
+                }
+            }
+            if (best != null && best.exerciseId() != null) {
+                guaranteedIds.add(best.exerciseId());
+                bestIdsByLine.add(best.exerciseId());
+            } else {
+                bestIdsByLine.add(null);
+            }
+        }
+
+        int maxTotal = Math.max(topN, lineCount * perLineTopN);
+
+        List<PgvectorSearchResult> ordered = bestById.values().stream()
+                .sorted(Comparator.comparingDouble(PgvectorSearchResult::distance))
+                .toList();
+
+        List<PgvectorSearchResult> limitedResults = new ArrayList<>();
+        Set<Long> addedIds = new HashSet<>();
+        for (Long id : guaranteedIds) {
+            PgvectorSearchResult result = bestById.get(id);
+            if (result != null && addedIds.add(id)) {
+                limitedResults.add(result);
+            }
+        }
+        for (PgvectorSearchResult result : ordered) {
+            if (limitedResults.size() >= maxTotal) {
+                break;
+            }
+            if (result.exerciseId() != null && addedIds.add(result.exerciseId())) {
+                limitedResults.add(result);
+            }
+        }
+        if (log.isInfoEnabled()) {
+            String summary = limitedResults.stream()
+                    .map(result -> "id:" + result.exerciseId() + " dist:" + String.format("%.4f", result.distance()))
+                    .collect(Collectors.joining(", "));
+            log.info(
+                    "RAG candidates: perLineTopN={}, lineCount={}, maxTotal={}, threshold={}, guaranteedIds={}, results=[{}]",
+                    perLineTopN,
+                    lineCount,
+                    maxTotal,
+                    ragDistanceThreshold,
+                    guaranteedIds,
+                    summary
+            );
+        }
+
+        List<Long> ids = limitedResults.stream()
+                .filter(result -> result.distance() <= ragDistanceThreshold || guaranteedIds.contains(result.exerciseId()))
+                .map(result -> result.exerciseId())
+                .filter(Objects::nonNull)
+                .toList();
+        if (log.isInfoEnabled()) {
+            log.info("RAG candidates after threshold: count={}, ids={}", ids.size(), ids);
+        }
+
+        if (ids.isEmpty()) {
+            return new RagHint("(없음)", bestIdsByLine);
+        }
+
+        Map<Long, Exercise> exerciseMap = exerciseRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Exercise::getId, e -> e, (a, b) -> a, HashMap::new));
+
+        String ragHintText = ids.stream()
+                .map(exerciseMap::get)
+                .filter(Objects::nonNull)
+                .map(this::formatRagHintLine)
+                .collect(Collectors.joining("\n"));
+        return new RagHint(ragHintText, bestIdsByLine);
+    }
+
+    private record RagHint(String text, List<Long> bestIdsByLine) {
+    }
+
+    private int resolvePerLineTopN(int lineCount) {
+        if (lineCount <= 2) {
+            return ragPerLineTopNShort;
+        }
+        if (lineCount <= 4) {
+            return ragPerLineTopNMedium;
+        }
+        return ragPerLineTopNLong;
+    }
+
+    private String formatRagHintLine(Exercise exercise) {
+        // 최소한의 정보만 전달해 후보 선택을 돕는다
+        String aliases = null;
+        if (exercise.getAliases() != null && !exercise.getAliases().isEmpty()) {
+            aliases = exercise.getAliases().stream()
+                    .map(alias -> alias.getAlias())
+                    .filter(value -> value != null && !value.isBlank())
+                    .collect(Collectors.joining(", "));
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("id:").append(exercise.getId())
+                .append(" name:").append(exercise.getName());
+
+        if (exercise.getPart() != null) {
+            builder.append(" part:").append(exercise.getPart().name());
+        }
+
+        if (aliases != null && !aliases.isBlank()) {
+            builder.append(" aliases:").append(aliases);
+        }
+
+        return builder.toString();
     }
 
 
