@@ -16,6 +16,8 @@ import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
 import com.app.bdink.trainer.controller.dto.response.TrainerResponse;
 import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerService;
+import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeResponse;
+import com.app.bdink.trainermember.service.TrainerMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class TrainerController {
     private final TrainerService trainerService;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
+    private final TrainerMemberService trainerMemberService;
     private final S3Service s3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -105,13 +108,24 @@ public class TrainerController {
         return RspTemplate.success(Success.UPDATE_TRAINER_SUCCESS, response);
     }
 
-    @PostMapping("/verify")
+    @PostMapping("/qrToken")
     @Operation(method = "POST", description = "QR 토큰으로 트레이너 소속을 생성합니다.")
     public RspTemplate<?> verifyTrainerQrToken(Principal principal,
                                                @RequestBody TrainerQrVerifyRequest request) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         String trainerMemberId = trainerService.verifyTrainerQrToken(member, request);
         return RspTemplate.success(Success.CREATE_TRAINER_MEMBER_SUCCESS, CreateIdDto.from(trainerMemberId));
+    }
+
+    @GetMapping("/trainermember")
+    @Operation(method = "GET", description = "트레이너 관리 회원의 주간 볼륨 변화를 조회합니다.")
+    public RspTemplate<?> getTrainerMembersWeeklyVolume(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
+
+        List<TrainerMemberWeeklyVolumeResponse> responses = trainerMemberService
+                .getWeeklyVolumeDeltaByTrainer(trainer.getId(), java.time.LocalDate.now());
+        return RspTemplate.success(Success.GET_TRAINER_MEMBER_SUCCESS, responses);
     }
 
     @DeleteMapping("/{id}")

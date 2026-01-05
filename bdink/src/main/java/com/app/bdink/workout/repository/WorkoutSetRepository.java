@@ -37,7 +37,7 @@ public interface WorkoutSetRepository extends JpaRepository<WorkoutSet, Long> {
      * 특정 회원의 특정 기간 볼륨 합계 (없으면 null → 0 처리)
      */
     @Query("""
-            select coalesce(sum(ws.weight * ws.reps), 0)
+            select coalesce(sum(1L * ws.weight * ws.reps), 0L)
             from WorkoutSet ws
             join ws.performedExercise pe
             join pe.workOutSession s
@@ -46,6 +46,27 @@ public interface WorkoutSetRepository extends JpaRepository<WorkoutSet, Long> {
             """)
     Long calculateVolumeForPeriod(
             @Param("member") Member member,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+    /**
+     * 여러 회원의 특정 기간 볼륨 합계 (없으면 0으로 처리).
+     */
+    @Query("""
+            select new com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto(
+                s.member.id,
+                coalesce(sum(1L * ws.weight * ws.reps), 0L)
+            )
+            from WorkoutSet ws
+            join ws.performedExercise pe
+            join pe.workOutSession s
+            where s.member.id in :memberIds
+              and s.createdAt between :start and :end
+            group by s.member.id
+            """)
+    List<MemberWeeklyVolumeDto> findWeeklyVolumeByMemberIds(
+            @Param("memberIds") List<Long> memberIds,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );

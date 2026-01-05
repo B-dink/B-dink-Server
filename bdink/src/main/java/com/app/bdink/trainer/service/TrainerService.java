@@ -73,6 +73,15 @@ public class TrainerService {
     }
 
     /**
+     * 멤버 기준 활성 트레이너만 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public Trainer getActiveTrainerByMemberId(Long memberId) {
+        return trainerRepository.findByMemberIdAndStatus(memberId, TrainerStatus.ACTIVE)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_TRAINER, Error.NOT_FOUND_TRAINER.getMessage()));
+    }
+
+    /**
      * 센터 기준 활성 트레이너 목록을 조회한다.
      */
     @Transactional(readOnly = true)

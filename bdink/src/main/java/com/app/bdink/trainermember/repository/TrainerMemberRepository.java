@@ -3,6 +3,8 @@ package com.app.bdink.trainermember.repository;
 import com.app.bdink.trainermember.entity.TrainerMember;
 import com.app.bdink.trainermember.entity.TrainerMemberStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,4 +23,14 @@ public interface TrainerMemberRepository extends JpaRepository<TrainerMember, Lo
     boolean existsByMemberIdAndStatus(Long memberId, TrainerMemberStatus status);
 
     List<TrainerMember> findAllByTrainerIdAndStatus(Long trainerId, TrainerMemberStatus status);
+
+    @Query("""
+            select tm
+            from TrainerMember tm
+            join fetch tm.member
+            where tm.trainer.id = :trainerId
+              and tm.status = :status
+            """)
+    List<TrainerMember> findAllByTrainerIdAndStatusWithMember(@Param("trainerId") Long trainerId,
+                                                             @Param("status") TrainerMemberStatus status);
 }
