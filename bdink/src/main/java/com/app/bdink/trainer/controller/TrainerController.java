@@ -13,6 +13,7 @@ import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrTokenUpdateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
+import com.app.bdink.trainer.controller.dto.response.IsTrainerResponse;
 import com.app.bdink.trainer.controller.dto.response.TrainerResponse;
 import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerService;
@@ -115,6 +116,14 @@ public class TrainerController {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         String trainerMemberId = trainerService.verifyTrainerQrToken(member, request);
         return RspTemplate.success(Success.CREATE_TRAINER_MEMBER_SUCCESS, CreateIdDto.from(trainerMemberId));
+    }
+
+    @GetMapping("/is-trainer")
+    @Operation(method = "GET", description = "현재 로그인한 사용자가 트레이너인지 확인합니다.")
+    public RspTemplate<?> isTrainer(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        boolean isTrainer = trainerService.isActiveTrainer(memberId);
+        return RspTemplate.success(Success.GET_TRAINER_SUCCESS, IsTrainerResponse.from(isTrainer));
     }
 
     @GetMapping("/trainermember")

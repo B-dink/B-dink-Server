@@ -73,6 +73,14 @@ public class TrainerService {
     }
 
     /**
+     * 멤버 기준 활성 트레이너 여부를 확인한다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isActiveTrainer(Long memberId) {
+        return trainerRepository.existsByMemberIdAndStatus(memberId, TrainerStatus.ACTIVE);
+    }
+
+    /**
      * 멤버 기준 활성 트레이너만 조회한다.
      */
     @Transactional(readOnly = true)
