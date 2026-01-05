@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -135,6 +136,17 @@ public class TrainerController {
         List<TrainerMemberWeeklyVolumeResponse> responses = trainerMemberService
                 .getWeeklyVolumeDeltaByTrainer(trainer.getId(), java.time.LocalDate.now());
         return RspTemplate.success(Success.GET_TRAINER_MEMBER_SUCCESS, responses);
+    }
+
+    @GetMapping("/trainermember/weekly-volume/{memberId}")
+    @Operation(method = "GET", description = "특정 회원의 주간 일별 볼륨 데이터를 조회합니다.")
+    public RspTemplate<?> getTrainerMemberWeeklyVolumeDetail(@PathVariable Long memberId,
+                                                             @RequestParam String baseDate) {
+        LocalDate base = LocalDate.parse(baseDate);
+        return RspTemplate.success(
+                Success.GET_TRAINER_MEMBER_SUCCESS,
+                trainerMemberService.getWeeklyVolumeDetailByMember(memberId, base)
+        );
     }
 
     @DeleteMapping("/{id}")

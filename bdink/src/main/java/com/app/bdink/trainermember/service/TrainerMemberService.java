@@ -11,6 +11,7 @@ import com.app.bdink.trainermember.controller.dto.request.TrainerMemberCreateReq
 import com.app.bdink.trainermember.controller.dto.request.TrainerMemberUpdateRequest;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberResponse;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeResponse;
+import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeDetailResponse;
 import com.app.bdink.trainermember.entity.TrainerMember;
 import com.app.bdink.trainermember.entity.TrainerMemberStatus;
 import com.app.bdink.trainermember.repository.TrainerMemberRepository;
@@ -23,6 +24,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -107,6 +109,41 @@ public class TrainerMemberService {
     public void deleteTrainerMember(Long id) {
         TrainerMember trainerMember = getActiveTrainerMember(id);
         trainerMember.deactivate();
+    }
+
+    /**
+     * 특정 회원의 주간 일별 볼륨 데이터를 조회한다.
+     * baseDate가 포함된 주(월~일)를 기준으로 계산한다.
+     */
+    @Transactional(readOnly = true)
+    public TrainerMemberWeeklyVolumeDetailResponse getWeeklyVolumeDetailByMember(Long memberId, LocalDate baseDate) {
+        TrainerMember trainerMember = trainerMemberRepository
+                .findByMemberIdAndStatus(memberId, TrainerMemberStatus.ACTIVE)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_TRAINER_MEMBER,
+                        Error.NOT_FOUND_TRAINER_MEMBER.getMessage()));
+
+        LocalDate weekStart = baseDate.with(DayOfWeek.MONDAY);
+        List<TrainerMemberWeeklyVolumeDetailResponse.DailyVolume> dailyVolumes = new ArrayList<>();
+
+        // 월~일까지 7일간 일별 볼륨 계산
+        for (int i = 0; i < 7; i++) {
+            LocalDate day = weekStart.plusDays(i);
+            LocalDateTime from = day.atStartOfDay();
+            LocalDateTime to = day.plusDays(1).atStartOfDay();
+            Long volume = workoutSetRepository.calculateVolumeForPeriod(trainerMember.getMember(), from, to);
+            if (volume == null) {
+                volume = 0L;
+            }
+
+            dailyVolumes.add(new TrainerMemberWeeklyVolumeDetailResponse.DailyVolume(day.toString(), volume));
+        }
+
+        String createdDate = trainerMember.getCreatedAt().toLocalDate().toString();
+        return new TrainerMemberWeeklyVolumeDetailResponse(
+                trainerMember.getMember().getId(),
+                createdDate,
+                dailyVolumes
+        );
     }
 
     /**
