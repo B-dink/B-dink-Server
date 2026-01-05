@@ -14,7 +14,6 @@ import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVo
 import com.app.bdink.trainermember.entity.TrainerMember;
 import com.app.bdink.trainermember.entity.TrainerMemberStatus;
 import com.app.bdink.trainermember.repository.TrainerMemberRepository;
-import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -139,12 +138,18 @@ public class TrainerMemberService {
         Map<Long, Long> thisWeekVolumeMap = workoutSetRepository
                 .findWeeklyVolumeByMemberIds(memberIds, thisWeekFrom, thisWeekTo)
                 .stream()
-                .collect(Collectors.toMap(MemberWeeklyVolumeDto::memberId, MemberWeeklyVolumeDto::weeklyVolume));
+                .collect(Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> ((Number) row[1]).longValue()
+                ));
 
         Map<Long, Long> lastWeekVolumeMap = workoutSetRepository
                 .findWeeklyVolumeByMemberIds(memberIds, lastWeekFrom, lastWeekTo)
                 .stream()
-                .collect(Collectors.toMap(MemberWeeklyVolumeDto::memberId, MemberWeeklyVolumeDto::weeklyVolume));
+                .collect(Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> ((Number) row[1]).longValue()
+                ));
 
         return trainerMembers.stream()
                 .map(trainerMember -> {
