@@ -15,7 +15,10 @@ import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVo
 import com.app.bdink.trainermember.entity.TrainerMember;
 import com.app.bdink.trainermember.entity.TrainerMemberStatus;
 import com.app.bdink.trainermember.repository.TrainerMemberRepository;
+import com.app.bdink.workout.controller.dto.ExercisePart;
+import com.app.bdink.workout.entity.WorkOutSession;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
+import com.app.bdink.workout.repository.WorkOutSessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +28,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.stream.Collectors;
+import java.time.temporal.WeekFields;
 
 /**
  * 트레이너-멤버 소속 비즈니스 로직을 담당한다.
@@ -41,6 +47,7 @@ public class TrainerMemberService {
     private final TrainerRepository trainerRepository;
     private final MemberService memberService;
     private final WorkoutSetRepository workoutSetRepository;
+    private final WorkOutSessionRepository workOutSessionRepository;
 
     /**
      * 트레이너 소속 멤버를 생성한다.
@@ -125,6 +132,12 @@ public class TrainerMemberService {
         LocalDate weekStart = baseDate.with(DayOfWeek.MONDAY);
         List<TrainerMemberWeeklyVolumeDetailResponse.DailyVolume> dailyVolumes = new ArrayList<>();
 
+        // YYYY-MM-WNN 형태의 주차 라벨 생성 (한국 기준)
+        WeekFields weekFields = WeekFields.of(Locale.KOREA);
+        int weekOfMonth = baseDate.get(weekFields.weekOfMonth());
+        String yearMonthWeekLabel = String.format("%04d-%02d-W%02d",
+                baseDate.getYear(), baseDate.getMonthValue(), weekOfMonth);
+
         // 월~일까지 7일간 일별 볼륨 계산
         for (int i = 0; i < 7; i++) {
             LocalDate day = weekStart.plusDays(i);
@@ -138,12 +151,81 @@ public class TrainerMemberService {
             dailyVolumes.add(new TrainerMemberWeeklyVolumeDetailResponse.DailyVolume(day.toString(), volume));
         }
 
+        // 주간 운동 부위 점수/레벨 합산 (main:2점, sub:1점, OTHERS 제외)
+        Map<ExercisePart, TrainerMemberWeeklyVolumeDetailResponse.PartScore> partScores = calculatePartScores(
+                trainerMember.getMember(),
+                weekStart.atStartOfDay(),
+                weekStart.plusDays(7).atStartOfDay()
+        );
+
         String createdDate = trainerMember.getCreatedAt().toLocalDate().toString();
         return new TrainerMemberWeeklyVolumeDetailResponse(
                 trainerMember.getMember().getId(),
                 createdDate,
-                dailyVolumes
+                yearMonthWeekLabel,
+                dailyVolumes,
+                partScores
         );
+    }
+
+    /**
+     * 기간 내 운동일지를 기준으로 부위별 점수를 합산한다.
+     * main 부위는 2점, sub 부위는 1점, OTHERS는 집계하지 않는다.
+     */
+    private Map<ExercisePart, TrainerMemberWeeklyVolumeDetailResponse.PartScore> calculatePartScores(Member member,
+                                                                                                      LocalDateTime from,
+                                                                                                      LocalDateTime to) {
+        List<WorkOutSession> sessions = workOutSessionRepository.findByMemberAndCreatedAtBetween(member, from, to);
+        Map<ExercisePart, Integer> scores = new EnumMap<>(ExercisePart.class);
+
+        for (WorkOutSession session : sessions) {
+            session.getPerformedExercises().forEach(performed -> {
+                ExercisePart part = performed.getExercise().getPart();
+                if (part == null || part == ExercisePart.OTHERS) {
+                    return;
+                }
+                // main 부위는 2점, sub 부위는 1점
+                int score = isMainPart(part) ? 2 : 1;
+                scores.merge(part, score, Integer::sum);
+            });
+        }
+
+        int totalScore = scores.values().stream().mapToInt(Integer::intValue).sum();
+        Map<ExercisePart, TrainerMemberWeeklyVolumeDetailResponse.PartScore> result = new EnumMap<>(ExercisePart.class);
+        scores.forEach((part, score) -> {
+            int level = calcLevel(score, totalScore);
+            result.put(part, new TrainerMemberWeeklyVolumeDetailResponse.PartScore(score, level));
+        });
+
+        return result;
+    }
+
+    /**
+     * 주간 전체 점수 대비 비율로 레벨을 산정한다.
+     * ratio = partScore / totalScore
+     */
+    private int calcLevel(int partScore, int totalScore) {
+        if (totalScore == 0 || partScore == 0) {
+            return 0;
+        }
+        double ratio = (double) partScore / totalScore;
+        if (ratio <= 0.33) {
+            return 1;
+        }
+        if (ratio <= 0.66) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /**
+     * main 부위 여부를 판별한다.
+     */
+    private boolean isMainPart(ExercisePart part) {
+        return part == ExercisePart.BACK
+                || part == ExercisePart.CHEST
+                || part == ExercisePart.SHOULDERS
+                || part == ExercisePart.LEGS;
     }
 
     /**
