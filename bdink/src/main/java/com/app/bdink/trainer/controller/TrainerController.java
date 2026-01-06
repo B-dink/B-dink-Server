@@ -178,7 +178,7 @@ public class TrainerController {
         );
     }
 
-    @PutMapping("/members/{memberId}/workout/{sessionId}/feedback")
+    @PutMapping("/members/feedback/{memberId}/{sessionId}")
     @Operation(method = "PUT", description = "회원 운동일지 피드백을 수정합니다.")
     public RspTemplate<?> updateMemberWorkoutFeedback(@PathVariable Long memberId,
                                                       @PathVariable Long sessionId,
@@ -187,7 +187,7 @@ public class TrainerController {
         return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, Success.UPDATE_EXERCISELIST_SUCCESS.getMessage());
     }
 
-    @GetMapping("/members/{memberId}/workout/{sessionId}/feedback")
+    @GetMapping("/members/feedback/{memberId}/{sessionId}")
     @Operation(method = "GET", description = "회원 운동일지 피드백을 조회합니다.")
     public RspTemplate<?> getMemberWorkoutFeedback(@PathVariable Long memberId,
                                                    @PathVariable Long sessionId) {
