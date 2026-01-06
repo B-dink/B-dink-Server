@@ -19,6 +19,7 @@ import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerService;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeResponse;
 import com.app.bdink.trainermember.service.TrainerMemberService;
+import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class TrainerController {
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
     private final TrainerMemberService trainerMemberService;
+    private final WorkoutService workoutService;
     private final S3Service s3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -139,13 +141,38 @@ public class TrainerController {
     }
 
     @GetMapping("/trainermember/weekly-volume/{memberId}")
-    @Operation(method = "GET", description = "특정 회원의 주간 일별 볼륨 데이터를 조회합니다.")
+    @Operation(method = "GET", description = "특정 회원의 주간 일별 볼륨 데이터 및 score, level 정보를 조회합니다.")
     public RspTemplate<?> getTrainerMemberWeeklyVolumeDetail(@PathVariable Long memberId,
                                                              @RequestParam String baseDate) {
         LocalDate base = LocalDate.parse(baseDate);
         return RspTemplate.success(
                 Success.GET_TRAINER_MEMBER_SUCCESS,
                 trainerMemberService.getWeeklyVolumeDetailByMember(memberId, base)
+        );
+    }
+
+    @GetMapping("/members/workout/calendar/{memberId}")
+    @Operation(method = "GET", description = "회원별 월간 운동 수행 날짜를 조회합니다.")
+    public RspTemplate<?> getMemberWorkoutCalendar(@PathVariable Long memberId,
+                                                   @RequestParam int year,
+                                                   @RequestParam int month) {
+        Member member = memberService.findById(memberId);
+        return RspTemplate.success(
+                Success.GET_WORKOUT_CALENDAR_SUCCESS,
+                workoutService.getWorkoutCalender(member, year, month)
+        );
+    }
+
+    @GetMapping("/members/workout/day/{memberId}")
+    @Operation(method = "GET", description = "회원별 특정 날짜 운동일지 상세 정보를 조회합니다.")
+    public RspTemplate<?> getMemberWorkoutDay(@PathVariable Long memberId,
+                                              @RequestParam
+                                              @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+                                              LocalDate date) {
+        Member member = memberService.findById(memberId);
+        return RspTemplate.success(
+                Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS,
+                workoutService.getWorkoutDailyDetail(member, date)
         );
     }
 
