@@ -13,7 +13,9 @@ import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrTokenUpdateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
+import com.app.bdink.trainer.controller.dto.request.TrainerFeedbackUpdateRequest;
 import com.app.bdink.trainer.controller.dto.response.IsTrainerResponse;
+import com.app.bdink.trainer.controller.dto.response.TrainerFeedbackResponse;
 import com.app.bdink.trainer.controller.dto.response.TrainerResponse;
 import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerService;
@@ -174,6 +176,24 @@ public class TrainerController {
                 Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS,
                 workoutService.getWorkoutDailyDetail(member, date)
         );
+    }
+
+    @PutMapping("/members/{memberId}/workout/{sessionId}/feedback")
+    @Operation(method = "PUT", description = "회원 운동일지 피드백을 수정합니다.")
+    public RspTemplate<?> updateMemberWorkoutFeedback(@PathVariable Long memberId,
+                                                      @PathVariable Long sessionId,
+                                                      @RequestBody TrainerFeedbackUpdateRequest request) {
+        workoutService.updateWorkoutFeedback(memberId, sessionId, request.feedback());
+        return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, Success.UPDATE_EXERCISELIST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/members/{memberId}/workout/{sessionId}/feedback")
+    @Operation(method = "GET", description = "회원 운동일지 피드백을 조회합니다.")
+    public RspTemplate<?> getMemberWorkoutFeedback(@PathVariable Long memberId,
+                                                   @PathVariable Long sessionId) {
+        String feedback = workoutService.getWorkoutFeedback(memberId, sessionId);
+        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS,
+                TrainerFeedbackResponse.of(sessionId, feedback));
     }
 
     @DeleteMapping("/{id}")

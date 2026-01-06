@@ -90,6 +90,12 @@ public class WorkoutService {
         );
     }
 
+    public WorkOutSession findWorkoutSession(Long id, Long memberId) {
+        return workOutSessionRepository.findByIdAndMemberId(id, memberId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
+        );
+    }
+
     public String createExercise(ExerciseReqDto exerciseReqDto,
                                  String exerciseVideoUrl,
                                  String exercisePictureUrl
@@ -229,6 +235,18 @@ public class WorkoutService {
             }
         }
         return String.valueOf(session.getId());
+    }
+
+    @Transactional
+    public void updateWorkoutFeedback(Long memberId, Long sessionId, String feedback) {
+        WorkOutSession session = findWorkoutSession(sessionId, memberId);
+        session.updateFeedback(feedback);
+    }
+
+    @Transactional(readOnly = true)
+    public String getWorkoutFeedback(Long memberId, Long sessionId) {
+        WorkOutSession session = findWorkoutSession(sessionId, memberId);
+        return session.getFeedback();
     }
 
     // 월 별 운동일자 기록 조회
