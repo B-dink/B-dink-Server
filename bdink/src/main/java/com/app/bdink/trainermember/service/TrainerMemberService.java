@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import java.util.stream.Collectors;
-import java.time.temporal.WeekFields;
 
 /**
  * 트레이너-멤버 소속 비즈니스 로직을 담당한다.
@@ -132,12 +130,6 @@ public class TrainerMemberService {
         LocalDate weekStart = baseDate.with(DayOfWeek.MONDAY);
         List<TrainerMemberWeeklyVolumeDetailResponse.DailyVolume> dailyVolumes = new ArrayList<>();
 
-        // YYYY-MM-WNN 형태의 주차 라벨 생성 (한국 기준)
-        WeekFields weekFields = WeekFields.of(Locale.KOREA);
-        int weekOfMonth = baseDate.get(weekFields.weekOfMonth());
-        String yearMonthWeekLabel = String.format("%04d-%02d-W%02d",
-                baseDate.getYear(), baseDate.getMonthValue(), weekOfMonth);
-
         // 월~일까지 7일간 일별 볼륨 계산
         for (int i = 0; i < 7; i++) {
             LocalDate day = weekStart.plusDays(i);
@@ -162,7 +154,6 @@ public class TrainerMemberService {
         return new TrainerMemberWeeklyVolumeDetailResponse(
                 trainerMember.getMember().getId(),
                 createdDate,
-                yearMonthWeekLabel,
                 dailyVolumes,
                 partScores
         );

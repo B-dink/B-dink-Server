@@ -13,7 +13,6 @@ import java.util.Map;
 public record TrainerMemberWeeklyVolumeDetailResponse(
         Long memberId,
         String trainerMemberCreatedDate,
-        String yearMonthWeekLabel,
         List<DailyVolume> dailyVolumes,
         Map<ExercisePart, PartScore> partScores
 ) {
