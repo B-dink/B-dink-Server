@@ -5,6 +5,7 @@ import java.util.List;
 public record WorkoutCalendarResDto(
         Integer year,
         Integer month,
-        List<Integer> days //운동한 날짜들 (ex. [1, 3, 5, 10])
+        List<Integer> days, //운동한 날짜들 (ex. [1, 3, 5, 10])
+        List<Integer> onFeedbackDays //피드백 된 날짜들 (ex. [1, 3, 5, 10])
 ) {
 }

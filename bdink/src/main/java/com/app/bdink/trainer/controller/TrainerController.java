@@ -1,6 +1,7 @@
 package com.app.bdink.trainer.controller;
 
 import com.app.bdink.common.util.CreateIdDto;
+import com.app.bdink.centerowner.service.CenterOwnerService;
 import com.app.bdink.external.aws.service.S3Service;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
@@ -44,6 +45,7 @@ import java.util.List;
 public class TrainerController {
 
     private final TrainerService trainerService;
+    private final CenterOwnerService centerOwnerService;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
     private final TrainerMemberService trainerMemberService;
@@ -127,7 +129,8 @@ public class TrainerController {
     @Operation(method = "GET", description = "현재 로그인한 사용자가 트레이너인지 확인합니다.")
     public RspTemplate<?> isTrainer(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
-        boolean isTrainer = trainerService.isActiveTrainer(memberId);
+        boolean isTrainer = trainerService.isActiveTrainer(memberId)
+                || !centerOwnerService.getActiveCenterIdsByMemberId(memberId).isEmpty();
         return RspTemplate.success(Success.GET_TRAINER_SUCCESS, IsTrainerResponse.from(isTrainer));
     }
 
@@ -135,6 +138,17 @@ public class TrainerController {
     @Operation(method = "GET", description = "트레이너 관리 회원의 주간 볼륨 변화를 조회합니다.")
     public RspTemplate<?> getTrainerMembersWeeklyVolume(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
+        List<Long> centerIds = centerOwnerService.getActiveCenterIdsByMemberId(memberId);
+        // 센터장일 경우 로직
+        if (!centerIds.isEmpty()) {
+            List<Long> trainerIds = trainerService.getActiveTrainersByCenters(centerIds).stream()
+                    .map(Trainer::getId)
+                    .toList();
+            List<TrainerMemberWeeklyVolumeResponse> responses = trainerMemberService
+                    .getWeeklyVolumeDeltaByTrainerIds(trainerIds, java.time.LocalDate.now());
+            return RspTemplate.success(Success.GET_TRAINER_MEMBER_SUCCESS, responses);
+        }
+
         Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
 
         List<TrainerMemberWeeklyVolumeResponse> responses = trainerMemberService

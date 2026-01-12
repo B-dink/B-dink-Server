@@ -269,7 +269,16 @@ public class WorkoutService {
                 .sorted()
                 .toList();
 
-        return new WorkoutCalendarResDto(year, month, days);
+        // feedback이 된 날짜 계산 로직
+        List<Integer> feedbackDays = sessions.stream()
+                // Include days only when feedback exists and is not blank.
+                .filter(s -> s.getFeedback() != null && !s.getFeedback().isBlank())
+                .map(s -> s.getCreatedAt().toLocalDate().getDayOfMonth())
+                .distinct()
+                .sorted()
+                .toList();
+
+        return new WorkoutCalendarResDto(year, month, days, feedbackDays);
     }
 
     // 볼륨 현황 계산

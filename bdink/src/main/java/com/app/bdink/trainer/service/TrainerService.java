@@ -98,6 +98,17 @@ public class TrainerService {
     }
 
     /**
+     * 여러 센터 기준 활성 트레이너 목록을 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public List<Trainer> getActiveTrainersByCenters(List<Long> centerIds) {
+        if (centerIds.isEmpty()) {
+            return List.of();
+        }
+        return trainerRepository.findAllByCenterIdInAndStatus(centerIds, TrainerStatus.ACTIVE);
+    }
+
+    /**
      * 트레이너 프로필 정보를 수정한다.
      */
     @Transactional

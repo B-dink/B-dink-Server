@@ -72,6 +72,16 @@ public class CenterOwnerService {
     }
 
     /**
+     * 멤버 기준 활성 센터장 소속 센터 ID 목록을 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public List<Long> getActiveCenterIdsByMemberId(Long memberId) {
+        return centerOwnerRepository.findAllByMemberIdAndStatus(memberId, CenterOwnerStatus.ACTIVE).stream()
+                .map(centerOwner -> centerOwner.getCenter().getId())
+                .toList();
+    }
+
+    /**
      * 센터장 소속 센터를 수정한다.
      */
     @Transactional

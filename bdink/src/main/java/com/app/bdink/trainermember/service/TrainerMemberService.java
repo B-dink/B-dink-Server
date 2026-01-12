@@ -227,6 +227,26 @@ public class TrainerMemberService {
         List<TrainerMember> trainerMembers = trainerMemberRepository
                 .findAllByTrainerIdAndStatusWithMember(trainerId, TrainerMemberStatus.ACTIVE);
 
+        return buildWeeklyVolumeDeltaResponses(trainerMembers, baseDate);
+    }
+
+    /**
+     * 센터장 기준으로 여러 트레이너의 회원 주간 볼륨 변화를 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public List<TrainerMemberWeeklyVolumeResponse> getWeeklyVolumeDeltaByTrainerIds(List<Long> trainerIds, LocalDate baseDate) {
+        if (trainerIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<TrainerMember> trainerMembers = trainerMemberRepository
+                .findAllByTrainerIdInAndStatusWithMember(trainerIds, TrainerMemberStatus.ACTIVE);
+
+        return buildWeeklyVolumeDeltaResponses(trainerMembers, baseDate);
+    }
+
+    private List<TrainerMemberWeeklyVolumeResponse> buildWeeklyVolumeDeltaResponses(List<TrainerMember> trainerMembers,
+                                                                                    LocalDate baseDate) {
         if (trainerMembers.isEmpty()) {
             return List.of();
         }
