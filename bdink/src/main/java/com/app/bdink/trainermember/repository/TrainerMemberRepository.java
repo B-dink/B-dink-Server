@@ -33,4 +33,14 @@ public interface TrainerMemberRepository extends JpaRepository<TrainerMember, Lo
             """)
     List<TrainerMember> findAllByTrainerIdAndStatusWithMember(@Param("trainerId") Long trainerId,
                                                              @Param("status") TrainerMemberStatus status);
+
+    @Query("""
+            select tm
+            from TrainerMember tm
+            join fetch tm.member
+            where tm.trainer.id in :trainerIds
+              and tm.status = :status
+            """)
+    List<TrainerMember> findAllByTrainerIdInAndStatusWithMember(@Param("trainerIds") List<Long> trainerIds,
+                                                                @Param("status") TrainerMemberStatus status);
 }

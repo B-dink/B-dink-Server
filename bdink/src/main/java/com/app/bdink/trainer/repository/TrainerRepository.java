@@ -22,5 +22,7 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
     List<Trainer> findAllByCenterIdAndStatus(Long centerId, TrainerStatus status);
 
+    List<Trainer> findAllByCenterIdInAndStatus(List<Long> centerIds, TrainerStatus status);
+
     List<Trainer> findAllByQrTokenAndStatus(String qrToken, TrainerStatus status);
 }
