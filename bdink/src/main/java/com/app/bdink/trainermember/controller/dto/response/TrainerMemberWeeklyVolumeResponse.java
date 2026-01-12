@@ -6,6 +6,7 @@ package com.app.bdink.trainermember.controller.dto.response;
 public record TrainerMemberWeeklyVolumeResponse(
         Long memberId,
         String memberName,
+        String memberProfileImage,
         long weeklyVolumeDelta,
         boolean weeklyVolumeIncreased
 ) {

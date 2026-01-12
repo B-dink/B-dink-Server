@@ -292,6 +292,7 @@ public class TrainerMemberService {
                     return new TrainerMemberWeeklyVolumeResponse(
                             memberId,
                             trainerMember.getMember().getName(),
+                            trainerMember.getMember().getPictureUrl(),
                             delta,
                             increased
                     );
