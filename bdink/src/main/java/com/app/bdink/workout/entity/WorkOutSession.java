@@ -31,6 +31,10 @@ public class WorkOutSession extends BaseTimeEntity {
     @Column(name = "workoutMemo")
     private String workoutMemo;
 
+    //Trainer Feedback
+    @Column(name = "feedback")
+    private String feedback;
+
     @OneToMany(mappedBy = "workOutSession",
             cascade = CascadeType.ALL,
             orphanRemoval = true
@@ -42,6 +46,7 @@ public class WorkOutSession extends BaseTimeEntity {
         this.member = member;
         this.memo = memo;
         this.workoutMemo = workoutMemo;
+        this.feedback = null;
     }
 
     public void changeMemo(String memo){
@@ -50,6 +55,10 @@ public class WorkOutSession extends BaseTimeEntity {
 
     public void changeWorkoutMemo(String workoutMemo){
         this.workoutMemo = workoutMemo;
+    }
+
+    public void updateFeedback(String feedback){
+        this.feedback = feedback;
     }
 
     public void addPerformedExercise(PerformedExercise pe){

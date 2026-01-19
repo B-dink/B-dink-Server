@@ -90,6 +90,12 @@ public class WorkoutService {
         );
     }
 
+    public WorkOutSession findWorkoutSession(Long id, Long memberId) {
+        return workOutSessionRepository.findByIdAndMemberId(id, memberId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
+        );
+    }
+
     public String createExercise(ExerciseReqDto exerciseReqDto,
                                  String exerciseVideoUrl,
                                  String exercisePictureUrl
@@ -231,6 +237,18 @@ public class WorkoutService {
         return String.valueOf(session.getId());
     }
 
+    @Transactional
+    public void updateWorkoutFeedback(Long memberId, Long sessionId, String feedback) {
+        WorkOutSession session = findWorkoutSession(sessionId, memberId);
+        session.updateFeedback(feedback);
+    }
+
+    @Transactional(readOnly = true)
+    public String getWorkoutFeedback(Long memberId, Long sessionId) {
+        WorkOutSession session = findWorkoutSession(sessionId, memberId);
+        return session.getFeedback();
+    }
+
     // 월 별 운동일자 기록 조회
     @Transactional(readOnly = true)
     public WorkoutCalendarResDto getWorkoutCalender(Member member, int year, int month) {
@@ -251,7 +269,16 @@ public class WorkoutService {
                 .sorted()
                 .toList();
 
-        return new WorkoutCalendarResDto(year, month, days);
+        // feedback이 된 날짜 계산 로직
+        List<Integer> feedbackDays = sessions.stream()
+                // Include days only when feedback exists and is not blank.
+                .filter(s -> s.getFeedback() != null && !s.getFeedback().isBlank())
+                .map(s -> s.getCreatedAt().toLocalDate().getDayOfMonth())
+                .distinct()
+                .sorted()
+                .toList();
+
+        return new WorkoutCalendarResDto(year, month, days, feedbackDays);
     }
 
     // 볼륨 현황 계산

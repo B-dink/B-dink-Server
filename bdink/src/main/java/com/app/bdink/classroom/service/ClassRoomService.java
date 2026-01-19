@@ -183,7 +183,9 @@ public class ClassRoomService implements ClassRoomUseCase {
                 .toList();
         List<CategorizedClassroomDto> result = new ArrayList<>();
         for (Career career : Career.values()) {
-            if (career.equals(Career.PROMOTION)) {
+            //TODO: 이쪽 한번 다시 확인해보기
+            // TRAINER/CENTEROWNER는 센터-트레이너 도메인 전용이라 클래스룸 목록에서 제외
+            if (career == Career.PROMOTION || career == Career.TRAINER || career == Career.CENTEROWNER) {
                 continue;
             }
             List<AllCareerClassRoomResponse> classroomsByCareer = getClassRoomByCareerWithIsBookmarked(career, member);

@@ -42,6 +42,9 @@ public enum Error {
     NOT_FOUND_KOLLUSMEDIALINK(HttpStatus.NOT_FOUND, "찾을 수 없는 시청기록 입니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),
     NOT_FOUND_INSTRUCTOR(HttpStatus.NOT_FOUND, "찾을 수 없는 강사입니다."),
+    NOT_FOUND_TRAINER(HttpStatus.NOT_FOUND, "찾을 수 없는 트레이너입니다."),
+    NOT_FOUND_CENTER_OWNER(HttpStatus.NOT_FOUND, "찾을 수 없는 센터장입니다."),
+    NOT_FOUND_TRAINER_MEMBER(HttpStatus.NOT_FOUND, "찾을 수 없는 트레이너 소속 멤버입니다."),
     NOT_FOUND_YOUTUBEVIDEO(HttpStatus.NOT_FOUND, "찾을 수 없는 유튜브 비디오 입니다."),
 
     NOT_FOUND_PAYMENT(HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보 입니다."),
@@ -63,6 +66,9 @@ public enum Error {
     BAD_REQUEST_PROVIDER(HttpStatus.BAD_REQUEST, "다른 유형 로그인으로 가입하셨습니다."),
     BAD_REQUEST_EMAIL(HttpStatus.BAD_REQUEST, "사용할 수 없는 이메일입니다."),
     EXIST_USER(HttpStatus.BAD_REQUEST, "이미 가입한 유저입니다."),
+    EXIST_TRAINER(HttpStatus.BAD_REQUEST, "이미 트레이너로 등록된 유저입니다."),
+    EXIST_CENTER_OWNER(HttpStatus.BAD_REQUEST, "이미 센터장으로 등록된 유저입니다."),
+    EXIST_TRAINER_MEMBER(HttpStatus.BAD_REQUEST, "이미 트레이너에 소속된 유저입니다."),
     EXIST_USERKEY(HttpStatus.BAD_REQUEST, "이미 유저키가 존재합니다."),
     EXIST_SUGANG(HttpStatus.BAD_REQUEST, "이미 수강신청한 강의 입니다."),
     NOT_EXIST_USERKEY(HttpStatus.BAD_REQUEST, "남아있는 사용자 키가 없습니다. 사용자키를 새로 추가해주세요."),
@@ -151,6 +157,7 @@ public enum Error {
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN,"리소스에 접근할 수 없는 유저입니다. 토큰을 확인해주세요."),
     NO_INSTRUCTOR(HttpStatus.FORBIDDEN, "강사정보가 없는 유저입니다."),
     INVALID_USER_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없는 유저입니다."),
+    INVALID_SELF_TRAINER_QR(HttpStatus.FORBIDDEN, "트레이너는 본인의 QR은 사용할 수 없습니다."),
     REJECT_ACCOUNT_PAYMENT(HttpStatus.FORBIDDEN, "잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_PAYMENT(HttpStatus.FORBIDDEN, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_COMPANY(HttpStatus.FORBIDDEN, "결제 승인이 거절되었습니다."),
@@ -298,4 +305,3 @@ public enum Error {
         return tossErrorMap.getOrDefault(tossCode, UNKNOWN_PAYMENT_ERROR);
     }
 }
-
