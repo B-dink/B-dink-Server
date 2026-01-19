@@ -16,6 +16,8 @@ public interface CenterOwnerRepository extends JpaRepository<CenterOwner, Long> 
 
     Optional<CenterOwner> findByCenterIdAndMemberId(Long centerId, Long memberId);
 
+    Optional<CenterOwner> findByMemberId(Long memberId);
+
     boolean existsByCenterIdAndMemberIdAndStatus(Long centerId, Long memberId, CenterOwnerStatus status);
 
     List<CenterOwner> findAllByCenterIdAndStatus(Long centerId, CenterOwnerStatus status);
