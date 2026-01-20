@@ -40,13 +40,10 @@ public class VersionController {
     @Operation(method = "GET", description = "유저의 현재 버전과 플랫폼을 기준으로 업데이트 필요 여부와 강제 업데이트 정보를 확인합니다.")
     public RspTemplate<UpdateCheckResponse> checkUpdate(
             @Valid @ModelAttribute CheckUpdateRequiredRequest request) {
-        Boolean isUpdateRequired = versionService.isUpdateRequired(request.version(), request.platform());
-        String version = versionService.getLatestVersion(request.platform()).getVersion();
-        CheckUpdateRequiredResponse checkUpdateRequiredResponse = new CheckUpdateRequiredResponse(isUpdateRequired, version);
-
-        ForceUpdateInfo forceUpdateInfo = versionService.checkForceUpdateInfo(request.version(), request.platform());
-
-        UpdateCheckResponse response = UpdateCheckResponse.from(checkUpdateRequiredResponse, forceUpdateInfo);
+        Version latestVersion = versionService.getLatestVersion(request.platform());
+        String minVersion = versionService.getMinVersion(request.platform());
+        boolean forceUpdateRequired = versionService.isForceUpdateRequired(request.version(), minVersion);
+        UpdateCheckResponse response = UpdateCheckResponse.from(latestVersion, minVersion, forceUpdateRequired);
 
         return RspTemplate.success(Success.GET_UPDATE_CHECK_SUCCESS, response);
     }
