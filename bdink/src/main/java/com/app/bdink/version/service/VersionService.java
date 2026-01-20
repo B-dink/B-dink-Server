@@ -11,5 +11,7 @@ public interface VersionService {
 
     Boolean isUpdateRequired(String currentVersion, Platform platform);
     ForceUpdateInfo checkForceUpdateInfo(String currentVersion, Platform platform);
+    String getMinVersion(Platform platform);
+    boolean isForceUpdateRequired(String currentVersion, String minVersion);
     Version getLatestVersion(Platform platform);
 }
