@@ -113,6 +113,7 @@ public enum Success {
     UPDATE_MAKETING_SUCCESS(HttpStatus.OK, "마케팅 수신 수정 성공"),
     UPDATE_NAME_SUCCESS(HttpStatus.OK, "이름 수정 성공"),
     UPDATE_PICTUREURL_SUCCESS(HttpStatus.OK, "사진 수정 성공"),
+    UPDATE_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 읽음 처리 성공"),
 
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),
@@ -129,6 +130,7 @@ public enum Success {
     GET_WORKOUT_SESSION_DETAIL_SUCCESS(HttpStatus.OK, "운동일지 상세 정보 조회 성공"),
     GET_EXERCISE_VERSION_SUCCESS(HttpStatus.OK, "운동종목 버전 조회 성공"),
     GET_EXERCISE_ALL_SUCCESS(HttpStatus.OK, "모든 운동종목 정보 조회 성공"),
+    GET_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 조회 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
