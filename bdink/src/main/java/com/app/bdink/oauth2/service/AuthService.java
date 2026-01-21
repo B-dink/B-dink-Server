@@ -66,7 +66,9 @@ public class AuthService {
     @Transactional
     public TokenDto reIssueToken(RefreshToken refreshToken) {
         Member member = memberService.findByRefreshToken(refreshToken.refreshToken());
-        return tokenProvider.reIssueTokenByRefresh(member, refreshToken.refreshToken());
+        TokenDto tokenDto = tokenProvider.reIssueTokenByRefresh(member, refreshToken.refreshToken());
+        memberService.markLogin(member);
+        return tokenDto;
     }
 
     @Transactional
