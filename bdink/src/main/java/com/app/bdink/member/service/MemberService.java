@@ -10,6 +10,7 @@ import com.app.bdink.member.controller.dto.request.MemberSocialRequestDto;
 import com.app.bdink.member.controller.dto.request.MemberUpdateNameDto;
 import com.app.bdink.member.controller.dto.response.NameCheckDto;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.entity.MemberStatus;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.exception.NotFoundMemberException;
 import com.app.bdink.member.repository.MemberRepository;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -186,6 +188,14 @@ public class MemberService {
     @Transactional
     public void updateProfile(final Member member, String pictureUrl) {
         member.updatePictureUrl(pictureUrl);
+    }
+
+    @Transactional
+    public void markLogin(Member member) {
+        if (member.getStatus() == MemberStatus.DORMANT) {
+            member.activate();
+        }
+        member.updateLastLoginAt(LocalDateTime.now());
     }
 
 }

@@ -5,6 +5,10 @@ import com.app.bdink.center.service.CenterService;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.notification.entity.NotificationLinkType;
+import com.app.bdink.notification.entity.NotificationType;
+import com.app.bdink.notification.service.NotificationFactory;
+import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
@@ -31,6 +35,8 @@ public class TrainerService {
     private final TrainerRepository trainerRepository;
     private final CenterService centerService;
     private final TrainerMemberService trainerMemberService;
+    private final NotificationService notificationService;
+    private final NotificationFactory notificationFactory;
 
     /**
      * 트레이너를 생성한다.
@@ -152,9 +158,27 @@ public class TrainerService {
             throw new CustomException(Error.INVALID_SELF_TRAINER_QR, Error.INVALID_SELF_TRAINER_QR.getMessage());
         }
 
-        return trainerMemberService.createTrainerMember(
+        String trainerMemberId = trainerMemberService.createTrainerMember(
                 new TrainerMemberCreateRequest(trainer.getId(), member.getId())
         );
+        notificationService.create(notificationFactory.create(
+                member.getId(),
+                NotificationType.TRAINER_REGISTERED,
+                "트레이너 등록 완료",
+                "트레이너 등록이 완료되었습니다.",
+                NotificationLinkType.TRAINER_PROFILE,
+                trainer.getId()
+        ));
+        notificationService.create(notificationFactory.create(
+                trainer.getMember().getId(),
+                NotificationType.TRAINER_REGISTERED,
+                "새 회원 등록",
+                "새 회원이 등록되었습니다.",
+                NotificationLinkType.TRAINER_MEMBER_LIST,
+                trainer.getId()
+        ));
+
+        return trainerMemberId;
     }
 
     /**

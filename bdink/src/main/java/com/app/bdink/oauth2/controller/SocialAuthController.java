@@ -53,6 +53,7 @@ public class SocialAuthController {
             @Parameter(description = "애플은 APPLE, 카카오는 KAKAO", in = ParameterIn.QUERY) @RequestParam("provider") String provider
     ) {
         LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
+        memberService.markLogin(result.member());
         TokenDto tokenDto = tokenProvider.createToken(result.member());
         CommonOauthDto commonOauthDto = new CommonOauthDto(tokenDto, result.member().getId());
         if (result.isNewMember()) {
@@ -157,4 +158,3 @@ public class SocialAuthController {
 
 
 }
-

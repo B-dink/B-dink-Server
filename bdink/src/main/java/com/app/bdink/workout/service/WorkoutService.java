@@ -12,6 +12,10 @@ import com.app.bdink.openai.service.AiMemoInputLogService;
 import com.app.bdink.openai.service.ExerciseEmbeddingService;
 import com.app.bdink.openai.service.ExerciseRagRetrievalService;
 import com.app.bdink.openai.service.OpenAiChatService;
+import com.app.bdink.notification.entity.NotificationLinkType;
+import com.app.bdink.notification.entity.NotificationType;
+import com.app.bdink.notification.service.NotificationFactory;
+import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
 import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
@@ -73,6 +77,8 @@ public class WorkoutService {
     private final ExerciseEmbeddingService exerciseEmbeddingService;
     private final ExerciseRagRetrievalService exerciseRagRetrievalService;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
+    private final NotificationFactory notificationFactory;
 
     @Value("${ai-memo.rag.distance-threshold}")
     private double ragDistanceThreshold;
@@ -241,6 +247,14 @@ public class WorkoutService {
     public void updateWorkoutFeedback(Long memberId, Long sessionId, String feedback) {
         WorkOutSession session = findWorkoutSession(sessionId, memberId);
         session.updateFeedback(feedback);
+        notificationService.create(notificationFactory.create(
+                session.getMember().getId(),
+                NotificationType.WORKOUT_FEEDBACK,
+                "트레이너 피드백",
+                "트레이너 피드백이 도착했어요.",
+                NotificationLinkType.WORKOUT_SESSION,
+                session.getId()
+        ));
     }
 
     @Transactional(readOnly = true)

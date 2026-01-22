@@ -7,6 +7,7 @@ import com.app.bdink.oauth2.domain.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -49,6 +50,13 @@ public class Member extends BaseTimeEntity {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private MemberStatus status;
+
+    @Column(name = "lastLoginAt")
+    private LocalDateTime lastLoginAt;
+
     private String refreshToken;
 
     @Column(columnDefinition = "boolean default false")
@@ -64,6 +72,7 @@ public class Member extends BaseTimeEntity {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.status = MemberStatus.ACTIVE;
         this.phoneNumber = phoneNumber;
         this.pictureUrl = pictureUrl;
         this.appleId = appleId;
@@ -91,6 +100,18 @@ public class Member extends BaseTimeEntity {
 
     public void updatePictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
 
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    public void activate() {
+        this.status = MemberStatus.ACTIVE;
+    }
+
+    public void dormancy() {
+        this.status = MemberStatus.DORMANT;
+    }
+
     public Career getInterest(){
         if (this.instructor != null){
             return instructor.getCareer();
@@ -103,10 +124,12 @@ public class Member extends BaseTimeEntity {
         this.pictureUrl = profileImage;
         this.phoneNumber = phone;
         this.role = Role.ROLE_USER;
+        this.status = MemberStatus.ACTIVE;
     }
 
     public void delete(){
         this.role = Role.DELETE_USER;
+        this.status = MemberStatus.DELETED;
         this.password = null;
         this.instructor = null;
         this.email = "";
