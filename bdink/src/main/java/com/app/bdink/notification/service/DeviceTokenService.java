@@ -1,5 +1,7 @@
 package com.app.bdink.notification.service;
 
+import com.app.bdink.global.exception.CustomException;
+import com.app.bdink.global.exception.Error;
 import com.app.bdink.notification.entity.DevicePlatform;
 import com.app.bdink.notification.entity.DeviceToken;
 import com.app.bdink.notification.repository.DeviceTokenRepository;
@@ -18,7 +20,7 @@ public class DeviceTokenService {
         DeviceToken existing = deviceTokenRepository.findByToken(token).orElse(null);
         if (existing != null) {
             if (!existing.getMemberId().equals(memberId)) {
-                throw new IllegalArgumentException("Invalid token owner");
+                throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
             }
             existing.updateToken(token, platform, isAllowed);
             return;
@@ -34,9 +36,9 @@ public class DeviceTokenService {
     @Transactional
     public void updateAllowed(Long memberId, String token, Boolean isAllowed) {
         DeviceToken deviceToken = deviceTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Device token not found"));
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
         if (!deviceToken.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("Invalid token owner");
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
         }
         deviceToken.updateAllowed(isAllowed);
     }
@@ -44,10 +46,17 @@ public class DeviceTokenService {
     @Transactional
     public void deactivate(Long memberId, String token) {
         DeviceToken deviceToken = deviceTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Device token not found"));
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
         if (!deviceToken.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("Invalid token owner");
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
         }
         deviceToken.deactivate();
+    }
+
+    @Transactional
+    public void deactivateAllForMember(Long memberId) {
+        for (DeviceToken deviceToken : deviceTokenRepository.findAllByMemberIdAndIsActiveTrue(memberId)) {
+            deviceToken.deactivate();
+        }
     }
 }

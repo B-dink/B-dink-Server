@@ -114,6 +114,9 @@ public enum Success {
     UPDATE_NAME_SUCCESS(HttpStatus.OK, "이름 수정 성공"),
     UPDATE_PICTUREURL_SUCCESS(HttpStatus.OK, "사진 수정 성공"),
     UPDATE_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 읽음 처리 성공"),
+    REGISTER_DEVICE_TOKEN_SUCCESS(HttpStatus.OK, "디바이스 토큰 등록 성공"),
+    UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS(HttpStatus.OK, "디바이스 알림 권한 변경 성공"),
+    DEACTIVATE_DEVICE_TOKEN_SUCCESS(HttpStatus.OK, "디바이스 토큰 비활성화 성공"),
 
 
     UPDATE_LECTURE_SUCCESS(HttpStatus.OK, "강의 수정 성공"),

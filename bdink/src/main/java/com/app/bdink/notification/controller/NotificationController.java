@@ -48,7 +48,7 @@ public class NotificationController {
                                         @RequestBody DeviceTokenRegisterRequest request) {
         Long memberId = memberUtilService.getMemberId(principal);
         deviceTokenService.registerOrUpdate(memberId, request.token(), request.platform(), request.isAllowed());
-        return RspTemplate.success(Success.UPDATE_NOTIFICATION_SUCCESS, Success.UPDATE_NOTIFICATION_SUCCESS.getMessage());
+        return RspTemplate.success(Success.REGISTER_DEVICE_TOKEN_SUCCESS, Success.REGISTER_DEVICE_TOKEN_SUCCESS.getMessage());
     }
 
     @PutMapping("/tokens/allowed")
@@ -57,7 +57,7 @@ public class NotificationController {
                                         @RequestBody DeviceTokenAllowedRequest request) {
         Long memberId = memberUtilService.getMemberId(principal);
         deviceTokenService.updateAllowed(memberId, request.token(), request.isAllowed());
-        return RspTemplate.success(Success.UPDATE_NOTIFICATION_SUCCESS, Success.UPDATE_NOTIFICATION_SUCCESS.getMessage());
+        return RspTemplate.success(Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS, Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS.getMessage());
     }
 
     @DeleteMapping("/tokens")
@@ -66,6 +66,6 @@ public class NotificationController {
                                           @RequestParam String token) {
         Long memberId = memberUtilService.getMemberId(principal);
         deviceTokenService.deactivate(memberId, token);
-        return RspTemplate.success(Success.UPDATE_NOTIFICATION_SUCCESS, Success.UPDATE_NOTIFICATION_SUCCESS.getMessage());
+        return RspTemplate.success(Success.DEACTIVATE_DEVICE_TOKEN_SUCCESS, Success.DEACTIVATE_DEVICE_TOKEN_SUCCESS.getMessage());
     }
 }
