@@ -574,12 +574,11 @@ public class WorkoutService {
                 exercise.getId(),
                 exercise.getName(),
                 exercise.getPictureUrl(),
-                //TODO: 이쪽 리스토로 출력이 안되면 다시 확인하기
                 dto.sets()
         );
     }
 
-    // LLM을 위한 프로토타입 로직 (ai 메모장)
+    // LLM 로직 (ai 메모장)
     public Exercise findFirstSimilarOrNull(String rawName){
         if(rawName == null || rawName.isBlank()) return null;
 
