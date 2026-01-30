@@ -56,6 +56,7 @@ public enum Error {
     NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
 
     NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보 입니다."),
+    NOT_FOUND_FCM_TOKEN(HttpStatus.NOT_FOUND, "존재하지 않는 fcm 토큰 정보 입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다"),
 
     /**

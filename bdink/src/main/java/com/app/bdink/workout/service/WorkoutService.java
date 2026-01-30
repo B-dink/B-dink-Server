@@ -317,9 +317,8 @@ public class WorkoutService {
         // 총 참여자 -> 전체 member 수 + 1000
         long totalParticipants = memberRepository.count()+1000;
 
-        // 4. 내 순위 + 내 주간 볼륨
-        //TODO : 기획적으로 랭킹에 없을 경우 0 or 전체 참여자 수 + 1 택
-        int rank = 0;
+        // 4. 내 순위 + 내 주간 볼륨 (랭킹에 없으면 totalParticipants로 처리)
+        int rank = (int) totalParticipants;
         long myWeeklyVolume = 0;
 
         for (int i = 0; i < ranking.size(); i++) {

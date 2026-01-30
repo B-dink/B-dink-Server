@@ -42,6 +42,14 @@ public class NotificationController {
         return RspTemplate.success(Success.UPDATE_NOTIFICATION_SUCCESS, Success.UPDATE_NOTIFICATION_SUCCESS.getMessage());
     }
 
+    @DeleteMapping("/{notificationId}")
+    @Operation(method = "DELETE", description = "특정 알림을 삭제(soft delete)합니다.")
+    public RspTemplate<?> deleteNotification(Principal principal, @PathVariable Long notificationId) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        notificationService.softDeleteNotification(memberId, notificationId);
+        return RspTemplate.success(Success.DELETE_NOTIFICATION_SUCCESS, Success.DELETE_NOTIFICATION_SUCCESS.getMessage());
+    }
+
     @PostMapping("/tokens")
     @Operation(method = "POST", description = "FCM 디바이스 토큰을 등록/갱신합니다.")
     public RspTemplate<?> registerToken(Principal principal,
@@ -58,6 +66,22 @@ public class NotificationController {
         Long memberId = memberUtilService.getMemberId(principal);
         deviceTokenService.updateAllowed(memberId, request.token(), request.isAllowed());
         return RspTemplate.success(Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS, Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/tokens/allowed/verify")
+    @Operation(method = "GET", description = "FCM 디바이스 토큰 알림 권한을 확인합니다.")
+    public RspTemplate<?> verifyAllowed(Principal principal, @RequestParam String token) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Boolean isAllowed = deviceTokenService.verifyForMember(memberId, token);
+        return RspTemplate.success(Success.VERIFY_DEVICE_TOKEN_ALOOWED_SUCCESS, isAllowed);
+    }
+
+    @GetMapping("/unread")
+    @Operation(method = "GET", description = "읽지 않은 알림이 있는지 확인합니다.")
+    public RspTemplate<?> checkUnreadNotification(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Boolean hasUnread =  notificationService.hasUnread(memberId);
+        return RspTemplate.success(Success.GET_NOTIFICATION_READ, hasUnread);
     }
 
     @DeleteMapping("/tokens")
