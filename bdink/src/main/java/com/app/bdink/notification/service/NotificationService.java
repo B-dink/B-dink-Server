@@ -47,4 +47,9 @@ public class NotificationService {
         }
         notification.updateRead(true);
     }
+
+    @Transactional
+    public boolean hasUnread(Long memberId) {
+        return notificationRepository.existsByReceiverMemberIdAndIsReadFalse(memberId);
+    }
 }

@@ -60,6 +60,22 @@ public class NotificationController {
         return RspTemplate.success(Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS, Success.UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS.getMessage());
     }
 
+    @GetMapping("/tokens/allowed/verify")
+    @Operation(method = "GET", description = "FCM 디바이스 토큰 알림 권한을 확인합니다.")
+    public RspTemplate<?> verifyAllowed(Principal principal, @RequestParam String token) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Boolean isAllowed = deviceTokenService.verifyForMember(memberId, token);
+        return RspTemplate.success(Success.VERIFY_DEVICE_TOKEN_ALOOWED_SUCCESS, isAllowed);
+    }
+
+    @GetMapping("/unread")
+    @Operation(method = "GET", description = "읽지 않은 알림이 있는지 확인합니다.")
+    public RspTemplate<?> checkUnreadNotification(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Boolean hasUnread =  notificationService.hasUnread(memberId);
+        return RspTemplate.success(Success.GET_NOTIFICATION_READ, hasUnread);
+    }
+
     @DeleteMapping("/tokens")
     @Operation(method = "DELETE", description = "FCM 디바이스 토큰을 비활성화합니다.")
     public RspTemplate<?> deactivateToken(Principal principal,

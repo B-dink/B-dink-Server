@@ -89,6 +89,9 @@ public enum Success {
     CHECK_QR_SUCCESS(HttpStatus.OK, "QR코드 인증 성공"),
 
 
+    GET_NOTIFICATION_READ(HttpStatus.OK, "알림 읽음 유무 조회 성공"),
+
+
 
 
     GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
@@ -116,6 +119,7 @@ public enum Success {
     UPDATE_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 읽음 처리 성공"),
     REGISTER_DEVICE_TOKEN_SUCCESS(HttpStatus.OK, "디바이스 토큰 등록 성공"),
     UPDATE_DEVICE_TOKEN_ALLOWED_SUCCESS(HttpStatus.OK, "디바이스 알림 권한 변경 성공"),
+    VERIFY_DEVICE_TOKEN_ALOOWED_SUCCESS(HttpStatus.OK, "디바이스 알림 권한 확인 성공"),
     DEACTIVATE_DEVICE_TOKEN_SUCCESS(HttpStatus.OK, "디바이스 토큰 비활성화 성공"),
 
 

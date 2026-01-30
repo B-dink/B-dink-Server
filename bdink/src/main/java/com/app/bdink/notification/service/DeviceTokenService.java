@@ -36,11 +36,21 @@ public class DeviceTokenService {
     @Transactional
     public void updateAllowed(Long memberId, String token, Boolean isAllowed) {
         DeviceToken deviceToken = deviceTokenRepository.findByToken(token)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_FCM_TOKEN, Error.NOT_FOUND_FCM_TOKEN.getMessage()));
         if (!deviceToken.getMemberId().equals(memberId)) {
             throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
         }
         deviceToken.updateAllowed(isAllowed);
+    }
+
+    @Transactional
+    public Boolean verifyForMember(Long memberId, String token) {
+        DeviceToken deviceToken = deviceTokenRepository.findByToken(token)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_FCM_TOKEN, Error.NOT_FOUND_FCM_TOKEN.getMessage()));
+        if (!deviceToken.getMemberId().equals(memberId)) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
+        return deviceToken.getIsAllowed();
     }
 
     @Transactional
