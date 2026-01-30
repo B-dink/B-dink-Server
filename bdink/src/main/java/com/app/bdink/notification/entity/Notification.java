@@ -52,6 +52,10 @@ public class Notification extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isRead;
 
+    // 삭제 여부 (soft delete)
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
     @Builder
     public Notification(Long receiverMemberId,
                         NotificationType type,
@@ -66,9 +70,14 @@ public class Notification extends BaseTimeEntity {
         this.linkType = linkType;
         this.linkId = linkId;
         this.isRead = false;
+        this.isDeleted = false;
     }
 
     public void updateRead(Boolean isRead) {
         this.isRead = isRead;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
     }
 }

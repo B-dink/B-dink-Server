@@ -33,7 +33,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> getNotifications(Long receiverMemberId) {
-        return notificationRepository.findAllByReceiverMemberIdOrderByCreatedAtDesc(receiverMemberId).stream()
+        return notificationRepository.findAllByReceiverMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(receiverMemberId).stream()
                 .map(NotificationResponse::from)
                 .toList();
     }
@@ -50,6 +50,16 @@ public class NotificationService {
 
     @Transactional
     public boolean hasUnread(Long memberId) {
-        return notificationRepository.existsByReceiverMemberIdAndIsReadFalse(memberId);
+        return notificationRepository.existsByReceiverMemberIdAndIsReadFalseAndIsDeletedFalse(memberId);
+    }
+
+    @Transactional
+    public void softDeleteNotification(Long receiverMemberId, Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_NOTIFICATION, Error.NOT_FOUND_NOTIFICATION.getMessage()));
+        if (!notification.getReceiverMemberId().equals(receiverMemberId)) {
+            throw new CustomException(Error.INVALID_USER_ACCESS, Error.INVALID_USER_ACCESS.getMessage());
+        }
+        notification.softDelete();
     }
 }

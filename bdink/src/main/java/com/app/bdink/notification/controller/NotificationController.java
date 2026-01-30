@@ -42,6 +42,14 @@ public class NotificationController {
         return RspTemplate.success(Success.UPDATE_NOTIFICATION_SUCCESS, Success.UPDATE_NOTIFICATION_SUCCESS.getMessage());
     }
 
+    @DeleteMapping("/{notificationId}")
+    @Operation(method = "DELETE", description = "특정 알림을 삭제(soft delete)합니다.")
+    public RspTemplate<?> deleteNotification(Principal principal, @PathVariable Long notificationId) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        notificationService.softDeleteNotification(memberId, notificationId);
+        return RspTemplate.success(Success.DELETE_NOTIFICATION_SUCCESS, Success.DELETE_NOTIFICATION_SUCCESS.getMessage());
+    }
+
     @PostMapping("/tokens")
     @Operation(method = "POST", description = "FCM 디바이스 토큰을 등록/갱신합니다.")
     public RspTemplate<?> registerToken(Principal principal,
