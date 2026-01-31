@@ -1,6 +1,6 @@
 package com.app.bdink.workout.controller.dto;
 
-public record MemberWeeklyVolumeDto(
+    public record MemberVolumeRankingDto(
         Long memberId,
-        Long weeklyVolume
+        Long volume
 ) {}
