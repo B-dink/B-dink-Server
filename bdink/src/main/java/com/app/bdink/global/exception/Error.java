@@ -46,6 +46,7 @@ public enum Error {
     NOT_FOUND_CENTER_OWNER(HttpStatus.NOT_FOUND, "찾을 수 없는 센터장입니다."),
     NOT_FOUND_TRAINER_MEMBER(HttpStatus.NOT_FOUND, "찾을 수 없는 트레이너 소속 멤버입니다."),
     NOT_FOUND_YOUTUBEVIDEO(HttpStatus.NOT_FOUND, "찾을 수 없는 유튜브 비디오 입니다."),
+    NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND, "찾을 수 없는 알림입니다."),
 
     NOT_FOUND_PAYMENT(HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보 입니다."),
     NOT_FOUND_PAYMENT_SESSION(HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
@@ -55,6 +56,7 @@ public enum Error {
     NOT_FOUND_USERKEY(HttpStatus.NOT_FOUND, "찾을 수 없는 사용자키 입니다."),
 
     NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보 입니다."),
+    NOT_FOUND_FCM_TOKEN(HttpStatus.NOT_FOUND, "존재하지 않는 fcm 토큰 정보 입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다"),
 
     /**

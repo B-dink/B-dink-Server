@@ -12,8 +12,12 @@ import com.app.bdink.openai.service.AiMemoInputLogService;
 import com.app.bdink.openai.service.ExerciseEmbeddingService;
 import com.app.bdink.openai.service.ExerciseRagRetrievalService;
 import com.app.bdink.openai.service.OpenAiChatService;
+import com.app.bdink.notification.entity.NotificationLinkType;
+import com.app.bdink.notification.entity.NotificationType;
+import com.app.bdink.notification.service.NotificationFactory;
+import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.workout.controller.dto.ExercisePart;
-import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
+import com.app.bdink.workout.controller.dto.MemberVolumeRankingDto;
 import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
@@ -73,6 +77,8 @@ public class WorkoutService {
     private final ExerciseEmbeddingService exerciseEmbeddingService;
     private final ExerciseRagRetrievalService exerciseRagRetrievalService;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
+    private final NotificationFactory notificationFactory;
 
     @Value("${ai-memo.rag.distance-threshold}")
     private double ragDistanceThreshold;
@@ -241,6 +247,14 @@ public class WorkoutService {
     public void updateWorkoutFeedback(Long memberId, Long sessionId, String feedback) {
         WorkOutSession session = findWorkoutSession(sessionId, memberId);
         session.updateFeedback(feedback);
+        notificationService.create(notificationFactory.create(
+                session.getMember().getId(),
+                NotificationType.WORKOUT_FEEDBACK,
+                "트레이너 피드백",
+                "트레이너 피드백이 도착했어요.",
+                NotificationLinkType.WORKOUT_SESSION,
+                session.getId()
+        ));
     }
 
     @Transactional(readOnly = true)
@@ -285,34 +299,36 @@ public class WorkoutService {
     @Transactional(readOnly = true)
     public VolumeStatusResDto getVolumeStatus(Member member, LocalDate baseDate) {
 
-        // 1. 이번 주(Mon~Sun) 계산
+        // 1. 이번 달(1일~말일) 계산
+        LocalDate thisMonthStart = baseDate.withDayOfMonth(1);
+        LocalDate thisMonthEnd = thisMonthStart.plusMonths(1);
+
+        LocalDateTime periodStart = thisMonthStart.atStartOfDay();
+        LocalDateTime periodEnd = thisMonthEnd.atStartOfDay();
+
+        // 2. 이번 주(Mon~Sun) 계산
         LocalDate thisWeekStart = baseDate.with(DayOfWeek.MONDAY);
         LocalDate thisWeekEnd = thisWeekStart.plusDays(6);
-
-        LocalDateTime weekStart = thisWeekStart.atStartOfDay();
-        LocalDateTime weekEnd = thisWeekEnd.atStartOfDay();
 
         // 2. 오늘 날짜 범위
         LocalDateTime todayStart = baseDate.atStartOfDay();
         LocalDateTime todayEnd = baseDate.plusDays(1).atStartOfDay();
 
-        // 3. 주간 랭킹 리스트 조회
-        List<MemberWeeklyVolumeDto> ranking =
-                workoutSetRepository.findWeeklyVolumeRanking(weekStart, weekEnd);
+        // 3. 월간 랭킹 리스트 조회
+        List<MemberVolumeRankingDto> ranking =
+                workoutSetRepository.findVolumeRanking(periodStart, periodEnd);
 
         // 총 참여자 -> 전체 member 수 + 1000
         long totalParticipants = memberRepository.count()+1000;
 
-        // 4. 내 순위 + 내 주간 볼륨
-        //TODO : 기획적으로 랭킹에 없을 경우 0 or 전체 참여자 수 + 1 택
-        int rank = 0;
-        long myWeeklyVolume = 0;
+        // 4. 내 순위(월간 기준) + 내 주간 볼륨 (랭킹에 없으면 totalParticipants로 처리)
+        int rank = (int) totalParticipants;
+        long myWeeklyVolume = calcWeekVolume(member, thisWeekStart, thisWeekEnd);
 
         for (int i = 0; i < ranking.size(); i++) {
-            MemberWeeklyVolumeDto dto = ranking.get(i);
+            MemberVolumeRankingDto dto = ranking.get(i);
             if (dto.memberId().equals(member.getId())) {
-                rank = i + 47;                 // 리스트는 0부터, 랭킹은 1(+47)부터
-                myWeeklyVolume = dto.weeklyVolume();
+                rank = i+1;                 // 리스트는 0부터
                 break;
             }
         }
@@ -561,12 +577,11 @@ public class WorkoutService {
                 exercise.getId(),
                 exercise.getName(),
                 exercise.getPictureUrl(),
-                //TODO: 이쪽 리스토로 출력이 안되면 다시 확인하기
                 dto.sets()
         );
     }
 
-    // LLM을 위한 프로토타입 로직 (ai 메모장)
+    // LLM 로직 (ai 메모장)
     public Exercise findFirstSimilarOrNull(String rawName){
         if(rawName == null || rawName.isBlank()) return null;
 

@@ -1,21 +1,26 @@
 package com.app.bdink.version.controller.dto;
 
+import com.app.bdink.version.entity.Platform;
+import com.app.bdink.version.entity.Version;
 import lombok.Builder;
 
 @Builder
 public record UpdateCheckResponse(
-        Boolean isUpdateRequired,
-        Boolean isForceUpdateRequired,
-        String currentVersion,
-        String minimumRequiredVersion
+        String minVersion,
+        String latestVersion,
+        Boolean forceUpdateRequired,
+        String releaseNotes,
+        Platform platform
 ) {
-    public static UpdateCheckResponse from(CheckUpdateRequiredResponse checkResponse,
-                                           ForceUpdateInfo forceUpdateInfo) {
+    public static UpdateCheckResponse from(Version latestVersion,
+                                           String minVersion,
+                                           boolean forceUpdateRequired) {
         return UpdateCheckResponse.builder()
-                .isUpdateRequired(checkResponse.isUpdateRequired())
-                .isForceUpdateRequired(forceUpdateInfo.isForceUpdateRequired())
-                .currentVersion(checkResponse.currentVersion())
-                .minimumRequiredVersion(forceUpdateInfo.forceUpdateVersion())
+                .minVersion(minVersion)
+                .latestVersion(latestVersion.getVersion())
+                .forceUpdateRequired(forceUpdateRequired)
+                .releaseNotes(latestVersion.getReleaseNotes())
+                .platform(latestVersion.getPlatform())
                 .build();
     }
 }

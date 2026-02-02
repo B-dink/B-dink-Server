@@ -42,3 +42,4 @@ application.yaml
 !docker-compose.yml
 .DS_Store
 *.p8
+src/main/resources/firebase/

@@ -1,0 +1,12 @@
+package com.app.bdink.notification.repository;
+
+import com.app.bdink.notification.entity.Notification;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    List<Notification> findAllByReceiverMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(Long receiverMemberId);
+
+    boolean existsByReceiverMemberIdAndIsReadFalseAndIsDeletedFalse(Long receiverMemberId);
+}

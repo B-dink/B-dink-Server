@@ -1,11 +1,13 @@
 package com.app.bdink.member.repository;
 
 import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.entity.MemberStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -24,6 +26,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByPhoneNumber(String phone);
 
     Optional<Member> findByRefreshToken(String refreshToken);
+
+    List<Member> findAllByStatusAndLastLoginAtBefore(MemberStatus status, LocalDateTime lastLoginAt);
 
     @Query("SELECT COUNT(m) FROM Member m WHERE m.createdAt >= :start AND m.createdAt < :end AND m.role != com.app.bdink.member.entity.Role.DELETE_USER")
     long countDailySignup(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);

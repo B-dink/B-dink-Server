@@ -11,6 +11,10 @@ import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.message.controller.dto.AlimTalkText;
 import com.app.bdink.message.service.KakaoAlimtalkService;
+import com.app.bdink.notification.entity.NotificationLinkType;
+import com.app.bdink.notification.entity.NotificationType;
+import com.app.bdink.notification.service.NotificationFactory;
+import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.sugang.controller.dto.SugangStatus;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomInfo;
 import com.app.bdink.sugang.controller.dto.response.SugangClassRoomListInfo;
@@ -35,6 +39,8 @@ import java.util.List;
 public class SugangService {
 
     private final KakaoAlimtalkService kakaoAlimtalkService;
+    private final NotificationService notificationService;
+    private final NotificationFactory notificationFactory;
 
     private final SugangRepository sugangRepository;
     private final LectureRepository lectureRepository;
@@ -71,6 +77,22 @@ public class SugangService {
                 .build();
 
         sugang = sugangRepository.save(sugang);
+        notificationService.create(notificationFactory.create(
+                member.getId(),
+                NotificationType.CLASS_PURCHASED,
+                "강의 구매 완료",
+                "강의 구매가 완료되었습니다.",
+                NotificationLinkType.MY_CLASSROOMS,
+                classRoomEntity.getId()
+        ));
+        notificationService.create(notificationFactory.create(
+                classRoomEntity.getInstructor().getMember().getId(),
+                NotificationType.CLASS_PURCHASED,
+                "강의 구매 알림",
+                "회원이 강의를 구매했습니다.",
+                NotificationLinkType.CONTENT_DETAIL,
+                classRoomEntity.getId()
+        ));
 
         // 알림톡 발송
         Integer price = classRoomEntity.getPriceDetail().getOriginPrice();

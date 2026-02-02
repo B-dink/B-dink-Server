@@ -65,6 +65,25 @@ public class VersionServiceImpl implements VersionService {
     }
 
     @Override
+    public String getMinVersion(Platform platform) {
+        List<Version> versionsByPlatform = versionRepository.findAllByPlatform(platform);
+
+        return versionsByPlatform.stream()
+                .filter(v -> Boolean.TRUE.equals(v.getForceUpdateRequired()))
+                .max((v1, v2) -> compareVersions(v1.getVersion(), v2.getVersion()))
+                .map(Version::getVersion)
+                .orElse(null);
+    }
+
+    @Override
+    public boolean isForceUpdateRequired(String currentVersion, String minVersion) {
+        if (minVersion == null) {
+            return false;
+        }
+        return compareVersions(currentVersion, minVersion) < 0;
+    }
+
+    @Override
     public Version getLatestVersion(Platform platform) {
         List<Version> versionsByPlatform = versionRepository.findAllByPlatform(platform);
 

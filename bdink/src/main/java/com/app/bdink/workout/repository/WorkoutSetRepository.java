@@ -1,7 +1,7 @@
 package com.app.bdink.workout.repository;
 
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto;
+import com.app.bdink.workout.controller.dto.MemberVolumeRankingDto;
 import com.app.bdink.workout.entity.PerformedExercise;
 import com.app.bdink.workout.entity.WorkoutSet;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +17,7 @@ public interface WorkoutSetRepository extends JpaRepository<WorkoutSet, Long> {
     void deleteByPerformedExercise(PerformedExercise performedExercise);
 
     @Query("""
-            select new com.app.bdink.workout.controller.dto.MemberWeeklyVolumeDto(
+            select new com.app.bdink.workout.controller.dto.MemberVolumeRankingDto(
                 s.member.id,
                 sum(ws.weight * ws.reps)
             )
@@ -28,7 +28,7 @@ public interface WorkoutSetRepository extends JpaRepository<WorkoutSet, Long> {
             group by s.member.id
             order by sum(ws.weight * ws.reps) desc
             """)
-    List<MemberWeeklyVolumeDto> findWeeklyVolumeRanking(
+    List<MemberVolumeRankingDto> findVolumeRanking(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
