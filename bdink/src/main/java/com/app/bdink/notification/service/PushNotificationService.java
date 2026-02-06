@@ -29,18 +29,24 @@ public class PushNotificationService {
     private void sendToToken(DeviceToken deviceToken, String title, String body, String linkType, String linkId) {
         Message message = Message.builder()
                 .setToken(deviceToken.getToken())
-                .putData("title", title)
-                .putData("body", body)
+                .setNotification(com.google.firebase.messaging.Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
                 .putData("linkType", linkType)
                 .putData("linkId", linkId)
                 .build();
         try {
             FirebaseMessaging.getInstance().send(message);
         } catch (FirebaseMessagingException e) {
-            if (e.getMessagingErrorCode() == MessagingErrorCode.UNREGISTERED) {
+            MessagingErrorCode errorCode = e.getMessagingErrorCode();
+            if (errorCode == MessagingErrorCode.UNREGISTERED) {
                 deviceToken.deactivate();
             }
-            log.warn("FCM send failed: {}", e.getMessage());
+            String httpStatus = e.getHttpResponse() != null ? String.valueOf(e.getHttpResponse().getStatusCode()) : "n/a";
+            String httpContent = e.getHttpResponse() != null ? e.getHttpResponse().getContent() : "n/a";
+            log.warn("FCM send failed: code={}, httpStatus={}, httpContent={}, message={}",
+                    errorCode, httpStatus, httpContent, e.getMessage());
         }
     }
 }
