@@ -8,6 +8,7 @@ import com.app.bdink.notification.controller.dto.DeviceTokenRegisterRequest;
 import com.app.bdink.notification.controller.dto.NotificationResponse;
 import com.app.bdink.notification.service.DeviceTokenService;
 import com.app.bdink.notification.service.NotificationService;
+import com.app.bdink.notification.service.PushNotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final DeviceTokenService deviceTokenService;
+    private final PushNotificationService pushNotificationService;
     private final MemberUtilService memberUtilService;
 
     @GetMapping
@@ -91,5 +93,13 @@ public class NotificationController {
         Long memberId = memberUtilService.getMemberId(principal);
         deviceTokenService.deactivate(memberId, token);
         return RspTemplate.success(Success.DEACTIVATE_DEVICE_TOKEN_SUCCESS, Success.DEACTIVATE_DEVICE_TOKEN_SUCCESS.getMessage());
+    }
+
+    @PostMapping("/fcmtest")
+    @Operation(method = "POST", description = "FCM 테스트 알림을 전송합니다.")
+    public RspTemplate<?> sendFcmTest(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "FCM 테스트", "테스트 메시지입니다.", "TEST", "");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
     }
 }
