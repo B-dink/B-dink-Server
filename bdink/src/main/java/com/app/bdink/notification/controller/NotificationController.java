@@ -5,6 +5,7 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.notification.controller.dto.DeviceTokenAllowedRequest;
 import com.app.bdink.notification.controller.dto.DeviceTokenRegisterRequest;
+import com.app.bdink.notification.controller.dto.FcmDeepLinkTestResponse;
 import com.app.bdink.notification.controller.dto.NotificationResponse;
 import com.app.bdink.notification.service.DeviceTokenService;
 import com.app.bdink.notification.service.NotificationService;
@@ -100,6 +101,54 @@ public class NotificationController {
     public RspTemplate<?> sendFcmTest(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         pushNotificationService.sendToMember(memberId, "FCM 테스트", "테스트 메시지입니다.", "TEST", "");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/trainer-profile")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: TRAINER_PROFILE (트레이너 등록 완료 알림)")
+    public RspTemplate<?> getFcmTestTrainerProfile(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "트레이너 등록 완료", "트레이너 등록이 완료되었습니다.", "TRAINER_PROFILE", "1");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/trainer-member-list")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: TRAINER_MEMBER_LIST (새 회원 등록 알림)")
+    public RspTemplate<?> getFcmTestTrainerMemberList(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "새 회원 등록", "새 회원이 등록되었습니다.", "TRAINER_MEMBER_LIST", "1");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/workout-session")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: WORKOUT_SESSION (트레이너 피드백 알림)")
+    public RspTemplate<?> getFcmTestWorkoutSession(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "트레이너 피드백", "트레이너 피드백이 도착했어요.", "WORKOUT_SESSION", "100");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/my-classrooms")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: MY_CLASSROOMS (강의 구매 완료 알림)")
+    public RspTemplate<?> getFcmTestMyClassrooms(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "강의 구매 완료", "강의 구매가 완료되었습니다.", "MY_CLASSROOMS", "200");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/content-detail")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: CONTENT_DETAIL (강의 구매 알림 - 강사용)")
+    public RspTemplate<?> getFcmTestContentDetail(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "강의 구매 알림", "회원이 강의를 구매했습니다.", "CONTENT_DETAIL", "200");
+        return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/fcmtest/link/qna-detail")
+    @Operation(method = "GET", description = "FCM 딥링크 테스트: QNA_DETAIL (강사 답변 등록 알림)")
+    public RspTemplate<?> getFcmTestQnaDetail(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        pushNotificationService.sendToMember(memberId, "강사 답변 등록", "작성한 질문에 답변이 등록되었습니다.", "QNA_DETAIL", "300");
         return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
     }
 }
