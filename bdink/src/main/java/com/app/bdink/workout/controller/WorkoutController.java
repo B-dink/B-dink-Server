@@ -103,6 +103,18 @@ public class WorkoutController {
 
     }
 
+    @GetMapping("/{sessionId}")
+    @Operation(method = "GET", description = "운동일지 상세 정보를 세션 ID로 조회합니다.")
+    public RspTemplate<?> getWorkoutSessionById(Principal principal,
+                                                @PathVariable Long sessionId) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        WorkoutDailyDetailResDto dto = workoutService.getWorkoutDailyDetailBySession(member, sessionId);
+
+        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS, dto);
+
+    }
+
     @GetMapping("/volume/weeklyCompare")
     @Operation(method = "GET", description = "지난주 대비 운동량 및 운동횟수를 조회합니다.")
     public RspTemplate<?> getWorkoutVolume(Principal principal) {
