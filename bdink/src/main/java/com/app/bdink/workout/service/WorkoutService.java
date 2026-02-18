@@ -423,30 +423,38 @@ public class WorkoutService {
         // 하루에 한 개의 운동일지만 작성 가능.
         WorkOutSession session = sessions.get(0);
 
+        return toWorkoutDailyDetailResDto(session);
+
+    }
+
+    @Transactional(readOnly = true)
+    public WorkoutDailyDetailResDto getWorkoutDailyDetailBySession(Member member, Long sessionId) {
+        WorkOutSession session = findWorkoutSession(sessionId, member);
+        return toWorkoutDailyDetailResDto(session);
+    }
+
+    private WorkoutDailyDetailResDto toWorkoutDailyDetailResDto(WorkOutSession session) {
         String dateString = session.getCreatedAt().toLocalDate().toString();
         String workoutName = session.getMemo();
         String workoutMemo = session.getWorkoutMemo();
 
         List<WorkoutDailyExerciseResDto> exercises = session.getPerformedExercises().stream()
-                .map(pe ->
-                        {
-                            Exercise exercise = pe.getExercise();
+                .map(pe -> {
+                    Exercise exercise = pe.getExercise();
 
-                            List<WorkoutDailySetResDto> sets = pe.getWorkoutSets().stream()
-                                    .map(ws -> new WorkoutDailySetResDto(
-                                            ws.getSetNumber(),
-                                            ws.getReps(),
-                                            ws.getWeight()))
-                                    .toList();
-                            return new WorkoutDailyExerciseResDto(
-                                    exercise.getId(),
-                                    exercise.getName(),
-                                    exercise.getPictureUrl(),
-                                    sets
-                            );
-                        }
-
-                )
+                    List<WorkoutDailySetResDto> sets = pe.getWorkoutSets().stream()
+                            .map(ws -> new WorkoutDailySetResDto(
+                                    ws.getSetNumber(),
+                                    ws.getReps(),
+                                    ws.getWeight()))
+                            .toList();
+                    return new WorkoutDailyExerciseResDto(
+                            exercise.getId(),
+                            exercise.getName(),
+                            exercise.getPictureUrl(),
+                            sets
+                    );
+                })
                 .toList();
 
         return new WorkoutDailyDetailResDto(
@@ -456,7 +464,6 @@ public class WorkoutService {
                 session.getId(),
                 exercises
         );
-
     }
 
     //지난주 볼륨 비교 및 지난달 운동 횟수 비교 로직
