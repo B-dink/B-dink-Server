@@ -115,6 +115,16 @@ public class WorkoutController {
 
     }
 
+    @GetMapping("/{sessionId}/feedback")
+    @Operation(method = "GET", description = "운동일지 피드백을 세션 ID로 조회합니다.")
+    public RspTemplate<?> getWorkoutSessionFeedback(Principal principal,
+                                                    @PathVariable Long sessionId) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        String feedback = workoutService.getWorkoutFeedback(memberId, sessionId);
+        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS,
+                com.app.bdink.trainer.controller.dto.response.TrainerFeedbackResponse.of(sessionId, feedback));
+    }
+
     @GetMapping("/volume/weeklyCompare")
     @Operation(method = "GET", description = "지난주 대비 운동량 및 운동횟수를 조회합니다.")
     public RspTemplate<?> getWorkoutVolume(Principal principal) {
