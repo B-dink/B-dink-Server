@@ -47,7 +47,7 @@ public class AnswerService {
                 "강사 답변 등록",
                 "작성한 질문에 답변이 등록되었습니다.",
                 NotificationLinkType.QNA_DETAIL,
-                question.getId()
+                question.getClassRoom().getId()
         ));
 
         return String.valueOf(answerRepository.save(answer).getId());

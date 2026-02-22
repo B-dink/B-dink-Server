@@ -139,6 +139,7 @@ public enum Success {
     GET_EXERCISE_ALL_SUCCESS(HttpStatus.OK, "모든 운동종목 정보 조회 성공"),
     GET_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 조회 성공"),
     DELETE_NOTIFICATION_SUCCESS(HttpStatus.OK, "알림 삭제 성공"),
+    FCM_TEST_SUCCESS(HttpStatus.OK, "FCM 테스트 전송 성공"),
 
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     REPORT_SUCCESS(HttpStatus.OK, "신고 성공"),
