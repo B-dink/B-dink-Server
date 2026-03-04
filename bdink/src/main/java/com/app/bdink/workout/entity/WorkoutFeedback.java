@@ -25,8 +25,8 @@ public class WorkoutFeedback extends BaseTimeEntity {
     private WorkOutSession workOutSession;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainer_member_id")
-    private Member trainerMember;
+    @JoinColumn(name = "trainer_id")
+    private Member trainer;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
@@ -35,9 +35,9 @@ public class WorkoutFeedback extends BaseTimeEntity {
     private List<WorkoutFeedbackMedia> mediaList = new ArrayList<>();
 
     @Builder
-    public WorkoutFeedback(WorkOutSession workOutSession, Member trainerMember, String content) {
+    public WorkoutFeedback(WorkOutSession workOutSession, Member trainer, String content) {
         this.workOutSession = workOutSession;
-        this.trainerMember = trainerMember;
+        this.trainer = trainer;
         this.content = content;
     }
 
