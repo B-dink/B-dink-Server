@@ -36,7 +36,7 @@ public class S3MultipartController {
     }
 
     @PostMapping("/complete-upload")
-    @Operation(method = "POST", description = "다 presignUrl에 넣으셨다면 이 API를 호출해서 완료시켜주면 서버에서 영상을 합치겠습니다.")
+    @Operation(method = "POST", description = "다 presignUrl에 넣으셨다면 이 API를 호출해서 완료시켜주면 서버에서 영상을 합치겠습니다.(강의 등록)")
     public RspTemplate<S3UploadResultDto> completeUpload(@RequestBody S3UploadCompleteDto s3UploadCompleteDto, @RequestParam Long lectureId){
         S3UploadResultDto result = s3MultipartService.completeUpload(s3UploadCompleteDto);
         Media media = mediaService.createLecture(lectureId, result.url(), s3UploadCompleteDto.uploadId(), null);
