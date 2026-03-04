@@ -22,14 +22,19 @@ import com.app.bdink.workout.controller.dto.request.ExerciseReqDto;
 import com.app.bdink.workout.controller.dto.request.PerformedExerciseSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackSaveReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackMediaReqDto;
 import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
 import com.app.bdink.workout.entity.WorkOutSession;
+import com.app.bdink.workout.entity.WorkoutFeedback;
+import com.app.bdink.workout.entity.WorkoutFeedbackMedia;
 import com.app.bdink.workout.entity.WorkoutSet;
 import com.app.bdink.workout.repository.ExerciseRepository;
 import com.app.bdink.workout.repository.PerformedExerciseRepository;
 import com.app.bdink.workout.repository.WorkOutSessionRepository;
+import com.app.bdink.workout.repository.WorkoutFeedbackRepository;
 import com.app.bdink.workout.repository.WorkoutSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +77,7 @@ public class WorkoutService {
     private final PerformedExerciseRepository performedExerciseRepository;
     private final WorkOutSessionRepository workOutSessionRepository;
     private final WorkoutSetRepository workoutSetRepository;
+    private final WorkoutFeedbackRepository workoutFeedbackRepository;
     private final OpenAiChatService openAiChatService;
     private final AiMemoInputLogService aiMemoInputLogService;
     private final ExerciseEmbeddingService exerciseEmbeddingService;
@@ -261,6 +267,96 @@ public class WorkoutService {
     public String getWorkoutFeedback(Long memberId, Long sessionId) {
         WorkOutSession session = findWorkoutSession(sessionId, memberId);
         return session.getFeedback();
+    }
+
+    // 트레이너 피드백 저장(텍스트 + 미디어)
+    @Transactional
+    public WorkoutFeedbackResDto saveWorkoutFeedback(Long trainerId, Long sessionId, WorkoutFeedbackSaveReqDto requestDto) {
+        // 1) 세션/트레이너 조회
+        // - 세션은 id 기준으로 조회
+        // - 트레이너는 memberId로 조회
+        WorkOutSession session = workOutSessionRepository.findById(sessionId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
+        );
+        Member trainer = memberRepository.findById(trainerId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_USER_EXCEPTION, Error.NOT_FOUND_USER_EXCEPTION.getMessage())
+        );
+
+        // 2) 기존 피드백 있으면 갱신, 없으면 새로 생성
+        WorkoutFeedback feedback = workoutFeedbackRepository.findByWorkOutSessionId(sessionId)
+                .orElseGet(() -> WorkoutFeedback.builder()
+                        .workOutSession(session)
+                        .trainer(trainer)
+                        .content(requestDto.content())
+                        .build());
+
+        // 3) 텍스트 갱신
+        feedback.updateContent(requestDto.content());
+
+        // 4) 기존 미디어 제거 후 새 미디어로 교체 (orphanRemoval)
+        // - 기존 미디어를 모두 비우고
+        // - 요청으로 받은 미디어 리스트를 다시 추가
+        feedback.clearMedia();
+        if (requestDto.media() != null) {
+            for (WorkoutFeedbackMediaReqDto mediaReq : requestDto.media()) {
+                WorkoutFeedbackMedia media = WorkoutFeedbackMedia.builder()
+                        .feedback(feedback)
+                        .mediaType(mediaReq.mediaType())
+                        .url(mediaReq.url())
+                        .mediaOrder(mediaReq.order())
+                        .thumbnailUrl(mediaReq.thumbnailUrl())
+                        .build();
+                feedback.addMedia(media);
+            }
+        }
+
+        // 5) 저장
+        WorkoutFeedback saved = workoutFeedbackRepository.save(feedback);
+
+        // 6) 알림 생성
+        notificationService.create(notificationFactory.create(
+                session.getMember().getId(),
+                NotificationType.WORKOUT_FEEDBACK,
+                "트레이너 피드백",
+                "트레이너 피드백이 도착했어요.",
+                NotificationLinkType.WORKOUT_SESSION,
+                session.getId()
+        ));
+
+        return toWorkoutFeedbackResDto(saved);
+    }
+
+    // 피드백 조회
+    @Transactional(readOnly = true)
+    public WorkoutFeedbackResDto getWorkoutFeedbackBySession(Long memberId, Long sessionId) {
+        // 1) 세션 권한 체크(회원 기준)
+        findWorkoutSession(sessionId, memberId);
+
+        // 2) 피드백 조회
+        WorkoutFeedback feedback = workoutFeedbackRepository.findByWorkOutSessionId(sessionId).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage())
+        );
+
+        return toWorkoutFeedbackResDto(feedback);
+    }
+
+    private WorkoutFeedbackResDto toWorkoutFeedbackResDto(WorkoutFeedback feedback) {
+        List<WorkoutFeedbackMediaResDto> media = feedback.getMediaList().stream()
+                .sorted(Comparator.comparing(m -> m.getMediaOrder() == null ? Integer.MAX_VALUE : m.getMediaOrder()))
+                .map(m -> new WorkoutFeedbackMediaResDto(
+                        m.getMediaType(),
+                        m.getUrl(),
+                        m.getMediaOrder(),
+                        m.getThumbnailUrl()
+                ))
+                .toList();
+
+        return new WorkoutFeedbackResDto(
+                feedback.getWorkOutSession().getId(),
+                feedback.getContent(),
+                media,
+                feedback.getCreatedAt()
+        );
     }
 
     // 월 별 운동일자 기록 조회
