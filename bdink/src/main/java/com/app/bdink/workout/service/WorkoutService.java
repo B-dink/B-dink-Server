@@ -100,6 +100,8 @@ public class WorkoutService {
     @Value("${ai-memo.rag.distance-threshold}")
     private double ragDistanceThreshold;
 
+    @Value("${aws-property.feedback-cdn-base}")
+    private String feedbackCdnBase;
 
     public Exercise findById(Long id) {
         return exerciseRepository.findById(id).orElseThrow(
@@ -369,7 +371,7 @@ public class WorkoutService {
                 .sorted(Comparator.comparing(m -> m.getMediaOrder() == null ? Integer.MAX_VALUE : m.getMediaOrder()))
                 .map(m -> new WorkoutFeedbackMediaResDto(
                         m.getMediaType(),
-                        m.getUrl(),
+                        toFeedbackMediaUrl(m.getUrl()),
                         m.getMediaOrder(),
                         m.getThumbnailUrl()
                 ))
@@ -381,6 +383,17 @@ public class WorkoutService {
                 media,
                 feedback.getCreatedAt()
         );
+    }
+
+    private String toFeedbackMediaUrl(String urlOrKey) {
+        if (urlOrKey == null || urlOrKey.isBlank()) {
+            return urlOrKey;
+        }
+        if (urlOrKey.startsWith("http://") || urlOrKey.startsWith("https://")) {
+            return urlOrKey;
+        }
+        String base = feedbackCdnBase.endsWith("/") ? feedbackCdnBase : feedbackCdnBase + "/";
+        return base + urlOrKey;
     }
 
     private WorkoutFeedbackUploadUrlResDto createFeedbackUploadUrl(WorkoutFeedbackUploadUrlFileReqDto file) {
