@@ -6,6 +6,8 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.openai.dto.request.AiWorkoutMemoReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackSaveReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackUploadUrlReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.service.WorkoutService;
@@ -120,9 +122,25 @@ public class WorkoutController {
     public RspTemplate<?> getWorkoutSessionFeedback(Principal principal,
                                                     @PathVariable Long sessionId) {
         Long memberId = memberUtilService.getMemberId(principal);
-        String feedback = workoutService.getWorkoutFeedback(memberId, sessionId);
-        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS,
-                com.app.bdink.trainer.controller.dto.response.TrainerFeedbackResponse.of(sessionId, feedback));
+        WorkoutFeedbackResDto dto = workoutService.getWorkoutFeedbackBySession(memberId, sessionId);
+        return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS, dto);
+    }
+
+    @PostMapping("/{sessionId}/feedback")
+    @Operation(method = "POST", description = "트레이너 피드백을 등록합니다.")
+    public RspTemplate<?> createWorkoutFeedback(Principal principal,
+                                                @PathVariable Long sessionId,
+                                                @RequestBody WorkoutFeedbackSaveReqDto requestDto) {
+        Long trainerId = memberUtilService.getMemberId(principal);
+        WorkoutFeedbackResDto dto = workoutService.saveWorkoutFeedback(trainerId, sessionId, requestDto);
+        return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, dto);
+    }
+
+    @PostMapping("/feedback/upload-urls")
+    @Operation(method = "POST", description = "피드백 이미지/영상 업로드용 presigned URL을 발급합니다.")
+    public RspTemplate<?> getWorkoutFeedbackUploadUrls(@RequestBody WorkoutFeedbackUploadUrlReqDto requestDto) {
+        WorkoutFeedbackUploadUrlsResDto dto = workoutService.getWorkoutFeedbackUploadUrls(requestDto);
+        return RspTemplate.success(Success.CREATE_PRESIGNURL_SUCCESS, dto);
     }
 
     @GetMapping("/volume/weeklyCompare")
