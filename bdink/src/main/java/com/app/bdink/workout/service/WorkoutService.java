@@ -12,6 +12,7 @@ import com.app.bdink.openai.service.AiMemoInputLogService;
 import com.app.bdink.openai.service.ExerciseEmbeddingService;
 import com.app.bdink.openai.service.ExerciseRagRetrievalService;
 import com.app.bdink.openai.service.OpenAiChatService;
+import com.app.bdink.external.aws.s3.config.S3Config;
 import com.app.bdink.notification.entity.NotificationLinkType;
 import com.app.bdink.notification.entity.NotificationType;
 import com.app.bdink.notification.service.NotificationFactory;
@@ -24,6 +25,8 @@ import com.app.bdink.workout.controller.dto.request.WorkoutSessionSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutSetSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackSaveReqDto;
 import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackMediaReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackUploadUrlReqDto;
+import com.app.bdink.workout.controller.dto.request.WorkoutFeedbackUploadUrlFileReqDto;
 import com.app.bdink.workout.controller.dto.response.*;
 import com.app.bdink.workout.entity.Exercise;
 import com.app.bdink.workout.entity.PerformedExercise;
@@ -41,8 +44,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -57,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -64,13 +73,13 @@ import java.util.stream.IntStream;
 @Slf4j
 @RequiredArgsConstructor
 public class WorkoutService {
-    @Value("${ai-memo.rag.per-line-topn.short:10}")
+    @Value("${ai-memo.rag.per-line-topn.short}")
     private int ragPerLineTopNShort;
 
-    @Value("${ai-memo.rag.per-line-topn.medium:7}")
+    @Value("${ai-memo.rag.per-line-topn.medium}")
     private int ragPerLineTopNMedium;
 
-    @Value("${ai-memo.rag.per-line-topn.long:5}")
+    @Value("${ai-memo.rag.per-line-topn.long}")
     private int ragPerLineTopNLong;
 
     private final ExerciseRepository exerciseRepository;
@@ -85,6 +94,8 @@ public class WorkoutService {
     private final MemberRepository memberRepository;
     private final NotificationService notificationService;
     private final NotificationFactory notificationFactory;
+    private final S3Presigner s3Presigner;
+    private final S3Config s3Config;
 
     @Value("${ai-memo.rag.distance-threshold}")
     private double ragDistanceThreshold;
@@ -249,6 +260,8 @@ public class WorkoutService {
         return String.valueOf(session.getId());
     }
 
+    // 회원 피드백 수정 로직
+    //todo: 레거시 코드라 삭제 or 주석처리 예정
     @Transactional
     public void updateWorkoutFeedback(Long memberId, Long sessionId, String feedback) {
         WorkOutSession session = findWorkoutSession(sessionId, memberId);
@@ -340,6 +353,17 @@ public class WorkoutService {
         return toWorkoutFeedbackResDto(feedback);
     }
 
+    // 피드백 업로드용 presigned URL 발급
+    @Transactional(readOnly = true)
+    public WorkoutFeedbackUploadUrlsResDto getWorkoutFeedbackUploadUrls(WorkoutFeedbackUploadUrlReqDto requestDto) {
+        // 요청된 파일 수만큼 presigned URL 발급
+        List<WorkoutFeedbackUploadUrlResDto> urls = requestDto.files().stream()
+                .map(this::createFeedbackUploadUrl)
+                .toList();
+
+        return new WorkoutFeedbackUploadUrlsResDto(urls);
+    }
+
     private WorkoutFeedbackResDto toWorkoutFeedbackResDto(WorkoutFeedback feedback) {
         List<WorkoutFeedbackMediaResDto> media = feedback.getMediaList().stream()
                 .sorted(Comparator.comparing(m -> m.getMediaOrder() == null ? Integer.MAX_VALUE : m.getMediaOrder()))
@@ -356,6 +380,39 @@ public class WorkoutService {
                 feedback.getContent(),
                 media,
                 feedback.getCreatedAt()
+        );
+    }
+
+    private WorkoutFeedbackUploadUrlResDto createFeedbackUploadUrl(WorkoutFeedbackUploadUrlFileReqDto file) {
+        // 파일 확장자 보존 + UUID로 새로운 파일명 생성
+        String extension = "";
+        String originalFileName = file.fileName();
+        int dotIndex = originalFileName.lastIndexOf(".");
+        if (dotIndex > -1) {
+            extension = originalFileName.substring(dotIndex);
+        }
+
+        String newFileName = UUID.randomUUID() + extension;
+        String key = "feedback/" + newFileName;
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(s3Config.getS3Bucket())
+                .key(key)
+                .contentType(file.contentType())
+                .build();
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .putObjectRequest(putObjectRequest)
+                .build();
+
+        PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
+
+        return new WorkoutFeedbackUploadUrlResDto(
+                file.mediaType(),
+                originalFileName,
+                key,
+                presigned.url().toString()
         );
     }
 
