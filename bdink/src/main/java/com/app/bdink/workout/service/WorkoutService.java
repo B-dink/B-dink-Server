@@ -121,6 +121,12 @@ public class WorkoutService {
         );
     }
 
+    public WorkOutSession findWorkoutSessionById(Long id) {
+        return workOutSessionRepository.findById(id).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_WORKOUTSESSION, Error.NOT_FOUND_WORKOUTSESSION.getMessage())
+        );
+    }
+
     public String createExercise(ExerciseReqDto exerciseReqDto,
                                  String exerciseVideoUrl,
                                  String exercisePictureUrl
@@ -343,9 +349,9 @@ public class WorkoutService {
 
     // 피드백 조회
     @Transactional(readOnly = true)
-    public WorkoutFeedbackResDto getWorkoutFeedbackBySession(Long memberId, Long sessionId) {
-        // 1) 세션 권한 체크(회원 기준)
-        findWorkoutSession(sessionId, memberId);
+    public WorkoutFeedbackResDto getWorkoutFeedbackBySession(Long sessionId) {
+        // 1) 세션이 존재하는지 체크
+        findWorkoutSessionById(sessionId);
 
         // 2) 피드백 조회
         WorkoutFeedback feedback = workoutFeedbackRepository.findByWorkOutSessionId(sessionId).orElseThrow(

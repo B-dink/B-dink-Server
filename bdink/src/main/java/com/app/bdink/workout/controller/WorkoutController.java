@@ -119,10 +119,8 @@ public class WorkoutController {
 
     @GetMapping("/{sessionId}/feedback")
     @Operation(method = "GET", description = "운동일지 피드백을 세션 ID로 조회합니다.")
-    public RspTemplate<?> getWorkoutSessionFeedback(Principal principal,
-                                                    @PathVariable Long sessionId) {
-        Long memberId = memberUtilService.getMemberId(principal);
-        WorkoutFeedbackResDto dto = workoutService.getWorkoutFeedbackBySession(memberId, sessionId);
+    public RspTemplate<?> getWorkoutSessionFeedback(@PathVariable Long sessionId) {
+        WorkoutFeedbackResDto dto = workoutService.getWorkoutFeedbackBySession(sessionId);
         return RspTemplate.success(Success.GET_WORKOUT_SESSION_DETAIL_SUCCESS, dto);
     }
 
