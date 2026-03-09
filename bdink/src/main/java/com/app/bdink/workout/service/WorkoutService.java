@@ -445,6 +445,7 @@ public class WorkoutService {
         LocalDateTime start = firstDay.atStartOfDay();
         LocalDateTime end = firstDayNextMonth.atStartOfDay();
 
+        // 운동일지 리스트 생성
         List<WorkOutSession> sessions =
                 workOutSessionRepository.findByMemberAndCreatedAtBetween(member, start, end);
 
@@ -456,9 +457,13 @@ public class WorkoutService {
                 .toList();
 
         // feedback이 된 날짜 계산 로직
+        /***
+         * 기존 session.getFeedback() 구조에서 workoutFeedback에서 정보를 가져와야함.
+         */
         List<Integer> feedbackDays = sessions.stream()
-                // Include days only when feedback exists and is not blank.
-                .filter(s -> s.getFeedback() != null && !s.getFeedback().isBlank())
+                // WorkoutSession이 존재하고 관련한 WorkoutFeedback이 존재할 때
+                .filter(s -> workoutFeedbackRepository.findByWorkOutSessionId(s.getId()).isPresent())
+//                .filter(s -> s.getFeedback() != null && !s.getFeedback().isBlank())
                 .map(s -> s.getCreatedAt().toLocalDate().getDayOfMonth())
                 .distinct()
                 .sorted()
