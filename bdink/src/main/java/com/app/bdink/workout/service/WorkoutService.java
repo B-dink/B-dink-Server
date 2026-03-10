@@ -614,6 +614,8 @@ public class WorkoutService {
         String dateString = session.getCreatedAt().toLocalDate().toString();
         String workoutName = session.getMemo();
         String workoutMemo = session.getWorkoutMemo();
+        boolean onFeedback = workoutFeedbackRepository.findByWorkOutSessionId(session.getId()).isPresent();
+
 
         List<WorkoutDailyExerciseResDto> exercises = session.getPerformedExercises().stream()
                 .map(pe -> {
@@ -639,6 +641,7 @@ public class WorkoutService {
                 workoutName,
                 workoutMemo,
                 session.getId(),
+                onFeedback,
                 exercises
         );
     }
