@@ -20,16 +20,16 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        SecurityScheme apiKey = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .in(SecurityScheme.In.HEADER)
-                .name("Authorization");
+        SecurityScheme bearerScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList("Bearer Token");
 
         return new OpenAPI()
-            .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
+            .components(new Components().addSecuritySchemes("Bearer Token", bearerScheme))
             .addSecurityItem(securityRequirement)
             .info(info())
             .servers(servers());
