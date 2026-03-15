@@ -84,4 +84,10 @@ public class LectureController {
         lectureService.deleteLecture(id);
         return RspTemplate.success(Success.DELETE_LECTURE_SUCCESS, Success.DELETE_LECTURE_SUCCESS.getMessage());
     }
+
+    @GetMapping("{lectureId}/media")
+    @Operation(method = "GET", description = "CDN 서비스를 이용한 lecture Media 주소를 제공합니다.")
+    RspTemplate<?> getLectureMedia(@RequestParam Long lectureId){
+        return RspTemplate.success(Success.GET_LECTURE_MEDIA, Success.GET_LECTURE_MEDIA.getMessage());
+    }
 }

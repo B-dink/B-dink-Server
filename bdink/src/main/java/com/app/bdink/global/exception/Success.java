@@ -93,6 +93,9 @@ public enum Success {
     GET_NOTIFICATION_READ(HttpStatus.OK, "알림 읽음 유무 조회 성공"),
 
 
+    GET_LECTURE_MEDIA(HttpStatus.OK, "강의 미디어 주소 조회 성공"),
+
+
 
 
     GET_CLASSROOM_SUCCESS(HttpStatus.OK, "클래스룸 조회 성공"),
