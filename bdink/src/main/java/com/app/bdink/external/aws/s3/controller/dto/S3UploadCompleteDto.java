@@ -6,6 +6,7 @@ public record S3UploadCompleteDto(
         List<S3UploadPartsDetailDto> parts,
         String fileName,
         String uploadId,
+        String assetId,
         Long totalSeconds //총 시간
 
 

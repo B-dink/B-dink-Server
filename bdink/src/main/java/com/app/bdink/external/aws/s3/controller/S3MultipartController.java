@@ -39,7 +39,7 @@ public class S3MultipartController {
     @Operation(method = "POST", description = "다 presignUrl에 넣으셨다면 이 API를 호출해서 완료시켜주면 서버에서 영상을 합치겠습니다. 반드시 강의가 미리 생성되어있어야 합니다.")
     public RspTemplate<S3UploadResultDto> completeUpload(@RequestBody S3UploadCompleteDto s3UploadCompleteDto, @RequestParam Long lectureId){
         S3UploadResultDto result = s3MultipartService.completeUpload(s3UploadCompleteDto);
-        Media media = mediaService.createLecture(lectureId, result.url(), s3UploadCompleteDto.uploadId(), null);
+        Media media = mediaService.createLecture(lectureId, result.name(), s3UploadCompleteDto.assetId(), null);
         media.updateTotalLength(s3UploadCompleteDto.totalSeconds());
         return RspTemplate.success(Success.UPLOAD_SUCCESS, result);
     }

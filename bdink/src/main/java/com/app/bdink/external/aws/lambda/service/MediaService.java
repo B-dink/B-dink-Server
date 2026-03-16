@@ -15,8 +15,8 @@ public class MediaService {
 
     private final MediaRepository mediaRepository;
 
-    @Value("${aws-property.cdn-name}")
-    private String CDN_URL;
+    @Value("${aws-property.cdn-media}")
+    private String cdnMediaUrl;
 
     public Media findById(Long id){
         return mediaRepository.findById(id).orElseThrow(
@@ -44,7 +44,6 @@ public class MediaService {
                 .s3Key(videoKey)
                 .media360Key(generateCdn360Link(assetId, videoKey))
                 .media720Key(generateCdn720Link(assetId, videoKey))
-                //TODO : 현재 업로드 Id를 assetId와 같이 사용하고 있음. 이점 나중에 분기 처리 해야할 듯.
                 .classRoomThumbnail(generateCdnThumbnail(assetId, thumbnailKey))
                 .mp4Link(generateCdnMp4Link(assetId, videoKey))
                 .build();
@@ -62,7 +61,7 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
-        return CDN_URL+assetId+"/HLS/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/HLS/" + updateS3Path;
     }
 
 
@@ -70,14 +69,14 @@ public class MediaService {
         if (assetId == null){
             return "";
         }
-        return CDN_URL+assetId+"/HLS/"+s3Key;
+        return cdnMediaUrl + assetId + "/MP4/" + s3Key;
     }
     public String generateCdnThumbnail(String assetId, String s3Key){
-        if (assetId == null){
+        if (assetId == null || s3Key == null){
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
-        return CDN_URL+assetId+"/thumbnail/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/thumbnail/" + updateS3Path;
     }
 
     public String generateCdn720Link(String assetId, String s3Key){
@@ -85,7 +84,7 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_720.m3u8");
-        return CDN_URL+assetId+"/HLS/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/HLS/" + updateS3Path;
     }
 
     public Media findByKey(String videoKey){
