@@ -3,6 +3,8 @@ package com.app.bdink.lecture.service;
 import com.app.bdink.chapter.entity.Chapter;
 import com.app.bdink.chapter.service.ChapterService;
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
+import com.app.bdink.external.aws.lambda.domain.Media;
+import com.app.bdink.external.aws.lambda.service.MediaService;
 import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
@@ -22,6 +24,7 @@ public class LectureService {
 
     private final LectureRepository lectureRepository;
     private final ChapterService chapterService;
+    private final MediaService mediaService;
 
     public Lecture findById(Long id){
         return lectureRepository.findById(id).orElseThrow(
@@ -33,7 +36,7 @@ public class LectureService {
     @Transactional
     public String createLecture(final Long classRoomId, final Long chapterId,
                                 final LectureDto lectureDto, final KollusMedia kollusMedia){
-        String mediaContentKey = kollusMedia.getMediaContentKey(); //todo:kollus id를 가져올 필요가 없을것 같음.
+//        String mediaContentKey = kollusMedia.getMediaContentKey();
 
         Chapter chapter = chapterService.findWithClassRoomById(chapterId);
 
@@ -51,7 +54,7 @@ public class LectureService {
                         .chapter(chapter) //강좌를 만들때 챕터는 무조건 있어야한다.
                         .title(lectureDto.title())
                         .time(lectureDto.convertToLocalTime())
-                        .mediaLink(mediaContentKey)
+//                        .mediaLink(mediaContentKey)
                         .sortOrder(nextSortOrder)
                         .build());
 
@@ -62,9 +65,9 @@ public class LectureService {
 
     @Transactional(readOnly = true)
     public LectureInfo getLectureInfo(Long id){
-
         Lecture lecture = findById(id);
-        return LectureInfo.from(lecture);
+        Media media = mediaService.findByLectureId(lecture.getId());
+        return LectureInfo.from(lecture, media);
     }
 
     @Transactional

@@ -18,6 +18,12 @@ public class MediaService {
     @Value("${aws-property.cdn-name}")
     private String CDN_URL;
 
+    public Media findById(Long id){
+        return mediaRepository.findById(id).orElseThrow(
+                ()-> new CustomException(Error.NOT_FOUND_MEDIA, Error.NOT_FOUND_MEDIA.getMessage())
+        );
+    }
+
     @Transactional
     public void createMedia(Long classRoomId, String videoKey, String assetId, String thumbnailKey){
         Media media = Media.builder()
@@ -38,6 +44,7 @@ public class MediaService {
                 .s3Key(videoKey)
                 .media360Key(generateCdn360Link(assetId, videoKey))
                 .media720Key(generateCdn720Link(assetId, videoKey))
+                //TODO : 현재 업로드 Id를 assetId와 같이 사용하고 있음. 이점 나중에 분기 처리 해야할 듯.
                 .classRoomThumbnail(generateCdnThumbnail(assetId, thumbnailKey))
                 .mp4Link(generateCdnMp4Link(assetId, videoKey))
                 .build();
