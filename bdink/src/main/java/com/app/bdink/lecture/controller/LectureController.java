@@ -67,7 +67,6 @@ public class LectureController {
     @GetMapping
     @Operation(method = "GET", description = "강의 id를 받아 해당 강의의 정보를 조회합니다.")
     public RspTemplate<?> getLectureInfo(@RequestParam Long id) {
-
         LectureInfo lectureInfo = lectureService.getLectureInfo(id);
         return RspTemplate.success(Success.GET_LECTURE_SUCCESS, lectureInfo);
     }
@@ -83,5 +82,11 @@ public class LectureController {
 
         lectureService.deleteLecture(id);
         return RspTemplate.success(Success.DELETE_LECTURE_SUCCESS, Success.DELETE_LECTURE_SUCCESS.getMessage());
+    }
+
+    @GetMapping("{lectureId}/media")
+    @Operation(method = "GET", description = "CDN 서비스를 이용한 lecture Media 주소를 제공합니다.")
+    RspTemplate<?> getLectureMedia(@PathVariable Long lectureId){
+        return RspTemplate.success(Success.GET_LECTURE_MEDIA, lectureService.getLectureInfo(lectureId));
     }
 }

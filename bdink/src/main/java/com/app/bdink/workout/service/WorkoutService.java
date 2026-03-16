@@ -100,7 +100,7 @@ public class WorkoutService {
     @Value("${ai-memo.rag.distance-threshold}")
     private double ragDistanceThreshold;
 
-    @Value("${aws-property.feedback-cdn-base}")
+    @Value("${aws-property.cdn-name}")
     private String feedbackCdnBase;
 
     public Exercise findById(Long id) {

@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +28,10 @@ public class S3MultipartService {
         String targetBucket = s3Config.getS3Bucket();
         String targetObjectDir = s3Config.getVideoDir();
 
-
-
         //사용자가 보낸 파일 확장자와 현재 시간을 이용해서 새로운 파일이름을 만든다.
         String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
-        String newFileName = System.currentTimeMillis() + fileType;
+        String assetId = UUID.randomUUID().toString();
+        String newFileName = assetId + fileType;
         Instant now = Instant.now();
 
         CreateMultipartUploadRequest createMultipartUploadRequest =
@@ -43,7 +43,7 @@ public class S3MultipartService {
                         .build();
         // 고유식별자인 업로드 ID 응답을 반환받기.
         CreateMultipartUploadResponse response = s3Client.createMultipartUpload(createMultipartUploadRequest);
-        return new S3UploadDto(response.uploadId(), newFileName);
+        return new S3UploadDto(response.uploadId(), newFileName, assetId);
     }
 
     public S3PreSignedUrlDto getUploadSignedUrl(S3UploadSignedUrlDto s3UploadSignedUrlDto){
@@ -77,6 +77,7 @@ public class S3MultipartService {
                     .partNumber(partForm.partNumber())
                     .eTag(partForm.AWSEtag())
                     .build();
+            completedPartList.add(part);
         }
 
         //멀티파트 업로드 완료 요청 보내기.
