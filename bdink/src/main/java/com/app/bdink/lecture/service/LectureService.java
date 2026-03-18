@@ -9,6 +9,7 @@ import com.app.bdink.external.kollus.entity.KollusMedia;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.lecture.controller.dto.LectureDto;
+import com.app.bdink.lecture.controller.dto.response.LectureCdnUrlResDto;
 import com.app.bdink.lecture.controller.dto.response.LectureInfo;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
@@ -25,6 +26,7 @@ public class LectureService {
     private final LectureRepository lectureRepository;
     private final ChapterService chapterService;
     private final MediaService mediaService;
+    private final LectureUtilService lectureUtilService;
 
     public Lecture findById(Long id){
         return lectureRepository.findById(id).orElseThrow(
@@ -68,6 +70,13 @@ public class LectureService {
         Lecture lecture = findById(id);
         Media media = mediaService.findByLectureId(lecture.getId());
         return LectureInfo.from(lecture, media);
+    }
+
+    @Transactional(readOnly = true)
+    public LectureCdnUrlResDto getLectureCdnUrlInfo(Long id){
+        Lecture lecture = findById(id);
+        Media media = mediaService.findByLectureId(lecture.getId());
+        return LectureCdnUrlResDto.from(lecture, media, lectureUtilService.getInfoLectureId(lecture));
     }
 
     @Transactional

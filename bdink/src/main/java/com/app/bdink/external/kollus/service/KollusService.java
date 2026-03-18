@@ -95,6 +95,7 @@ public class KollusService {
         kollusMediaRepository.save(kollusMedia);
     }
 
+    // kollus play url을 받기 위해 필요한 method
     @Transactional
     public KollusApiResponse.KollusUrlResponse createKollusURLService(Principal principal, Long lectureId) {
         Long memberId = Long.valueOf(principal.getName());
@@ -114,8 +115,6 @@ public class KollusService {
 
         LocalDateTime kollusCreatedAt = LocalDateTime.now();
 
-
-        //TODO: KOLLUS 채널 업로드키 LECTURE에서 들고와도 될것 같기도. -> 사이드이펙트 고려해서 생각 확장해보기.
         Lecture lecture = lectureService.findById(lectureId);
 
         KollusMedia kollusMedia = kollusMediaRepository
@@ -279,7 +278,6 @@ public class KollusService {
         }
     }
 
-    //todo: 잘 돌아가는지 테스트 해보기 그전에 콜러스 콜백 설정하기
     @Transactional
     public ResponseEntity<?> playCallbackService(PlayRequestDTO playRequestDTO) {
         long unixExp = System.currentTimeMillis() / 1000 + 3600;
