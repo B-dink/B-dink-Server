@@ -156,11 +156,11 @@ public class SugangService {
                     List<Lecture> lectures = lectureRepository.findAllByClassRoom(sugang.getClassRoomEntity());
                     return lectures.stream()
                             .map(lecture -> {
-                                KollusMediaLink kollusMediaLink = kollusMediaLinkRepository
-                                        .findByMemberIdAndLectureId(member.getId(), lecture.getId())
-                                        .orElse(null);
-                                //todo: 이쪽 문제 터질수도? 나중에 확인한번 더하기
-                                return SugangClassRoomInfo.of(sugang, lecture, kollusMediaLink);
+                                //todo: 진행률 관련 로직 Kollus -> CDN으로 바뀜에 따라 변경
+//                                KollusMediaLink kollusMediaLink = kollusMediaLinkRepository
+//                                        .findByMemberIdAndLectureId(member.getId(), lecture.getId())
+//                                        .orElse(null);
+                                return SugangClassRoomInfo.of(sugang, lecture);
                             });
                 })
                 .toList();
