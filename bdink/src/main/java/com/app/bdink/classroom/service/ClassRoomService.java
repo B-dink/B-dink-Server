@@ -330,19 +330,21 @@ public class ClassRoomService implements ClassRoomUseCase {
         // Step 3: 각 Lecture에 대해 진행률 확인
         List<ClassRoomProgressResponse> progressList = new ArrayList<>();
 
+        // kollus MediaLink 관련 로직 (진행률)
         for (Lecture lecture : lectures) {
             // 이 lecture에 대한 KollusMediaLink 찾기
-            Optional<KollusMediaLink> linkOpt = kollusMediaLinkRepository
-                    .findByMemberIdAndLectureId(member.getId(), lecture.getId());
+//            Optional<KollusMediaLink> linkOpt = kollusMediaLinkRepository
+//                    .findByMemberIdAndLectureId(member.getId(), lecture.getId());
 
-            String status;
-            if (linkOpt.isPresent() && linkOpt.get().isCompleted()) {
-                status = "완강";
-            } else if (linkOpt.isPresent() && linkOpt.get().getWatchProgress() > 0) {
-                status = linkOpt.get().getPlaytimePercent() + "%";
-            } else {
-                status = "0";
-            }
+            //todo: CDN 진행률 관련 로직이 생성되지 않음에 따라 0으로 임시결정
+            String status = "0%";
+//            if (linkOpt.isPresent() && linkOpt.get().isCompleted()) {
+//                status = "완강";
+//            } else if (linkOpt.isPresent() && linkOpt.get().getWatchProgress() > 0) {
+//                status = linkOpt.get().getPlaytimePercent() + "%";
+//            } else {
+//                status = "0";
+//            }
 
             progressList.add(new ClassRoomProgressResponse(
                     lecture.getTitle(),
