@@ -1,19 +1,20 @@
 package com.app.bdink.lecture.controller.dto.response;
 
+import com.app.bdink.external.aws.lambda.domain.Media;
 import com.app.bdink.lecture.entity.Lecture;
 
 import java.time.LocalTime;
 
 public record LectureInfo(
         String title,
-
-        String mediaLink,
+        String media720Link,
         String lectureTime
 ) {
-    public static LectureInfo from(final Lecture lecture){
+    public static LectureInfo from(final Lecture lecture, final Media media){
+
         return new LectureInfo(
                 lecture.getTitle(),
-                lecture.getMediaLink(),
+                media.getM3u8720Link(),
                 makeTimeString(lecture.getTime())
         );
     }

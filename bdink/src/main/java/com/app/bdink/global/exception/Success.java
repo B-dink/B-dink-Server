@@ -86,10 +86,14 @@ public enum Success {
     GET_CENTER_SUCCESS(HttpStatus.OK, "센터 조회 성공"),
     GET_ALLCENTER_SUCCESS(HttpStatus.OK, "계약중인 모든 센터 조회 성공"),
     GET_EXERCISEPART_SUCCESS(HttpStatus.OK, "파트별 운동종목 조회 성공"),
+    GET_VERIFY_TRAINER_SUCCESS(HttpStatus.OK, "소속 트레이너 유무 및 이름 조회 성공"),
     CHECK_QR_SUCCESS(HttpStatus.OK, "QR코드 인증 성공"),
 
 
     GET_NOTIFICATION_READ(HttpStatus.OK, "알림 읽음 유무 조회 성공"),
+
+
+    GET_LECTURE_MEDIA(HttpStatus.OK, "강의 미디어 주소 조회 성공"),
 
 
 

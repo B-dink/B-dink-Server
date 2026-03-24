@@ -7,6 +7,7 @@ public record WorkoutDailyDetailResDto(
         String workoutName,
         String workoutMemo,
         long sessionId,
+        Boolean onFeedback,
         List<WorkoutDailyExerciseResDto> sessions
 ) {
 }

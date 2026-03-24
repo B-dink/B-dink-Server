@@ -15,8 +15,14 @@ public class MediaService {
 
     private final MediaRepository mediaRepository;
 
-    @Value("${aws-property.cdn-name}")
-    private String CDN_URL;
+    @Value("${aws-property.cdn-media}")
+    private String cdnMediaUrl;
+
+    public Media findById(Long id){
+        return mediaRepository.findById(id).orElseThrow(
+                ()-> new CustomException(Error.NOT_FOUND_MEDIA, Error.NOT_FOUND_MEDIA.getMessage())
+        );
+    }
 
     @Transactional
     public void createMedia(Long classRoomId, String videoKey, String assetId, String thumbnailKey){
@@ -55,7 +61,7 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
-        return CDN_URL+assetId+"/HLS/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/HLS/" + updateS3Path;
     }
 
 
@@ -63,14 +69,14 @@ public class MediaService {
         if (assetId == null){
             return "";
         }
-        return CDN_URL+assetId+"/HLS/"+s3Key;
+        return cdnMediaUrl + assetId + "/MP4/" + s3Key;
     }
     public String generateCdnThumbnail(String assetId, String s3Key){
-        if (assetId == null){
+        if (assetId == null || s3Key == null){
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_360.m3u8");
-        return CDN_URL+assetId+"/thumbnail/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/thumbnail/" + updateS3Path;
     }
 
     public String generateCdn720Link(String assetId, String s3Key){
@@ -78,7 +84,7 @@ public class MediaService {
             return "";
         }
         String updateS3Path = s3Key.replace(".mp4", "_720.m3u8");
-        return CDN_URL+assetId+"/HLS/"+updateS3Path;
+        return cdnMediaUrl + assetId + "/HLS/" + updateS3Path;
     }
 
     public Media findByKey(String videoKey){

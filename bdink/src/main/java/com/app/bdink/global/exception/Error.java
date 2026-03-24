@@ -38,6 +38,7 @@ public enum Error {
     NOT_FOUND_CLASSROOM_DETAILPAGE(HttpStatus.NOT_FOUND, "강의실에 디테일 페이지가 없습니다."),
     NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
     NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
+    NOT_FOUND_MEDIA(HttpStatus.NOT_FOUND, "찾을 수 없는 미디어입니다."),
     NOT_FOUND_KOLLUSMEDIA(HttpStatus.NOT_FOUND, "찾을 수 없는 미디어입니다."),
     NOT_FOUND_KOLLUSMEDIALINK(HttpStatus.NOT_FOUND, "찾을 수 없는 시청기록 입니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "찾을 수 없는 파일입니다."),

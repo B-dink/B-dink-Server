@@ -26,6 +26,7 @@ import com.app.bdink.workout.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -183,7 +184,7 @@ public class TrainerController {
     @Operation(method = "GET", description = "회원별 특정 날짜 운동일지 상세 정보를 조회합니다.")
     public RspTemplate<?> getMemberWorkoutDay(@PathVariable Long memberId,
                                               @RequestParam
-                                              @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                               LocalDate date) {
         Member member = memberService.findById(memberId);
         return RspTemplate.success(

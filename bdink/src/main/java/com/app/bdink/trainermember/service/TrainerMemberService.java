@@ -10,6 +10,7 @@ import com.app.bdink.trainer.repository.TrainerRepository;
 import com.app.bdink.trainermember.controller.dto.request.TrainerMemberCreateRequest;
 import com.app.bdink.trainermember.controller.dto.request.TrainerMemberUpdateRequest;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberResponse;
+import com.app.bdink.trainermember.controller.dto.response.TrainerMemberVerify;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeResponse;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberWeeklyVolumeDetailResponse;
 import com.app.bdink.trainermember.entity.TrainerMember;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -300,5 +302,18 @@ public class TrainerMemberService {
                 .sorted(Comparator.comparing(TrainerMemberWeeklyVolumeResponse::memberName,
                         Comparator.nullsLast(String::compareTo)))
                 .toList();
+    }
+
+    @Transactional
+    public TrainerMemberVerify verifyTrainerName(Long memberId) {
+        boolean isTrainerMember = false;
+        String trainerName = null;
+
+        if(trainerMemberRepository.findByMemberId(memberId).isPresent()) {
+            isTrainerMember = true;
+            TrainerMember trainerMember = trainerMemberRepository.findByMemberId(memberId).get();
+            trainerName = trainerMember.getTrainer().getName();
+        }
+        return new TrainerMemberVerify(isTrainerMember, trainerName);
     }
 }

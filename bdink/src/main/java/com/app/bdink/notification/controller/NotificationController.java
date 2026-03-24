@@ -124,7 +124,7 @@ public class NotificationController {
     @Operation(method = "GET", description = "FCM 딥링크 테스트: WORKOUT_SESSION (트레이너 피드백 알림)")
     public RspTemplate<?> getFcmTestWorkoutSession(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
-        pushNotificationService.sendToMember(memberId, "트레이너 피드백", "트레이너 피드백이 도착했어요.", "WORKOUT_SESSION", "121");
+        pushNotificationService.sendToMember(memberId, "트레이너 피드백", "트레이너 피드백이 도착했어요.", "WORKOUT_SESSION", "259");
         return RspTemplate.success(Success.FCM_TEST_SUCCESS, Success.FCM_TEST_SUCCESS.getMessage());
     }
 

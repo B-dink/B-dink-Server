@@ -12,6 +12,7 @@ import com.app.bdink.trainer.service.TrainerService;
 import com.app.bdink.trainermember.controller.dto.request.TrainerMemberCreateRequest;
 import com.app.bdink.trainermember.controller.dto.request.TrainerMemberUpdateRequest;
 import com.app.bdink.trainermember.controller.dto.response.TrainerMemberResponse;
+import com.app.bdink.trainermember.controller.dto.response.TrainerMemberVerify;
 import com.app.bdink.trainermember.entity.TrainerMember;
 import com.app.bdink.trainermember.service.TrainerMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -99,6 +100,14 @@ public class TrainerMemberController {
 
         trainerMemberService.deleteTrainerMember(id);
         return RspTemplate.success(Success.DELETE_TRAINER_MEMBER_SUCCESS, Success.DELETE_TRAINER_MEMBER_SUCCESS.getMessage());
+    }
+
+    @GetMapping("/verify/trainer")
+    @Operation(method = "GET", description = "트레이너 멤버의 트레이너 정보를 확인합니다.")
+    public RspTemplate<?> verifyTrainer(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        TrainerMemberVerify trainerMemberVerify = trainerMemberService.verifyTrainerName(memberId);
+        return RspTemplate.success(Success.GET_VERIFY_TRAINER_SUCCESS, trainerMemberVerify);
     }
 
     /**
