@@ -1,11 +1,10 @@
 package com.app.bdink.sugang.service;
 
 import com.app.bdink.classroom.adapter.out.persistence.entity.ClassRoomEntity;
-import com.app.bdink.external.kollus.entity.KollusMediaLink;
-import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.learning.repository.LearningProgressRepository;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
 import com.app.bdink.member.entity.Member;
@@ -44,7 +43,7 @@ public class SugangService {
 
     private final SugangRepository sugangRepository;
     private final LectureRepository lectureRepository;
-    private final KollusMediaLinkRepository kollusMediaLinkRepository;
+    private final LearningProgressRepository learningProgressRepository;
 
     public Sugang findById(Long id) {
         return sugangRepository.findById(id)
@@ -180,15 +179,21 @@ public class SugangService {
     public void updateAllSugangProgress(Member member) {
         List<Sugang> sugangs = sugangRepository.findByMemberAndSugangStatus(member, SugangStatus.PAYMENT_COMPLETED);
 
+        // 회원이 수강 중인 모든 클래스룸의 집계 진행률을 일괄 갱신한다.
         for (Sugang sugang : sugangs) {
-            updateSugangProgress(sugang);
+            updateSugangProgressByClassRoom(member, sugang.getClassRoomEntity());
         }
     }
 
     @Transactional
     public void updateSugangProgress(Sugang sugang) {
-        Member member = sugang.getMember();
-        ClassRoomEntity classRoomEntity = sugang.getClassRoomEntity();
+        updateSugangProgressByClassRoom(sugang.getMember(), sugang.getClassRoomEntity());
+    }
+
+    @Transactional
+    public void updateSugangProgressByClassRoom(Member member, ClassRoomEntity classRoomEntity) {
+        Sugang sugang = sugangRepository.findByMemberAndClassRoomEntity(member, classRoomEntity)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_SUGANG, Error.NOT_FOUND_SUGANG.getMessage()));
 
         int totalLectureCount = lectureRepository.countByClassRoom(classRoomEntity);
         log.info("totalLectureCount : {}", totalLectureCount);
@@ -198,8 +203,12 @@ public class SugangService {
             return;
         }
 
-        int completedLectureCount = kollusMediaLinkRepository.countByMemberAndLecture_ClassRoomAndPlaytimePercentGreaterThanEqual(member,
-                classRoomEntity, 90);
+        // legacy: Kollus 기반 진행률 계산
+//        int completedLectureCount = kollusMediaLinkRepository.countByMemberAndLecture_ClassRoomAndPlaytimePercentGreaterThanEqual(member,
+//                classRoomEntity, 90);
+        // 새 학습 진행률 테이블에서 완강된 강의 수를 기준으로 클래스룸 진행률을 계산한다.
+        int completedLectureCount = learningProgressRepository.countByMemberAndLectureClassRoomAndCompleted(member,
+                classRoomEntity, true);
 
         double progress = ((double) completedLectureCount / totalLectureCount) * 100;
         log.info("progress1 : {}", progress);
