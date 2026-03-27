@@ -17,14 +17,14 @@ import com.app.bdink.classroom.port.in.ClassRoomUseCase;
 import com.app.bdink.classroom.repository.ClassRoomDetailImageRepository;
 import com.app.bdink.classroom.repository.ClassRoomRepository;
 import com.app.bdink.classroom.service.command.CreateClassRoomCommand;
-import com.app.bdink.external.kollus.entity.KollusMediaLink;
-import com.app.bdink.external.kollus.repository.KollusMediaLinkRepository;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.global.totalTime.TotalTimeUtil;
 import com.app.bdink.instructor.adapter.in.controller.dto.response.InstructorClassroomDto;
 import com.app.bdink.instructor.adapter.out.persistence.entity.Instructor;
 import com.app.bdink.instructor.mapper.InstructorMapper;
+import com.app.bdink.learning.entity.LearningProgress;
+import com.app.bdink.learning.repository.LearningProgressRepository;
 import com.app.bdink.lecture.controller.dto.response.LectureDetailResponse;
 import com.app.bdink.lecture.entity.Lecture;
 import com.app.bdink.lecture.repository.LectureRepository;
@@ -71,7 +71,7 @@ public class ClassRoomService implements ClassRoomUseCase {
     private final ReviewService reviewService;
     private final ClassRoomDetailImageRepository classRoomDetailImageRepository;
     private final SugangRepository sugangRepository;
-    private final KollusMediaLinkRepository kollusMediaLinkRepository;
+    private final LearningProgressRepository learningProgressRepository;
     private final BookmarkRepository bookmarkRepository;
     private final MemberService memberService;
     private final MemberUtilService memberUtilService;
@@ -103,20 +103,29 @@ public class ClassRoomService implements ClassRoomUseCase {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
         ClassRoomEntity classRoomEntity = findById(id);
 
-        List<KollusMediaLink> mediaLinks = kollusMediaLinkRepository
-                .findAllByMemberAndLectureClassRoom(member, classRoomEntity);
+        // legacy: Kollus 기반 챕터 진도 집계
+//        List<KollusMediaLink> mediaLinks = kollusMediaLinkRepository
+//                .findAllByMemberAndLectureClassRoom(member, classRoomEntity);
+//
+//        Map<Long, KollusMediaLink> mediaLinkMap = mediaLinks.stream()
+//                .collect(Collectors.toMap(link -> link.getLecture().getId(), link -> link));
 
-        Map<Long, KollusMediaLink> mediaLinkMap = mediaLinks.stream()
-                .collect(Collectors.toMap(link -> link.getLecture().getId(), link -> link));
+        Map<Long, LearningProgress> progressMap = learningProgressRepository.findAllByMemberAndLectureClassRoom(member, classRoomEntity)
+                .stream()
+                .collect(Collectors.toMap(progress -> progress.getLecture().getId(), progress -> progress));
 
+        // 챕터 응답은 강의별 최신 학습 상태를 붙여서 내려준다.
         List<ChapterResponse> chapters = classRoomEntity.getChapters().stream()
-                .map(chapter -> ChapterResponse.of(chapter, mediaLinkMap))
+                .map(chapter -> ChapterResponse.of(chapter, progressMap))
                 .collect(Collectors.toList());
 
 
         int totalLectures = lectureRepository.countByClassRoom(classRoomEntity);
 
-        int completedLectures = kollusMediaLinkRepository.countByMemberAndLectureClassRoomAndCompleted(member, classRoomEntity, true);
+        // legacy: Kollus 기반 완강 수 집계
+//        int completedLectures = kollusMediaLinkRepository.countByMemberAndLectureClassRoomAndCompleted(member, classRoomEntity, true);
+        // 클래스룸 전체 진도율은 완강 강의 수 기준으로 계산한다.
+        int completedLectures = learningProgressRepository.countByMemberAndLectureClassRoomAndCompleted(member, classRoomEntity, true);
 
         double progressRatio = totalLectures == 0 ? 0.0 :
                 ((double) completedLectures / totalLectures) * 100;
@@ -326,6 +335,9 @@ public class ClassRoomService implements ClassRoomUseCase {
 
         // Step 2: 클래스룸의 모든 Lecture 조회
         List<Lecture> lectures = lectureRepository.findAllByClassRoom(classRoom);
+        Map<Long, LearningProgress> progressMap = learningProgressRepository.findAllByMemberAndLectureClassRoom(member, classRoom)
+                .stream()
+                .collect(Collectors.toMap(progress -> progress.getLecture().getId(), progress -> progress));
 
         // Step 3: 각 Lecture에 대해 진행률 확인
         List<ClassRoomProgressResponse> progressList = new ArrayList<>();
@@ -336,7 +348,6 @@ public class ClassRoomService implements ClassRoomUseCase {
 //            Optional<KollusMediaLink> linkOpt = kollusMediaLinkRepository
 //                    .findByMemberIdAndLectureId(member.getId(), lecture.getId());
 
-            //todo: CDN 진행률 관련 로직이 생성되지 않음에 따라 0으로 임시결정
             String status = "0%";
 //            if (linkOpt.isPresent() && linkOpt.get().isCompleted()) {
 //                status = "완강";
@@ -345,6 +356,11 @@ public class ClassRoomService implements ClassRoomUseCase {
 //            } else {
 //                status = "0";
 //            }
+            LearningProgress progress = progressMap.get(lecture.getId());
+            if (progress != null) {
+                // 완강이면 "완강", 아니면 반올림한 퍼센트 문자열을 그대로 노출한다.
+                status = progress.isCompleted() ? "완강" : Math.round(progress.getProgressPercent()) + "%";
+            }
 
             progressList.add(new ClassRoomProgressResponse(
                     lecture.getTitle(),
