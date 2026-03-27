@@ -58,6 +58,7 @@ public enum Success {
     NAME_CHECK_DUPLICATED(HttpStatus.OK, "중복된 이름 입니다."),
     NAME_CHECK_SUCCESS(HttpStatus.OK, "이름 체크 성공."),
     GET_CLASSROOM_PROGRESS_SUCCESS(HttpStatus.OK,"강의 진행률 조회 성공"),
+    GET_LEARNING_PROGRESS_SUCCESS(HttpStatus.OK,"학습 진행률 조회 성공"),
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
     SEARCH_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 검색 성공"),
 
@@ -109,6 +110,7 @@ public enum Success {
     UPDATE_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 수정 성공"),
     UPDATE_EXERCISELIST_SUCCESS(HttpStatus.OK,"운동일지 수정 성공"),
     UPDATE_ROUTINE_SUCCESS(HttpStatus.OK,"추천 운동루틴 업데이트 성공"),
+    UPDATE_LEARNING_PROGRESS_SUCCESS(HttpStatus.OK,"학습 진행률 저장 성공"),
 
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
