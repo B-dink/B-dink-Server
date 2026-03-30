@@ -1,4 +1,4 @@
-package com.app.bdink.subscription.controller.dto.request;
+package com.app.bdink.trainermembership.controller.dto.request;
 
 import java.time.LocalDate;
 

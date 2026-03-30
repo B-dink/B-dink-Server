@@ -1,4 +1,4 @@
-package com.app.bdink.subscription.service;
+package com.app.bdink.trainermembership.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

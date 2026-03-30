@@ -1,6 +1,6 @@
-package com.app.bdink.subscription.controller.dto.response;
+package com.app.bdink.trainermembership.controller.dto.response;
 
-import com.app.bdink.subscription.entity.TrainerMembership;
+import com.app.bdink.trainermembership.entity.TrainerMembership;
 
 import java.time.LocalDate;
 

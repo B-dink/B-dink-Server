@@ -1,4 +1,4 @@
-package com.app.bdink.subscription.entity;
+package com.app.bdink.trainermembership.entity;
 
 public enum TrainerMembershipStatus {
     ACTIVE,

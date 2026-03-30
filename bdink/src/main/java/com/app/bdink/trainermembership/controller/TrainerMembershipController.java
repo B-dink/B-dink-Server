@@ -1,4 +1,4 @@
-package com.app.bdink.subscription.controller;
+package com.app.bdink.trainermembership.controller;
 
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.Success;
@@ -6,12 +6,12 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
-import com.app.bdink.subscription.controller.dto.request.TrainerMembershipCancelRequest;
-import com.app.bdink.subscription.controller.dto.request.TrainerMembershipCreateRequest;
-import com.app.bdink.subscription.controller.dto.request.TrainerMembershipRenewRequest;
-import com.app.bdink.subscription.controller.dto.response.TrainerMembershipPlanResponse;
-import com.app.bdink.subscription.controller.dto.response.TrainerMembershipResponse;
-import com.app.bdink.subscription.service.TrainerMembershipService;
+import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCancelRequest;
+import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCreateRequest;
+import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipRenewRequest;
+import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipPlanResponse;
+import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipResponse;
+import com.app.bdink.trainermembership.service.TrainerMembershipService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,13 @@
-package com.app.bdink.subscription.service;
+package com.app.bdink.trainermembership.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
-import com.app.bdink.subscription.entity.TrainerMembership;
-import com.app.bdink.subscription.entity.TrainerMembershipPlan;
-import com.app.bdink.subscription.entity.TrainerMembershipStatus;
-import com.app.bdink.subscription.repository.TrainerMembershipRepository;
-import com.app.bdink.subscription.repository.TrainerMembershipPlanRepository;
+import com.app.bdink.trainermembership.entity.TrainerMembership;
+import com.app.bdink.trainermembership.entity.TrainerMembershipPlan;
+import com.app.bdink.trainermembership.entity.TrainerMembershipStatus;
+import com.app.bdink.trainermembership.repository.TrainerMembershipRepository;
+import com.app.bdink.trainermembership.repository.TrainerMembershipPlanRepository;
 import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerQrService;
 import com.app.bdink.trainer.service.TrainerService;

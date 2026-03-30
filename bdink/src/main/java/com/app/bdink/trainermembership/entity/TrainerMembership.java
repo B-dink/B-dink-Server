@@ -1,4 +1,4 @@
-package com.app.bdink.subscription.entity;
+package com.app.bdink.trainermembership.entity;
 
 import com.app.bdink.common.entity.BaseTimeEntity;
 import com.app.bdink.trainer.entity.Trainer;

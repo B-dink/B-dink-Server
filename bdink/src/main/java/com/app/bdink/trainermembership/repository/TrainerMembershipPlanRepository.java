@@ -1,6 +1,6 @@
-package com.app.bdink.subscription.repository;
+package com.app.bdink.trainermembership.repository;
 
-import com.app.bdink.subscription.entity.TrainerMembershipPlan;
+import com.app.bdink.trainermembership.entity.TrainerMembershipPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

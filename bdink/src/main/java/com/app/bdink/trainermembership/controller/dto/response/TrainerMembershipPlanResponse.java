@@ -1,6 +1,6 @@
-package com.app.bdink.subscription.controller.dto.response;
+package com.app.bdink.trainermembership.controller.dto.response;
 
-import com.app.bdink.subscription.entity.TrainerMembershipPlan;
+import com.app.bdink.trainermembership.entity.TrainerMembershipPlan;
 
 public record TrainerMembershipPlanResponse(
         Long id,
