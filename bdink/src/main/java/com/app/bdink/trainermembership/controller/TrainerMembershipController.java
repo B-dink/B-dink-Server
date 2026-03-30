@@ -22,8 +22,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/subscriptions")
-@Tag(name = "구독 API", description = "트레이너 정기결제 구독 관련 API입니다.")
+@RequestMapping("/api/v1/trainer-memberships")
+@Tag(name = "트레이너 멤버십 API", description = "트레이너 멤버십 관련 API입니다.")
 public class TrainerMembershipController {
 
     private final TrainerMembershipService trainerMembershipService;
@@ -31,7 +31,7 @@ public class TrainerMembershipController {
     private final MemberService memberService;
 
     @GetMapping("/plans")
-    @Operation(method = "GET", description = "활성화된 구독 플랜 목록을 조회합니다.")
+    @Operation(method = "GET", description = "활성화된 트레이너 멤버십 플랜 목록을 조회합니다.")
     public RspTemplate<?> getMembershipPlans() {
         List<TrainerMembershipPlanResponse> responses = trainerMembershipService.getActivePlans().stream()
                 .map(TrainerMembershipPlanResponse::from)
