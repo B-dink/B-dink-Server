@@ -47,7 +47,7 @@ public class TrainerMembershipController {
 
         String membershipId = trainerMembershipService.createMembershipForMember(
                 member,
-                request.subscriptionPlanId(),
+                request.trainerMembershipPlanId(),
                 request.paymentDate(),
                 request.autoRenew()
         ).getId().toString();

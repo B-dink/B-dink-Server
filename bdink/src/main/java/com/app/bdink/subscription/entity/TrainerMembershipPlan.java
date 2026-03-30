@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "subscription_plan")
-public class SubscriptionPlan extends BaseTimeEntity {
+public class TrainerMembershipPlan extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class SubscriptionPlan extends BaseTimeEntity {
     private Boolean active;
 
     @Builder
-    public SubscriptionPlan(String name, Integer billingCycleMonths, Integer price, String description, Boolean active) {
+    public TrainerMembershipPlan(String name, Integer billingCycleMonths, Integer price, String description, Boolean active) {
         this.name = name;
         this.billingCycleMonths = billingCycleMonths;
         this.price = price;

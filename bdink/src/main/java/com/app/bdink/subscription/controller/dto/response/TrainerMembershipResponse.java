@@ -1,14 +1,14 @@
 package com.app.bdink.subscription.controller.dto.response;
 
-import com.app.bdink.subscription.entity.TrainerSubscription;
+import com.app.bdink.subscription.entity.TrainerMembership;
 
 import java.time.LocalDate;
 
 public record TrainerMembershipResponse(
         Long id,
         Long trainerId,
-        Long subscriptionPlanId,
-        String subscriptionPlanName,
+        Long trainerMembershipPlanId,
+        String trainerMembershipPlanName,
         Integer billingCycleMonths,
         Integer price,
         String trainerMembershipStatus,
@@ -18,20 +18,20 @@ public record TrainerMembershipResponse(
         boolean autoRenew,
         LocalDate canceledDate
 ) {
-    public static TrainerMembershipResponse from(TrainerSubscription subscription) {
+    public static TrainerMembershipResponse from(TrainerMembership membership) {
         return new TrainerMembershipResponse(
-                subscription.getId(),
-                subscription.getTrainer().getId(),
-                subscription.getSubscriptionPlan().getId(),
-                subscription.getSubscriptionPlan().getName(),
-                subscription.getSubscriptionPlan().getBillingCycleMonths(),
-                subscription.getSubscriptionPlan().getPrice(),
-                subscription.getSubscriptionStatus().name(),
-                subscription.getStartedDate(),
-                subscription.getNextBillingDate(),
-                subscription.getExpiredDate(),
-                subscription.isAutoRenew(),
-                subscription.getCanceledDate()
+                membership.getId(),
+                membership.getTrainer().getId(),
+                membership.getTrainerMembershipPlan().getId(),
+                membership.getTrainerMembershipPlan().getName(),
+                membership.getTrainerMembershipPlan().getBillingCycleMonths(),
+                membership.getTrainerMembershipPlan().getPrice(),
+                membership.getTrainerMembershipStatus().name(),
+                membership.getStartedDate(),
+                membership.getNextBillingDate(),
+                membership.getExpiredDate(),
+                membership.isAutoRenew(),
+                membership.getCanceledDate()
         );
     }
 }

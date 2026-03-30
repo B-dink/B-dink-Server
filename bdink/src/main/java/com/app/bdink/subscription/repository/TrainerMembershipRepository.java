@@ -1,7 +1,7 @@
 package com.app.bdink.subscription.repository;
 
 import com.app.bdink.subscription.entity.TrainerMembershipStatus;
-import com.app.bdink.subscription.entity.TrainerSubscription;
+import com.app.bdink.subscription.entity.TrainerMembership;
 import com.app.bdink.trainer.entity.Trainer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,13 +9,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface TrainerMembershipRepository extends JpaRepository<TrainerSubscription, Long> {
+public interface TrainerMembershipRepository extends JpaRepository<TrainerMembership, Long> {
 
-    Optional<TrainerSubscription> findByTrainerAndSubscriptionStatus(Trainer trainer, TrainerMembershipStatus subscriptionStatus);
+    Optional<TrainerMembership> findByTrainerAndTrainerMembershipStatus(Trainer trainer, TrainerMembershipStatus trainerMembershipStatus);
 
-    List<TrainerSubscription> findAllBySubscriptionStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
-            TrainerMembershipStatus subscriptionStatus, LocalDate date
+    List<TrainerMembership> findAllByTrainerMembershipStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
+            TrainerMembershipStatus trainerMembershipStatus, LocalDate date
     );
 
-    List<TrainerSubscription> findAllByExpiredDateBeforeAndSubscriptionStatus(LocalDate date, TrainerMembershipStatus subscriptionStatus);
+    List<TrainerMembership> findAllByExpiredDateBeforeAndTrainerMembershipStatus(LocalDate date, TrainerMembershipStatus trainerMembershipStatus);
 }

@@ -1,6 +1,6 @@
 package com.app.bdink.subscription.controller.dto.response;
 
-import com.app.bdink.subscription.entity.SubscriptionPlan;
+import com.app.bdink.subscription.entity.TrainerMembershipPlan;
 
 public record TrainerMembershipPlanResponse(
         Long id,
@@ -10,14 +10,14 @@ public record TrainerMembershipPlanResponse(
         String description,
         Boolean active
 ) {
-    public static TrainerMembershipPlanResponse from(SubscriptionPlan subscriptionPlan) {
+    public static TrainerMembershipPlanResponse from(TrainerMembershipPlan trainerMembershipPlan) {
         return new TrainerMembershipPlanResponse(
-                subscriptionPlan.getId(),
-                subscriptionPlan.getName(),
-                subscriptionPlan.getBillingCycleMonths(),
-                subscriptionPlan.getPrice(),
-                subscriptionPlan.getDescription(),
-                subscriptionPlan.getActive()
+                trainerMembershipPlan.getId(),
+                trainerMembershipPlan.getName(),
+                trainerMembershipPlan.getBillingCycleMonths(),
+                trainerMembershipPlan.getPrice(),
+                trainerMembershipPlan.getDescription(),
+                trainerMembershipPlan.getActive()
         );
     }
 }
