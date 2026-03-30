@@ -9,6 +9,7 @@ import com.app.bdink.subscription.entity.TrainerSubscription;
 import com.app.bdink.subscription.repository.SubscriptionPlanRepository;
 import com.app.bdink.subscription.repository.TrainerSubscriptionRepository;
 import com.app.bdink.trainer.entity.Trainer;
+import com.app.bdink.trainer.service.TrainerQrService;
 import com.app.bdink.trainer.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class TrainerSubscriptionService {
     private final TrainerSubscriptionRepository trainerSubscriptionRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final TrainerService trainerService;
+    private final TrainerQrService trainerQrService;
 
     @Transactional(readOnly = true)
     public TrainerSubscription findById(Long id) {
@@ -70,6 +72,7 @@ public class TrainerSubscriptionService {
     public TrainerSubscription createSubscriptionForMember(Member member, Long subscriptionPlanId,
                                                            LocalDate paymentDate, boolean autoRenew) {
         Trainer trainer = trainerService.getOrCreatePaidTrainer(member);
+        trainerQrService.ensureTrainerQr(trainer);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
         trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
