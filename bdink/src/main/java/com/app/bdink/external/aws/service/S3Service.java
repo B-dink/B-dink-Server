@@ -96,6 +96,22 @@ public class S3Service {
         );
     }
 
+    // 서버에서 byte[] 방식으로 생성
+    public String uploadImageBytes(String directoryPath, String fileName, byte[] fileBytes, String contentType) {
+        final String key = directoryPath + fileName;
+        final S3Client s3Client = s3Config.getS3Client();
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(contentType)
+                .contentDisposition("inline")
+                .build();
+
+        s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+        return generateCdnImageKey(key);
+    }
+
 
     private String generateImageFileName() {
         return UUID.randomUUID().toString() + ".jpg";
