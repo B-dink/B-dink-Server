@@ -7,7 +7,7 @@ import com.app.bdink.subscription.entity.SubscriptionPlan;
 import com.app.bdink.subscription.entity.TrainerMembershipStatus;
 import com.app.bdink.subscription.entity.TrainerSubscription;
 import com.app.bdink.subscription.repository.SubscriptionPlanRepository;
-import com.app.bdink.subscription.repository.TrainerSubscriptionRepository;
+import com.app.bdink.subscription.repository.TrainerMembershipRepository;
 import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerQrService;
 import com.app.bdink.trainer.service.TrainerService;
@@ -22,16 +22,16 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TrainerSubscriptionService {
+public class TrainerMembershipService {
 
-    private final TrainerSubscriptionRepository trainerSubscriptionRepository;
+    private final TrainerMembershipRepository trainerMembershipRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final TrainerService trainerService;
     private final TrainerQrService trainerQrService;
 
     @Transactional(readOnly = true)
     public TrainerSubscription findById(Long id) {
-        return trainerSubscriptionRepository.findById(id)
+        return trainerMembershipRepository.findById(id)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
     }
 
@@ -47,106 +47,106 @@ public class TrainerSubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public TrainerSubscription getActiveSubscription(Long trainerId) {
+    public TrainerSubscription getActiveMembership(Long trainerId) {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
-        return trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
+        return trainerMembershipRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
     }
 
     @Transactional
-    public TrainerSubscription createSubscription(Long trainerId, Long subscriptionPlanId,
-                                                  LocalDate paymentDate, boolean autoRenew) {
+    public TrainerSubscription createMembership(Long trainerId, Long subscriptionPlanId,
+                                                LocalDate paymentDate, boolean autoRenew) {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
-        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
+        trainerMembershipRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .ifPresent(subscription -> {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
 
         TrainerSubscription subscription = TrainerSubscription.create(trainer, subscriptionPlan, paymentDate, autoRenew);
-        return trainerSubscriptionRepository.save(subscription);
+        return trainerMembershipRepository.save(subscription);
     }
 
     @Transactional
-    public TrainerSubscription createSubscriptionForMember(Member member, Long subscriptionPlanId,
-                                                           LocalDate paymentDate, boolean autoRenew) {
+    public TrainerSubscription createMembershipForMember(Member member, Long subscriptionPlanId,
+                                                         LocalDate paymentDate, boolean autoRenew) {
         Trainer trainer = trainerService.getOrCreatePaidTrainer(member);
         trainerQrService.ensureTrainerQr(trainer);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
-        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
+        trainerMembershipRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .ifPresent(subscription -> {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
 
         TrainerSubscription subscription = TrainerSubscription.create(trainer, subscriptionPlan, paymentDate, autoRenew);
-        return trainerSubscriptionRepository.save(subscription);
+        return trainerMembershipRepository.save(subscription);
     }
 
     @Transactional
-    public TrainerSubscription renewSubscription(Long subscriptionId, LocalDate paymentDate) {
-        TrainerSubscription subscription = findById(subscriptionId);
+    public TrainerSubscription renewMembership(Long membershipId, LocalDate paymentDate) {
+        TrainerSubscription subscription = findById(membershipId);
         subscription.renew(paymentDate);
         return subscription;
     }
 
     @Transactional
-    public TrainerSubscription cancelSubscription(Long subscriptionId, LocalDate canceledDate) {
-        TrainerSubscription subscription = findById(subscriptionId);
+    public TrainerSubscription cancelMembership(Long membershipId, LocalDate canceledDate) {
+        TrainerSubscription subscription = findById(membershipId);
         subscription.cancel(canceledDate);
         return subscription;
     }
 
     @Transactional
-    public TrainerSubscription expireSubscription(Long subscriptionId, LocalDate expiredDate) {
-        TrainerSubscription subscription = findById(subscriptionId);
+    public TrainerSubscription expireMembership(Long membershipId, LocalDate expiredDate) {
+        TrainerSubscription subscription = findById(membershipId);
         subscription.expire(expiredDate);
         return subscription;
     }
 
     @Transactional
-    public TrainerSubscription markPaymentFailed(Long subscriptionId) {
-        TrainerSubscription subscription = findById(subscriptionId);
+    public TrainerSubscription markMembershipPaymentFailed(Long membershipId) {
+        TrainerSubscription subscription = findById(membershipId);
         subscription.markPaymentFailed();
         return subscription;
     }
 
     @Transactional(readOnly = true)
-    public List<TrainerSubscription> getBillingDueSubscriptions(LocalDate date) {
-        return trainerSubscriptionRepository.findAllBySubscriptionStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
+    public List<TrainerSubscription> getBillingDueMemberships(LocalDate date) {
+        return trainerMembershipRepository.findAllBySubscriptionStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
                 TrainerMembershipStatus.ACTIVE, date
         );
     }
 
     @Transactional(readOnly = true)
-    public List<TrainerSubscription> getExpiredSubscriptions(LocalDate date) {
-        return trainerSubscriptionRepository.findAllByExpiredDateBeforeAndSubscriptionStatus(
+    public List<TrainerSubscription> getExpiredMemberships(LocalDate date) {
+        return trainerMembershipRepository.findAllByExpiredDateBeforeAndSubscriptionStatus(
                 date, TrainerMembershipStatus.ACTIVE
         );
     }
 
     @Transactional
-    public void processRecurringBilling(LocalDate today) {
-        List<TrainerSubscription> dueSubscriptions = getBillingDueSubscriptions(today);
+    public void processRecurringMembershipBilling(LocalDate today) {
+        List<TrainerSubscription> dueMemberships = getBillingDueMemberships(today);
 
         // 실제 정기결제 연동 전까지는 청구 대상만 로그로 남긴다.
-        for (TrainerSubscription subscription : dueSubscriptions) {
-            log.info("Recurring billing due. subscriptionId={}, trainerId={}, nextBillingDate={}",
-                    subscription.getId(), subscription.getTrainer().getId(), subscription.getNextBillingDate());
+        for (TrainerSubscription membership : dueMemberships) {
+            log.info("Recurring membership billing due. membershipId={}, trainerId={}, nextBillingDate={}",
+                    membership.getId(), membership.getTrainer().getId(), membership.getNextBillingDate());
         }
     }
 
     @Transactional
-    public void expireDueSubscriptions(LocalDate today) {
-        List<TrainerSubscription> expiredSubscriptions = getExpiredSubscriptions(today);
+    public void expireDueMemberships(LocalDate today) {
+        List<TrainerSubscription> expiredMemberships = getExpiredMemberships(today);
 
-        for (TrainerSubscription subscription : expiredSubscriptions) {
-            subscription.expire(subscription.getExpiredDate());
+        for (TrainerSubscription membership : expiredMemberships) {
+            membership.expire(membership.getExpiredDate());
         }
 
-        if (!expiredSubscriptions.isEmpty()) {
-            log.info("Expired trainer subscriptions updated: {}", expiredSubscriptions.size());
+        if (!expiredMemberships.isEmpty()) {
+            log.info("Expired trainer memberships updated: {}", expiredMemberships.size());
         }
     }
 }

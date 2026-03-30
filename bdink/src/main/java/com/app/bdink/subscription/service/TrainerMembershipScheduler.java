@@ -11,20 +11,20 @@ import java.time.LocalDate;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TrainerSubscriptionScheduler {
+public class TrainerMembershipScheduler {
 
-    private final TrainerSubscriptionService trainerSubscriptionService;
+    private final TrainerMembershipService trainerMembershipService;
 
     @Transactional
     @Scheduled(cron = "0 0 3 * * *")
-    public void processSubscriptions() {
+    public void processMemberships() {
         LocalDate today = LocalDate.now();
 
         // 자동결제 대상 조회 및 처리
-        trainerSubscriptionService.processRecurringBilling(today);
+        trainerMembershipService.processRecurringMembershipBilling(today);
         // 만료일이 지난 구독 상태 정리
-        trainerSubscriptionService.expireDueSubscriptions(today);
+        trainerMembershipService.expireDueMemberships(today);
 
-        log.info("Trainer subscription scheduler executed. date={}", today);
+        log.info("Trainer membership scheduler executed. date={}", today);
     }
 }

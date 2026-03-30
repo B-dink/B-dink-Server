@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface TrainerSubscriptionRepository extends JpaRepository<TrainerSubscription, Long> {
+public interface TrainerMembershipRepository extends JpaRepository<TrainerSubscription, Long> {
 
     Optional<TrainerSubscription> findByTrainerAndSubscriptionStatus(Trainer trainer, TrainerMembershipStatus subscriptionStatus);
 
