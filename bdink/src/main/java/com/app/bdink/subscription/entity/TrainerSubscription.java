@@ -70,22 +70,23 @@ public class TrainerSubscription extends BaseTimeEntity {
     public static TrainerSubscription create(Trainer trainer, SubscriptionPlan subscriptionPlan,
                                              LocalDate paymentDate, boolean autoRenew) {
         LocalDate expiredDate = paymentDate.plusMonths(subscriptionPlan.getBillingCycleMonths());
+        LocalDate nextBillingDate = expiredDate.plusDays(1);
         return TrainerSubscription.builder()
                 .trainer(trainer)
                 .subscriptionPlan(subscriptionPlan)
                 .subscriptionStatus(SubscriptionStatus.ACTIVE)
                 .startedDate(paymentDate)
-                .nextBillingDate(expiredDate)
+                .nextBillingDate(nextBillingDate)
                 .expiredDate(expiredDate)
                 .autoRenew(autoRenew)
                 .build();
     }
 
     public void renew(LocalDate paymentDate) {
-        // 정기결제 성공 시 결제일 기준으로 다음 청구일과 이용 만료일을 같이 갱신한다.
-        LocalDate nextPeriodDate = paymentDate.plusMonths(subscriptionPlan.getBillingCycleMonths());
-        this.nextBillingDate = nextPeriodDate;
-        this.expiredDate = nextPeriodDate;
+        // 이용 마지막 날과 다음 결제 필요일을 분리해 하루 차이로 관리한다.
+        LocalDate nextExpiredDate = paymentDate.plusMonths(subscriptionPlan.getBillingCycleMonths());
+        this.expiredDate = nextExpiredDate;
+        this.nextBillingDate = nextExpiredDate.plusDays(1);
         this.subscriptionStatus = SubscriptionStatus.ACTIVE;
         this.canceledDate = null;
     }
