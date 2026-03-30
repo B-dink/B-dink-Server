@@ -2,6 +2,7 @@ package com.app.bdink.trainer.service;
 
 import com.app.bdink.center.entity.Center;
 import com.app.bdink.center.service.CenterService;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
@@ -93,6 +94,34 @@ public class TrainerService {
     public Trainer getActiveTrainerByMemberId(Long memberId) {
         return trainerRepository.findByMemberIdAndStatus(memberId, TrainerStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_TRAINER, Error.NOT_FOUND_TRAINER.getMessage()));
+    }
+
+    /**
+     * 결제 완료 후 트레이너 구독 생성을 위해 최소 정보의 트레이너를 생성하거나 기존 활성 트레이너를 반환한다.
+     */
+    @Transactional
+    public Trainer getOrCreatePaidTrainer(Member member) {
+        Trainer existingTrainer = trainerRepository.findByMemberId(member.getId()).orElse(null);
+
+        if (existingTrainer != null) {
+            if (existingTrainer.getStatus() == TrainerStatus.INACTIVE) {
+                existingTrainer.updateCenter(null);
+                existingTrainer.update(member.getName(), Career.TRAINER, null, null);
+                existingTrainer.activate();
+            }
+            return existingTrainer;
+        }
+
+        Trainer trainer = Trainer.builder()
+                .center(null)
+                .member(member)
+                .name(member.getName())
+                .career(Career.TRAINER)
+                .intro(null)
+                .profileImage(null)
+                .build();
+
+        return trainerRepository.save(trainer);
     }
 
     /**

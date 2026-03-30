@@ -3,6 +3,9 @@ package com.app.bdink.subscription.controller;
 import com.app.bdink.common.util.CreateIdDto;
 import com.app.bdink.global.exception.Success;
 import com.app.bdink.global.template.RspTemplate;
+import com.app.bdink.member.entity.Member;
+import com.app.bdink.member.service.MemberService;
+import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.subscription.controller.dto.request.TrainerSubscriptionCancelRequest;
 import com.app.bdink.subscription.controller.dto.request.TrainerSubscriptionCreateRequest;
 import com.app.bdink.subscription.controller.dto.request.TrainerSubscriptionRenewRequest;
@@ -14,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -23,6 +27,8 @@ import java.util.List;
 public class TrainerSubscriptionController {
 
     private final TrainerSubscriptionService trainerSubscriptionService;
+    private final MemberUtilService memberUtilService;
+    private final MemberService memberService;
 
     @GetMapping("/plans")
     @Operation(method = "GET", description = "활성화된 구독 플랜 목록을 조회합니다.")
@@ -35,9 +41,12 @@ public class TrainerSubscriptionController {
 
     @PostMapping
     @Operation(method = "POST", description = "클라이언트 결제 완료 후 트레이너 구독을 생성합니다.")
-    public RspTemplate<?> createSubscription(@RequestBody TrainerSubscriptionCreateRequest request) {
-        String subscriptionId = trainerSubscriptionService.createSubscription(
-                request.trainerId(),
+    public RspTemplate<?> createSubscription(Principal principal,
+                                             @RequestBody TrainerSubscriptionCreateRequest request) {
+        Member member = memberService.findById(memberUtilService.getMemberId(principal));
+
+        String subscriptionId = trainerSubscriptionService.createSubscriptionForMember(
+                member,
                 request.subscriptionPlanId(),
                 request.paymentDate(),
                 request.autoRenew()

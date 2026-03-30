@@ -2,6 +2,7 @@ package com.app.bdink.subscription.service;
 
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
+import com.app.bdink.member.entity.Member;
 import com.app.bdink.subscription.entity.SubscriptionPlan;
 import com.app.bdink.subscription.entity.SubscriptionStatus;
 import com.app.bdink.subscription.entity.TrainerSubscription;
@@ -54,6 +55,21 @@ public class TrainerSubscriptionService {
     public TrainerSubscription createSubscription(Long trainerId, Long subscriptionPlanId,
                                                   LocalDate paymentDate, boolean autoRenew) {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
+        SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
+
+        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
+                .ifPresent(subscription -> {
+                    throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
+                });
+
+        TrainerSubscription subscription = TrainerSubscription.create(trainer, subscriptionPlan, paymentDate, autoRenew);
+        return trainerSubscriptionRepository.save(subscription);
+    }
+
+    @Transactional
+    public TrainerSubscription createSubscriptionForMember(Member member, Long subscriptionPlanId,
+                                                           LocalDate paymentDate, boolean autoRenew) {
+        Trainer trainer = trainerService.getOrCreatePaidTrainer(member);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
         trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
