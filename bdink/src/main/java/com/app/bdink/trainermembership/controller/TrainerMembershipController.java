@@ -6,9 +6,7 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
-import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCancelRequest;
 import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCreateRequest;
-import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipRenewRequest;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipPlanResponse;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipResponse;
 import com.app.bdink.trainermembership.service.TrainerMembershipService;
@@ -48,8 +46,7 @@ public class TrainerMembershipController {
         String membershipId = trainerMembershipService.createMembershipForMember(
                 member,
                 request.trainerMembershipPlanId(),
-                request.paymentDate(),
-                request.autoRenew()
+                request.paymentDate()
         ).getId().toString();
 
         return RspTemplate.success(Success.CREATE_TRAINER_MEMBERSHIP_SUCCESS, CreateIdDto.from(membershipId));
@@ -70,26 +67,6 @@ public class TrainerMembershipController {
         return RspTemplate.success(
                 Success.GET_TRAINER_MEMBERSHIP_SUCCESS,
                 TrainerMembershipResponse.from(trainerMembershipService.getActiveMembership(trainerId))
-        );
-    }
-
-    @PostMapping("/{id}/renew")
-    @Operation(method = "POST", description = "클라이언트 결제 완료 후 기존 멤버십의 결제일을 갱신합니다.")
-    public RspTemplate<?> renewMembership(@PathVariable Long id,
-                                          @RequestBody TrainerMembershipRenewRequest request) {
-        return RspTemplate.success(
-                Success.UPDATE_TRAINER_MEMBERSHIP_SUCCESS,
-                TrainerMembershipResponse.from(trainerMembershipService.renewMembership(id, request.paymentDate()))
-        );
-    }
-
-    @PostMapping("/{id}/cancel")
-    @Operation(method = "POST", description = "자동결제를 해지합니다.")
-    public RspTemplate<?> cancelMembership(@PathVariable Long id,
-                                           @RequestBody TrainerMembershipCancelRequest request) {
-        return RspTemplate.success(
-                Success.UPDATE_TRAINER_MEMBERSHIP_SUCCESS,
-                TrainerMembershipResponse.from(trainerMembershipService.cancelMembership(id, request.canceledDate()))
         );
     }
 }

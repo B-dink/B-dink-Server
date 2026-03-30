@@ -12,7 +12,6 @@ import com.app.bdink.trainer.entity.Trainer;
 import com.app.bdink.trainer.service.TrainerQrService;
 import com.app.bdink.trainer.service.TrainerService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class TrainerMembershipService {
 
@@ -55,7 +53,7 @@ public class TrainerMembershipService {
 
     @Transactional
     public TrainerMembership createMembership(Long trainerId, Long trainerMembershipPlanId,
-                                              LocalDate paymentDate, boolean autoRenew) {
+                                              LocalDate paymentDate) {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
         TrainerMembershipPlan trainerMembershipPlan = findPlanById(trainerMembershipPlanId);
 
@@ -64,13 +62,13 @@ public class TrainerMembershipService {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
 
-        TrainerMembership membership = TrainerMembership.create(trainer, trainerMembershipPlan, paymentDate, autoRenew);
+        TrainerMembership membership = TrainerMembership.create(trainer, trainerMembershipPlan, paymentDate);
         return trainerMembershipRepository.save(membership);
     }
 
     @Transactional
     public TrainerMembership createMembershipForMember(Member member, Long trainerMembershipPlanId,
-                                                       LocalDate paymentDate, boolean autoRenew) {
+                                                       LocalDate paymentDate) {
         Trainer trainer = trainerService.getOrCreatePaidTrainer(member);
         trainerQrService.ensureTrainerQr(trainer);
         TrainerMembershipPlan trainerMembershipPlan = findPlanById(trainerMembershipPlanId);
@@ -80,22 +78,8 @@ public class TrainerMembershipService {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
 
-        TrainerMembership membership = TrainerMembership.create(trainer, trainerMembershipPlan, paymentDate, autoRenew);
+        TrainerMembership membership = TrainerMembership.create(trainer, trainerMembershipPlan, paymentDate);
         return trainerMembershipRepository.save(membership);
-    }
-
-    @Transactional
-    public TrainerMembership renewMembership(Long membershipId, LocalDate paymentDate) {
-        TrainerMembership membership = findById(membershipId);
-        membership.renew(paymentDate);
-        return membership;
-    }
-
-    @Transactional
-    public TrainerMembership cancelMembership(Long membershipId, LocalDate canceledDate) {
-        TrainerMembership membership = findById(membershipId);
-        membership.cancel(canceledDate);
-        return membership;
     }
 
     @Transactional
@@ -103,20 +87,6 @@ public class TrainerMembershipService {
         TrainerMembership membership = findById(membershipId);
         membership.expire(expiredDate);
         return membership;
-    }
-
-    @Transactional
-    public TrainerMembership markMembershipPaymentFailed(Long membershipId) {
-        TrainerMembership membership = findById(membershipId);
-        membership.markPaymentFailed();
-        return membership;
-    }
-
-    @Transactional(readOnly = true)
-    public List<TrainerMembership> getBillingDueMemberships(LocalDate date) {
-        return trainerMembershipRepository.findAllByTrainerMembershipStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
-                TrainerMembershipStatus.ACTIVE, date
-        );
     }
 
     @Transactional(readOnly = true)
@@ -127,26 +97,11 @@ public class TrainerMembershipService {
     }
 
     @Transactional
-    public void processRecurringMembershipBilling(LocalDate today) {
-        List<TrainerMembership> dueMemberships = getBillingDueMemberships(today);
-
-        // 실제 정기결제 연동 전까지는 청구 대상만 로그로 남긴다.
-        for (TrainerMembership membership : dueMemberships) {
-            log.info("Recurring membership billing due. membershipId={}, trainerId={}, nextBillingDate={}",
-                    membership.getId(), membership.getTrainer().getId(), membership.getNextBillingDate());
-        }
-    }
-
-    @Transactional
     public void expireDueMemberships(LocalDate today) {
         List<TrainerMembership> expiredMemberships = getExpiredMemberships(today);
 
         for (TrainerMembership membership : expiredMemberships) {
             membership.expire(membership.getExpiredDate());
-        }
-
-        if (!expiredMemberships.isEmpty()) {
-            log.info("Expired trainer memberships updated: {}", expiredMemberships.size());
         }
     }
 }

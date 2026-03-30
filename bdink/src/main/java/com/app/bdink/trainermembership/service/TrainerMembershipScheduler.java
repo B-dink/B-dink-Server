@@ -20,9 +20,7 @@ public class TrainerMembershipScheduler {
     public void processMemberships() {
         LocalDate today = LocalDate.now();
 
-        // 자동결제 대상 조회 및 처리
-        trainerMembershipService.processRecurringMembershipBilling(today);
-        // 만료일이 지난 구독 상태 정리
+        // 만료일이 지난 멤버십 상태만 정리한다.
         trainerMembershipService.expireDueMemberships(today);
 
         log.info("Trainer membership scheduler executed. date={}", today);

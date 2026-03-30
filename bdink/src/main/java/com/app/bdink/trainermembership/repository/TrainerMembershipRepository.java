@@ -13,9 +13,5 @@ public interface TrainerMembershipRepository extends JpaRepository<TrainerMember
 
     Optional<TrainerMembership> findByTrainerAndTrainerMembershipStatus(Trainer trainer, TrainerMembershipStatus trainerMembershipStatus);
 
-    List<TrainerMembership> findAllByTrainerMembershipStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
-            TrainerMembershipStatus trainerMembershipStatus, LocalDate date
-    );
-
     List<TrainerMembership> findAllByExpiredDateBeforeAndTrainerMembershipStatus(LocalDate date, TrainerMembershipStatus trainerMembershipStatus);
 }

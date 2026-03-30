@@ -13,10 +13,7 @@ public record TrainerMembershipResponse(
         Integer price,
         String trainerMembershipStatus,
         LocalDate startedDate,
-        LocalDate nextBillingDate,
-        LocalDate expiredDate,
-        boolean autoRenew,
-        LocalDate canceledDate
+        LocalDate expiredDate
 ) {
     public static TrainerMembershipResponse from(TrainerMembership membership) {
         return new TrainerMembershipResponse(
@@ -28,10 +25,7 @@ public record TrainerMembershipResponse(
                 membership.getTrainerMembershipPlan().getPrice(),
                 membership.getTrainerMembershipStatus().name(),
                 membership.getStartedDate(),
-                membership.getNextBillingDate(),
-                membership.getExpiredDate(),
-                membership.isAutoRenew(),
-                membership.getCanceledDate()
+                membership.getExpiredDate()
         );
     }
 }
