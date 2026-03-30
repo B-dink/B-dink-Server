@@ -28,7 +28,7 @@ public class Trainer extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "center_id", nullable = false)
+    @JoinColumn(name = "center_id")
     private Center center;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -58,6 +58,7 @@ public class Trainer extends BaseTimeEntity {
 
     @Builder
     public Trainer(Center center, Member member, String name, Career career, String intro, String profileImage) {
+        // 결제 완료 직후 자동 생성되는 트레이너는 센터 없이 생성될 수 있다.
         this.center = center;
         this.member = member;
         this.name = name;
