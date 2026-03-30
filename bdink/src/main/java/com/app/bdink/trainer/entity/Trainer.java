@@ -51,6 +51,9 @@ public class Trainer extends BaseTimeEntity {
     @Column(name = "qrToken")
     private String qrToken;
 
+    @Column(name = "qrImageUrl")
+    private String qrImageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     // soft delete용 상태값
@@ -91,6 +94,14 @@ public class Trainer extends BaseTimeEntity {
      */
     public void updateQrToken(String qrToken) {
         this.qrToken = qrToken;
+    }
+
+    /**
+     * 트레이너 QR 검증 토큰과 QR 이미지 주소를 함께 갱신한다.
+     */
+    public void updateQrInfo(String qrToken, String qrImageUrl) {
+        this.qrToken = qrToken;
+        this.qrImageUrl = qrImageUrl;
     }
 
     /**
