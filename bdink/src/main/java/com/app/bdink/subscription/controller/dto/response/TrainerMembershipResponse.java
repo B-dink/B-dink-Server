@@ -4,22 +4,22 @@ import com.app.bdink.subscription.entity.TrainerSubscription;
 
 import java.time.LocalDate;
 
-public record TrainerSubscriptionResponse(
+public record TrainerMembershipResponse(
         Long id,
         Long trainerId,
         Long subscriptionPlanId,
         String subscriptionPlanName,
         Integer billingCycleMonths,
         Integer price,
-        String subscriptionStatus,
+        String trainerMembershipStatus,
         LocalDate startedDate,
         LocalDate nextBillingDate,
         LocalDate expiredDate,
         boolean autoRenew,
         LocalDate canceledDate
 ) {
-    public static TrainerSubscriptionResponse from(TrainerSubscription subscription) {
-        return new TrainerSubscriptionResponse(
+    public static TrainerMembershipResponse from(TrainerSubscription subscription) {
+        return new TrainerMembershipResponse(
                 subscription.getId(),
                 subscription.getTrainer().getId(),
                 subscription.getSubscriptionPlan().getId(),

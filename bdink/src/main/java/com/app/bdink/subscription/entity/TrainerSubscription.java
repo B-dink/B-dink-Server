@@ -37,7 +37,7 @@ public class TrainerSubscription extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private SubscriptionStatus subscriptionStatus;
+    private TrainerMembershipStatus subscriptionStatus;
 
     @Column(nullable = false)
     private LocalDate startedDate;
@@ -54,12 +54,12 @@ public class TrainerSubscription extends BaseTimeEntity {
     private LocalDate canceledDate;
 
     @Builder
-    public TrainerSubscription(Trainer trainer, SubscriptionPlan subscriptionPlan, SubscriptionStatus subscriptionStatus,
+    public TrainerSubscription(Trainer trainer, SubscriptionPlan subscriptionPlan, TrainerMembershipStatus subscriptionStatus,
                                LocalDate startedDate, LocalDate nextBillingDate, LocalDate expiredDate,
                                boolean autoRenew, LocalDate canceledDate) {
         this.trainer = trainer;
         this.subscriptionPlan = subscriptionPlan;
-        this.subscriptionStatus = subscriptionStatus == null ? SubscriptionStatus.ACTIVE : subscriptionStatus;
+        this.subscriptionStatus = subscriptionStatus == null ? TrainerMembershipStatus.ACTIVE : subscriptionStatus;
         this.startedDate = startedDate;
         this.nextBillingDate = nextBillingDate;
         this.expiredDate = expiredDate;
@@ -74,7 +74,7 @@ public class TrainerSubscription extends BaseTimeEntity {
         return TrainerSubscription.builder()
                 .trainer(trainer)
                 .subscriptionPlan(subscriptionPlan)
-                .subscriptionStatus(SubscriptionStatus.ACTIVE)
+                .subscriptionStatus(TrainerMembershipStatus.ACTIVE)
                 .startedDate(paymentDate)
                 .nextBillingDate(nextBillingDate)
                 .expiredDate(expiredDate)
@@ -87,29 +87,29 @@ public class TrainerSubscription extends BaseTimeEntity {
         LocalDate nextExpiredDate = paymentDate.plusMonths(subscriptionPlan.getBillingCycleMonths());
         this.expiredDate = nextExpiredDate;
         this.nextBillingDate = nextExpiredDate.plusDays(1);
-        this.subscriptionStatus = SubscriptionStatus.ACTIVE;
+        this.subscriptionStatus = TrainerMembershipStatus.ACTIVE;
         this.canceledDate = null;
     }
 
     public void cancel(LocalDate canceledDate) {
-        this.subscriptionStatus = SubscriptionStatus.CANCELED;
+        this.subscriptionStatus = TrainerMembershipStatus.CANCELED;
         this.autoRenew = false;
         this.canceledDate = canceledDate;
     }
 
     public void expire(LocalDate expiredDate) {
-        this.subscriptionStatus = SubscriptionStatus.EXPIRED;
+        this.subscriptionStatus = TrainerMembershipStatus.EXPIRED;
         this.expiredDate = expiredDate;
         this.autoRenew = false;
     }
 
     public void markPaymentFailed() {
-        this.subscriptionStatus = SubscriptionStatus.PAYMENT_FAILED;
+        this.subscriptionStatus = TrainerMembershipStatus.PAYMENT_FAILED;
     }
 
     public boolean isBillingDue(LocalDate today) {
         return autoRenew
-                && subscriptionStatus == SubscriptionStatus.ACTIVE
+                && subscriptionStatus == TrainerMembershipStatus.ACTIVE
                 && !nextBillingDate.isAfter(today);
     }
 }

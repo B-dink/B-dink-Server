@@ -1,6 +1,6 @@
 package com.app.bdink.subscription.entity;
 
-public enum SubscriptionStatus {
+public enum TrainerMembershipStatus {
     ACTIVE,
     CANCELED,
     EXPIRED,

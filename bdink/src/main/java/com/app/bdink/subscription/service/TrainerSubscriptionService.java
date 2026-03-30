@@ -4,7 +4,7 @@ import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.subscription.entity.SubscriptionPlan;
-import com.app.bdink.subscription.entity.SubscriptionStatus;
+import com.app.bdink.subscription.entity.TrainerMembershipStatus;
 import com.app.bdink.subscription.entity.TrainerSubscription;
 import com.app.bdink.subscription.repository.SubscriptionPlanRepository;
 import com.app.bdink.subscription.repository.TrainerSubscriptionRepository;
@@ -49,7 +49,7 @@ public class TrainerSubscriptionService {
     @Transactional(readOnly = true)
     public TrainerSubscription getActiveSubscription(Long trainerId) {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
-        return trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
+        return trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
     }
 
@@ -59,7 +59,7 @@ public class TrainerSubscriptionService {
         Trainer trainer = trainerService.getActiveTrainer(trainerId);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
-        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
+        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .ifPresent(subscription -> {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
@@ -75,7 +75,7 @@ public class TrainerSubscriptionService {
         trainerQrService.ensureTrainerQr(trainer);
         SubscriptionPlan subscriptionPlan = findPlanById(subscriptionPlanId);
 
-        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, SubscriptionStatus.ACTIVE)
+        trainerSubscriptionRepository.findByTrainerAndSubscriptionStatus(trainer, TrainerMembershipStatus.ACTIVE)
                 .ifPresent(subscription -> {
                     throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
                 });
@@ -115,14 +115,14 @@ public class TrainerSubscriptionService {
     @Transactional(readOnly = true)
     public List<TrainerSubscription> getBillingDueSubscriptions(LocalDate date) {
         return trainerSubscriptionRepository.findAllBySubscriptionStatusAndAutoRenewTrueAndNextBillingDateLessThanEqual(
-                SubscriptionStatus.ACTIVE, date
+                TrainerMembershipStatus.ACTIVE, date
         );
     }
 
     @Transactional(readOnly = true)
     public List<TrainerSubscription> getExpiredSubscriptions(LocalDate date) {
         return trainerSubscriptionRepository.findAllByExpiredDateBeforeAndSubscriptionStatus(
-                date, SubscriptionStatus.ACTIVE
+                date, TrainerMembershipStatus.ACTIVE
         );
     }
 

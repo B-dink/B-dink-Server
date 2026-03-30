@@ -2,7 +2,7 @@ package com.app.bdink.subscription.controller.dto.request;
 
 import java.time.LocalDate;
 
-public record TrainerSubscriptionRenewRequest(
-        LocalDate paymentDate
+public record TrainerMembershipCancelRequest(
+        LocalDate canceledDate
 ) {
 }
