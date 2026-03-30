@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "trainer_subscription",
+        name = "trainer_membership",
         indexes = {
-                @Index(name = "idx_trainer_subscription_next_billing_date", columnList = "nextBillingDate"),
-                @Index(name = "idx_trainer_subscription_expired_date", columnList = "expiredDate")
+                @Index(name = "idx_trainer_membership_next_billing_date", columnList = "nextBillingDate"),
+                @Index(name = "idx_trainer_membership_expired_date", columnList = "expiredDate")
         }
 )
 public class TrainerMembership extends BaseTimeEntity {
@@ -32,11 +32,11 @@ public class TrainerMembership extends BaseTimeEntity {
     private Trainer trainer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subscription_plan_id", nullable = false)
+    @JoinColumn(name = "trainer_membership_plan_id", nullable = false)
     private TrainerMembershipPlan trainerMembershipPlan;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(name = "trainer_membership_status", nullable = false, length = 30)
     private TrainerMembershipStatus trainerMembershipStatus;
 
     @Column(nullable = false)
