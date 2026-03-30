@@ -28,7 +28,7 @@ public class Trainer extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "center_id", nullable = false)
+    @JoinColumn(name = "center_id")
     private Center center;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -51,6 +51,9 @@ public class Trainer extends BaseTimeEntity {
     @Column(name = "qrToken")
     private String qrToken;
 
+    @Column(name = "qrImageUrl")
+    private String qrImageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     // soft delete용 상태값
@@ -58,6 +61,7 @@ public class Trainer extends BaseTimeEntity {
 
     @Builder
     public Trainer(Center center, Member member, String name, Career career, String intro, String profileImage) {
+        // 결제 완료 직후 자동 생성되는 트레이너는 센터 없이 생성될 수 있다.
         this.center = center;
         this.member = member;
         this.name = name;
@@ -90,6 +94,14 @@ public class Trainer extends BaseTimeEntity {
      */
     public void updateQrToken(String qrToken) {
         this.qrToken = qrToken;
+    }
+
+    /**
+     * 트레이너 QR 검증 토큰과 QR 이미지 주소를 함께 갱신한다.
+     */
+    public void updateQrInfo(String qrToken, String qrImageUrl) {
+        this.qrToken = qrToken;
+        this.qrImageUrl = qrImageUrl;
     }
 
     /**

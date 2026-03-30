@@ -2,6 +2,7 @@ package com.app.bdink.trainer.service;
 
 import com.app.bdink.center.entity.Center;
 import com.app.bdink.center.service.CenterService;
+import com.app.bdink.classroom.domain.Career;
 import com.app.bdink.global.exception.CustomException;
 import com.app.bdink.global.exception.Error;
 import com.app.bdink.member.entity.Member;
@@ -10,6 +11,7 @@ import com.app.bdink.notification.entity.NotificationType;
 import com.app.bdink.notification.service.NotificationFactory;
 import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
+import com.app.bdink.trainer.controller.dto.request.TrainerProfileCompleteRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
 import com.app.bdink.trainer.controller.dto.response.TrainerResponse;
@@ -96,6 +98,34 @@ public class TrainerService {
     }
 
     /**
+     * 결제 완료 후 트레이너 구독 생성을 위해 최소 정보의 트레이너를 생성하거나 기존 활성 트레이너를 반환한다.
+     */
+    @Transactional
+    public Trainer getOrCreatePaidTrainer(Member member) {
+        Trainer existingTrainer = trainerRepository.findByMemberId(member.getId()).orElse(null);
+
+        if (existingTrainer != null) {
+            if (existingTrainer.getStatus() == TrainerStatus.INACTIVE) {
+                existingTrainer.updateCenter(null);
+                existingTrainer.update(member.getName(), Career.TRAINER, null, null);
+                existingTrainer.activate();
+            }
+            return existingTrainer;
+        }
+
+        Trainer trainer = Trainer.builder()
+                .center(null)
+                .member(member)
+                .name(member.getName())
+                .career(Career.TRAINER)
+                .intro(null)
+                .profileImage(null)
+                .build();
+
+        return trainerRepository.save(trainer);
+    }
+
+    /**
      * 센터 기준 활성 트레이너 목록을 조회한다.
      */
     @Transactional(readOnly = true)
@@ -121,6 +151,20 @@ public class TrainerService {
     public TrainerResponse updateTrainer(Long id, TrainerUpdateRequest request, String profileImageKey) {
         Trainer trainer = getActiveTrainer(id);
         trainer.update(request.name(), request.career(), request.intro(), profileImageKey);
+        return TrainerResponse.from(trainer);
+    }
+
+    /**
+     * 결제 후 자동 생성된 트레이너의 프로필을 보완한다.
+     */
+    @Transactional
+    public TrainerResponse completeTrainerProfile(Long memberId, TrainerProfileCompleteRequest request, String profileImageKey) {
+        Trainer trainer = getActiveTrainerByMemberId(memberId);
+        Center center = centerService.findById(request.centerId());
+
+        trainer.updateCenter(center);
+        trainer.update(trainer.getName(), Career.TRAINER, request.intro(), profileImageKey);
+
         return TrainerResponse.from(trainer);
     }
 

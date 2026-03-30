@@ -59,6 +59,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:bom:2.21.0'
 	implementation 'software.amazon.awssdk:s3:2.21.0'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.9'
+	implementation 'com.google.zxing:core:3.5.3'
+	implementation 'com.google.zxing:javase:3.5.3'
 
 	// firebase admin sdk
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
