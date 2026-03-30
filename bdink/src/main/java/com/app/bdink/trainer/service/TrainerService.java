@@ -11,6 +11,7 @@ import com.app.bdink.notification.entity.NotificationType;
 import com.app.bdink.notification.service.NotificationFactory;
 import com.app.bdink.notification.service.NotificationService;
 import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
+import com.app.bdink.trainer.controller.dto.request.TrainerProfileCompleteRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
 import com.app.bdink.trainer.controller.dto.response.TrainerResponse;
@@ -150,6 +151,20 @@ public class TrainerService {
     public TrainerResponse updateTrainer(Long id, TrainerUpdateRequest request, String profileImageKey) {
         Trainer trainer = getActiveTrainer(id);
         trainer.update(request.name(), request.career(), request.intro(), profileImageKey);
+        return TrainerResponse.from(trainer);
+    }
+
+    /**
+     * 결제 후 자동 생성된 트레이너의 프로필을 보완한다.
+     */
+    @Transactional
+    public TrainerResponse completeTrainerProfile(Long memberId, TrainerProfileCompleteRequest request, String profileImageKey) {
+        Trainer trainer = getActiveTrainerByMemberId(memberId);
+        Center center = centerService.findById(request.centerId());
+
+        trainer.updateCenter(center);
+        trainer.update(trainer.getName(), Career.TRAINER, request.intro(), profileImageKey);
+
         return TrainerResponse.from(trainer);
     }
 
