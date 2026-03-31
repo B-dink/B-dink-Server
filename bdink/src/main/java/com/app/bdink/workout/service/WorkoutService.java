@@ -505,7 +505,7 @@ public class WorkoutService {
         for (int i = 0; i < ranking.size(); i++) {
             MemberVolumeRankingDto dto = ranking.get(i);
             if (dto.memberId().equals(member.getId())) {
-                rank = i+1;                 // 리스트는 0부터
+                rank = i+200;                 // 기획에 따라 + 200 진행
                 break;
             }
         }
