@@ -7,9 +7,12 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCreateRequest;
+import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipQrInfoResponse;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipPlanResponse;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipResponse;
 import com.app.bdink.trainermembership.service.TrainerMembershipService;
+import com.app.bdink.trainer.entity.Trainer;
+import com.app.bdink.trainer.service.TrainerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import java.util.List;
 public class TrainerMembershipController {
 
     private final TrainerMembershipService trainerMembershipService;
+    private final TrainerService trainerService;
     private final MemberUtilService memberUtilService;
     private final MemberService memberService;
 
@@ -67,6 +71,18 @@ public class TrainerMembershipController {
         return RspTemplate.success(
                 Success.GET_TRAINER_MEMBERSHIP_SUCCESS,
                 TrainerMembershipResponse.from(trainerMembershipService.getActiveMembership(trainerId))
+        );
+    }
+
+    @GetMapping("/me/qr-info")
+    @Operation(method = "GET", description = "현재 로그인한 트레이너의 QR 이미지 주소와 멤버십 만료일을 조회합니다.")
+    public RspTemplate<?> getMyMembershipQrInfo(Principal principal) {
+        Long memberId = memberUtilService.getMemberId(principal);
+        Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
+
+        return RspTemplate.success(
+                Success.GET_TRAINER_MEMBERSHIP_SUCCESS,
+                TrainerMembershipQrInfoResponse.from(trainer, trainerMembershipService.getMyActiveMembership(memberId))
         );
     }
 }

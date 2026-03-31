@@ -51,6 +51,13 @@ public class TrainerMembershipService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
     }
 
+    @Transactional(readOnly = true)
+    public TrainerMembership getMyActiveMembership(Long memberId) {
+        Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
+        return trainerMembershipRepository.findByTrainerAndTrainerMembershipStatus(trainer, TrainerMembershipStatus.ACTIVE)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND, Error.NOT_FOUND.getMessage()));
+    }
+
     @Transactional
     public TrainerMembership createMembership(Long trainerId, Long trainerMembershipPlanId,
                                               LocalDate paymentDate) {
