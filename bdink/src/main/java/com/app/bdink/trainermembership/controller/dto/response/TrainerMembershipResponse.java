@@ -1,0 +1,31 @@
+package com.app.bdink.trainermembership.controller.dto.response;
+
+import com.app.bdink.trainermembership.entity.TrainerMembership;
+
+import java.time.LocalDate;
+
+public record TrainerMembershipResponse(
+        Long id,
+        Long trainerId,
+        Long trainerMembershipPlanId,
+        String trainerMembershipPlanName,
+        Integer billingCycleMonths,
+        Integer price,
+        String trainerMembershipStatus,
+        LocalDate startedDate,
+        LocalDate expiredDate
+) {
+    public static TrainerMembershipResponse from(TrainerMembership membership) {
+        return new TrainerMembershipResponse(
+                membership.getId(),
+                membership.getTrainer().getId(),
+                membership.getTrainerMembershipPlan().getId(),
+                membership.getTrainerMembershipPlan().getName(),
+                membership.getTrainerMembershipPlan().getBillingCycleMonths(),
+                membership.getTrainerMembershipPlan().getPrice(),
+                membership.getTrainerMembershipStatus().name(),
+                membership.getStartedDate(),
+                membership.getExpiredDate()
+        );
+    }
+}
