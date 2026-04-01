@@ -290,6 +290,24 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
             throw new PaymentFailedException(Error.INVALID_RECEIPT, "No purchase data found in receipt");
         }
 
+        log.debug("Apple receipt in_app details: {}",
+                inAppPurchases.stream()
+                        .map(purchase -> String.format("{transactionId=%s, productId=%s, originalTransactionId=%s, purchaseDateMs=%s}",
+                                purchase.getTransactionId(),
+                                purchase.getProductId(),
+                                purchase.getOriginalTransactionId(),
+                                purchase.getPurchaseDateMs()))
+                        .toList());
+
+        log.debug("Apple receipt latest_receipt_info details: {}",
+                latestReceiptInfo.stream()
+                        .map(purchase -> String.format("{transactionId=%s, productId=%s, originalTransactionId=%s, purchaseDateMs=%s}",
+                                purchase.getTransactionId(),
+                                purchase.getProductId(),
+                                purchase.getOriginalTransactionId(),
+                                purchase.getPurchaseDateMs()))
+                        .toList());
+
         InAppPurchase inAppPurchase = Stream.concat(inAppPurchases.stream(), latestReceiptInfo.stream())
                 .filter(purchase -> request.transactionId().equals(purchase.getTransactionId()))
                 .findFirst()
