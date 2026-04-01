@@ -162,17 +162,8 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                         Error.PRODUCT_NOT_AVAILABLE.getMessage() + productId);
             }
 
-            // 2. 구매 이력도 락으로 체크
-            log.debug("Checking existing purchases with lock - memberId: {}, productId: {}", memberId, productId);
-            boolean existingPurchases = applePurchaseHistoryRepository.findByUserIdAndProductIdWithLock(memberId, productId);
-
-            if (existingPurchases) {
-                log.warn("Duplicate purchase attempt detected - memberId: {}, productId: {}", memberId, productId);
-                throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
-                        Error.DUPLICATE_PURCHASE.getMessage() + productId);
-            }
-
-            log.debug("No existing purchases found - memberId: {}, productId: {}", memberId, productId);
+            // 단발성 재구매는 허용하므로 userId + productId 기준의 사전 차단은 하지 않는다.
+            log.debug("Product lock check completed - memberId: {}, productId: {}", memberId, productId);
             return product;
 
         } catch (PessimisticLockingFailureException e) {
@@ -323,6 +314,14 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
         log.debug("Saving purchase history - memberId: {}, productId: {}, transactionId: {}, originalTransactionId: {}",
                 memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
 
+        applePurchaseHistoryRepository.findByUserIdAndTransactionId(memberId, inAppPurchase.getTransactionId())
+                .ifPresent(existing -> {
+                    log.warn("Duplicate purchase detected before save - memberId: {}, transactionId: {}",
+                            memberId, inAppPurchase.getTransactionId());
+                    throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
+                            "This purchase has already been processed: " + inAppPurchase.getTransactionId());
+                });
+
         try {
             ApplePurchaseHistory applePurchaseHistory = ApplePurchaseHistory.createPurchase(
                     memberId,
@@ -347,30 +346,23 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                 memberId, inAppPurchase.getProductId(), inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId());
 
         ApplePurchaseHistory existing = applePurchaseHistoryRepository
-                .findByUserIdAndOriginalTransactionIdAndProductId(
-                        memberId, inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId())
+                .findByUserIdAndTransactionId(memberId, inAppPurchase.getTransactionId())
                 .orElseThrow(() -> {
-                    log.error("Constraint violation but no existing record found - memberId: {}, originalTransactionId: {}, productId: {}",
-                            memberId, inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId());
+                    log.error("Constraint violation but no existing transaction found - memberId: {}, transactionId: {}, originalTransactionId: {}, productId: {}",
+                            memberId, inAppPurchase.getTransactionId(), inAppPurchase.getOriginalTransactionId(), inAppPurchase.getProductId());
                     return new PaymentFailedException(Error.INTERNAL_SERVER_ERROR,
-                            "Constraint violation but no existing record found");
+                            "Constraint violation but no existing transaction found");
                 });
 
         log.debug("Found existing purchase - memberId: {}, existingTransactionId: {}, newTransactionId: {}",
                 memberId, existing.getTransactionId(), inAppPurchase.getTransactionId());
 
-        // 중복 결제 상황
         if (existing.getTransactionId().equals(inAppPurchase.getTransactionId())) {
             log.warn("Duplicate purchase detected - memberId: {}, transactionId: {}",
                     memberId, inAppPurchase.getTransactionId());
             throw new PaymentFailedException(Error.DUPLICATE_PURCHASE,
                     "This purchase has already been processed: " + inAppPurchase.getTransactionId());
         }
-
-        // 복원 상황
-        log.info("Purchase restoration detected - memberId: {}, productId: {}, originalTransactionId: {}, existingTransactionId: {}, newTransactionId: {}",
-                memberId, inAppPurchase.getProductId(), inAppPurchase.getOriginalTransactionId(),
-                existing.getTransactionId(), inAppPurchase.getTransactionId());
     }
 
     private PurchaseResponse createSuccessResponse(String transactionId) {
