@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -273,18 +274,31 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
                 request.productId(), request.transactionId());
 
         AppleReceipt receipt = appleReceiptResponse.getReceipt();
+        List<InAppPurchase> inAppPurchases = receipt != null && receipt.getInApp() != null
+                ? receipt.getInApp()
+                : List.of();
+        List<InAppPurchase> latestReceiptInfo = appleReceiptResponse.getLatestReceiptInfo() != null
+                ? appleReceiptResponse.getLatestReceiptInfo()
+                : List.of();
 
-        if (receipt.getInApp() == null || receipt.getInApp().isEmpty()) {
-            log.error("No in-app purchase data found in receipt - requestedProductId: {}", request.productId());
-            throw new PaymentFailedException(Error.INVALID_RECEIPT, "No in-app purchase data found in receipt");
+        log.debug("Apple receipt purchase sources - inAppCount: {}, latestReceiptInfoCount: {}",
+                inAppPurchases.size(), latestReceiptInfo.size());
+
+        if (inAppPurchases.isEmpty() && latestReceiptInfo.isEmpty()) {
+            log.error("No purchase data found in receipt - requestedProductId: {}, requestedTransactionId: {}",
+                    request.productId(), request.transactionId());
+            throw new PaymentFailedException(Error.INVALID_RECEIPT, "No purchase data found in receipt");
         }
 
-        InAppPurchase inAppPurchase = receipt.getInApp().stream()
+        InAppPurchase inAppPurchase = Stream.concat(inAppPurchases.stream(), latestReceiptInfo.stream())
                 .filter(purchase -> request.transactionId().equals(purchase.getTransactionId()))
                 .findFirst()
                 .orElseThrow(() -> {
-                    log.error("No matching transaction found in receipt - requestedTransactionId: {}, requestedProductId: {}",
-                            request.transactionId(), request.productId());
+                    log.error("No matching transaction found in receipt - requestedTransactionId: {}, requestedProductId: {}, inAppTransactionIds: {}, latestReceiptTransactionIds: {}",
+                            request.transactionId(),
+                            request.productId(),
+                            inAppPurchases.stream().map(InAppPurchase::getTransactionId).toList(),
+                            latestReceiptInfo.stream().map(InAppPurchase::getTransactionId).toList());
                     return new PaymentFailedException(Error.INVALID_RECEIPT,
                             String.format("No matching transaction found in receipt. requestedTransactionId: %s",
                                     request.transactionId()));
