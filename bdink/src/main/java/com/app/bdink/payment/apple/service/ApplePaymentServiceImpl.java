@@ -278,7 +278,8 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
     }
 
     private InAppPurchase getInAppPurchase(PurchaseRequest request, AppleReceiptResponse appleReceiptResponse) {
-        log.debug("Extracting in-app purchase data from receipt - requestedProductId: {}", request.productId());
+        log.debug("Extracting in-app purchase data from receipt - requestedProductId: {}, requestedTransactionId: {}",
+                request.productId(), request.transactionId());
 
         AppleReceipt receipt = appleReceiptResponse.getReceipt();
 
@@ -287,7 +288,17 @@ public class ApplePaymentServiceImpl implements ApplePaymentService {
             throw new PaymentFailedException(Error.INVALID_RECEIPT, "No in-app purchase data found in receipt");
         }
 
-        InAppPurchase inAppPurchase = receipt.getInApp().get(0);
+        InAppPurchase inAppPurchase = receipt.getInApp().stream()
+                .filter(purchase -> request.transactionId().equals(purchase.getTransactionId()))
+                .findFirst()
+                .orElseThrow(() -> {
+                    log.error("No matching transaction found in receipt - requestedTransactionId: {}, requestedProductId: {}",
+                            request.transactionId(), request.productId());
+                    return new PaymentFailedException(Error.INVALID_RECEIPT,
+                            String.format("No matching transaction found in receipt. requestedTransactionId: %s",
+                                    request.transactionId()));
+                });
+
         log.debug("In-app purchase data extracted - receiptProductId: {}, transactionId: {}",
                 inAppPurchase.getProductId(), inAppPurchase.getTransactionId());
 
