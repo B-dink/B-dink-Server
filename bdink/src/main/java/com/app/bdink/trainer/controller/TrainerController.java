@@ -11,6 +11,7 @@ import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
 import com.app.bdink.trainer.controller.dto.request.TrainerCreateRequest;
+import com.app.bdink.trainer.controller.dto.request.TrainerProfileCompleteRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrTokenUpdateRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerQrVerifyRequest;
 import com.app.bdink.trainer.controller.dto.request.TrainerUpdateRequest;
@@ -106,6 +107,22 @@ public class TrainerController {
         }
 
         TrainerResponse response = trainerService.updateTrainer(id, request, profileImageKey);
+        return RspTemplate.success(Success.UPDATE_TRAINER_SUCCESS, response);
+    }
+
+    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(method = "PUT", description = "결제 후 자동 생성된 트레이너의 프로필 정보를 보완합니다.")
+    public RspTemplate<?> completeTrainerProfile(Principal principal,
+                                                 @RequestPart(value = "trainerProfileDto") TrainerProfileCompleteRequest request,
+                                                 @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        Long memberId = memberUtilService.getMemberId(principal);
+
+        String profileImageKey = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageKey = s3Service.uploadImageOrMedia("image/", profileImage);
+        }
+
+        TrainerResponse response = trainerService.completeTrainerProfile(memberId, request, profileImageKey);
         return RspTemplate.success(Success.UPDATE_TRAINER_SUCCESS, response);
     }
 

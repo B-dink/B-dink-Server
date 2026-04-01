@@ -20,7 +20,7 @@ public record TrainerResponse(
     public static TrainerResponse from(Trainer trainer) {
         return new TrainerResponse(
                 trainer.getId(),
-                trainer.getCenter().getId(),
+                trainer.getCenter() != null ? trainer.getCenter().getId() : null,
                 trainer.getMember().getId(),
                 trainer.getName(),
                 trainer.getCareer(),

@@ -1,0 +1,17 @@
+package com.app.bdink.trainermembership.repository;
+
+import com.app.bdink.trainermembership.entity.TrainerMembershipStatus;
+import com.app.bdink.trainermembership.entity.TrainerMembership;
+import com.app.bdink.trainer.entity.Trainer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+public interface TrainerMembershipRepository extends JpaRepository<TrainerMembership, Long> {
+
+    Optional<TrainerMembership> findByTrainerAndTrainerMembershipStatus(Trainer trainer, TrainerMembershipStatus trainerMembershipStatus);
+
+    List<TrainerMembership> findAllByExpiredDateBeforeAndTrainerMembershipStatus(LocalDate date, TrainerMembershipStatus trainerMembershipStatus);
+}
