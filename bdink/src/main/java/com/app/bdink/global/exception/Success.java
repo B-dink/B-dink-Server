@@ -119,6 +119,7 @@ public enum Success {
 
     UPDATE_INSTRUCTOR_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),
     UPDATE_TRAINER_SUCCESS(HttpStatus.OK, "트레이너 수정 성공"),
+    UPDATE_TRAINER_PROFILE_SUCCESS(HttpStatus.OK, "트레이너 수정 성공"),
     UPDATE_CENTER_OWNER_SUCCESS(HttpStatus.OK, "센터장 수정 성공"),
     UPDATE_TRAINER_MEMBER_SUCCESS(HttpStatus.OK, "트레이너 소속 멤버 수정 성공"),
     UPDATE_ANSWER_SUCCESS(HttpStatus.OK, "강사정보 수정 성공"),

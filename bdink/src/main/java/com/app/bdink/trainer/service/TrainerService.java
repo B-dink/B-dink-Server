@@ -163,7 +163,7 @@ public class TrainerService {
         Center center = centerService.findById(request.centerId());
 
         trainer.updateCenter(center);
-        trainer.update(trainer.getName(), Career.TRAINER, request.intro(), profileImageKey);
+        trainer.update(request.trainerName(), Career.TRAINER, request.intro(), profileImageKey);
 
         return TrainerResponse.from(trainer);
     }
