@@ -122,8 +122,8 @@ public class TrainerController {
             profileImageKey = s3Service.uploadImageOrMedia("image/", profileImage);
         }
 
-        TrainerResponse response = trainerService.completeTrainerProfile(memberId, request, profileImageKey);
-        return RspTemplate.success(Success.UPDATE_TRAINER_SUCCESS, response);
+        trainerService.completeTrainerProfile(memberId, request, profileImageKey);
+        return RspTemplate.success(Success.UPDATE_TRAINER_PROFILE_SUCCESS, Success.UPDATE_TRAINER_PROFILE_SUCCESS.getMessage());
     }
 
     @PutMapping("/{id}/qr-token")

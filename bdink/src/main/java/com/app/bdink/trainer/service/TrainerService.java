@@ -158,14 +158,15 @@ public class TrainerService {
      * 결제 후 자동 생성된 트레이너의 프로필을 보완한다.
      */
     @Transactional
-    public TrainerResponse completeTrainerProfile(Long memberId, TrainerProfileCompleteRequest request, String profileImageKey) {
+    public void completeTrainerProfile(Long memberId, TrainerProfileCompleteRequest request, String profileImageKey) {
         Trainer trainer = getActiveTrainerByMemberId(memberId);
-        Center center = centerService.findById(request.centerId());
 
-        trainer.updateCenter(center);
-        trainer.update(trainer.getName(), Career.TRAINER, request.intro(), profileImageKey);
-
-        return TrainerResponse.from(trainer);
+        // centerId가 전달된 경우에만 센터를 변경하고, null이면 기존 센터를 유지한다.
+        if (request.centerId() != null) {
+            Center center = centerService.findById(request.centerId());
+            trainer.updateCenter(center);
+        }
+        trainer.update(request.trainerName(), Career.TRAINER, request.intro(), profileImageKey);
     }
 
     /**
