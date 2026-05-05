@@ -4,6 +4,5 @@ public record WorkoutSetSaveReqDto(
         Integer setNumber,
         Integer weight,
         Integer reps
-//        Integer restTime
 ) {
 }
