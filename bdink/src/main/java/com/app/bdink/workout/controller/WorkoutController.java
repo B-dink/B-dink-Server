@@ -58,6 +58,17 @@ public class WorkoutController {
         return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, updateId);
     }
 
+    @PutMapping("/trainer/{memberId}/{sessionId}")
+    @Operation(method = "PUT", description = "트레이너가 회원의 운동일지를 수정합니다.")
+    public RspTemplate<?> updateWorkoutSessionByTrainer(@PathVariable Long memberId,
+                                               @PathVariable Long sessionId,
+                                               @RequestBody WorkoutSessionSaveReqDto requestDto) {
+        Member member = memberService.findById(memberId);
+        String updateId = workoutService.updateWorkoutSession(member, sessionId, requestDto);
+
+        return RspTemplate.success(Success.UPDATE_EXERCISELIST_SUCCESS, updateId);
+    }
+
     @GetMapping("/calendar")
     @Operation(method = "GET", description = "특정 월에 운동한 날짜들을 조회합니다.")
     public RspTemplate<?> getWorkoutCalendar(Principal principal,
