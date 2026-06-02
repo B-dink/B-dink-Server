@@ -6,6 +6,7 @@ import com.app.bdink.global.template.RspTemplate;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
 import com.app.bdink.member.util.MemberUtilService;
+import com.app.bdink.trainer.service.TrainerQrService;
 import com.app.bdink.trainermembership.controller.dto.request.TrainerMembershipCreateRequest;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipQrInfoResponse;
 import com.app.bdink.trainermembership.controller.dto.response.TrainerMembershipPlanResponse;
@@ -31,6 +32,7 @@ public class TrainerMembershipController {
     private final TrainerService trainerService;
     private final MemberUtilService memberUtilService;
     private final MemberService memberService;
+    private final TrainerQrService trainerQrService;
 
     @GetMapping("/plans")
     @Operation(method = "GET", description = "활성화된 트레이너 멤버십 플랜 목록을 조회합니다.")
@@ -79,6 +81,8 @@ public class TrainerMembershipController {
     public RspTemplate<?> getMyMembershipQrInfo(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
+
+        trainerQrService.ensureTrainerQr(trainer);
 
         return RspTemplate.success(
                 Success.GET_TRAINER_MEMBERSHIP_SUCCESS,

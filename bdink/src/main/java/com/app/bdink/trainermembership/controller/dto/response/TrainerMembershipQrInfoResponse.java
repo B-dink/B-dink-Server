@@ -12,7 +12,9 @@ public record TrainerMembershipQrInfoResponse(
     public static TrainerMembershipQrInfoResponse from(Trainer trainer, TrainerMembership membership) {
         return new TrainerMembershipQrInfoResponse(
                 trainer.getQrImageUrl(),
-                membership.getExpiredDate()
+                membership != null ? membership.getExpiredDate() : null
+//                membership.getExpiredDate() // 현재 멤버십 적용 x로 기획 변경 후 추 후 다시 사용 예정
+
         );
     }
 }
