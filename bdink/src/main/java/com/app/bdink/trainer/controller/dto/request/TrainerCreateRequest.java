@@ -8,7 +8,9 @@ import com.app.bdink.classroom.domain.Career;
  */
 public record TrainerCreateRequest(
         Long centerId,
-        Career career,
+//        Career career,
+        String trainerName,
         String intro
+
 ) {
 }
