@@ -1,6 +1,5 @@
 package com.app.bdink.trainer.controller.dto.request;
 
-import com.app.bdink.classroom.domain.Career;
 
 /**
  * 트레이너 생성 요청 DTO.
