@@ -54,7 +54,7 @@ public class TrainerService {
                 throw new CustomException(Error.EXIST_TRAINER, Error.EXIST_TRAINER.getMessage());
             }
             existingTrainer.updateCenter(center);
-            existingTrainer.update(member.getName(), request.career(), request.intro(), profileImageKey);
+            existingTrainer.update(request.trainerName(), Career.TRAINER, request.intro(), profileImageKey);
             existingTrainer.activate();
             return existingTrainer.getId().toString();
         }
@@ -62,8 +62,8 @@ public class TrainerService {
         Trainer trainer = Trainer.builder()
                 .center(center)
                 .member(member)
-                .name(member.getName())
-                .career(request.career())
+                .name(request.trainerName() != null ? request.trainerName() : member.getName())
+                .career(Career.TRAINER)
                 .intro(request.intro())
                 .profileImage(profileImageKey)
                 .build();
