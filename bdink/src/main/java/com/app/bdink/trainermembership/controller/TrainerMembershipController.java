@@ -77,7 +77,7 @@ public class TrainerMembershipController {
     }
 
     @GetMapping("/me/qr-info")
-    @Operation(method = "GET", description = "현재 로그인한 트레이너의 QR 이미지 주소와 멤버십 만료일을 조회합니다.")
+    @Operation(method = "GET", description = "현재 로그인한 트레이너의 QR 이미지 주소를 조회합니다.")
     public RspTemplate<?> getMyMembershipQrInfo(Principal principal) {
         Long memberId = memberUtilService.getMemberId(principal);
         Trainer trainer = trainerService.getActiveTrainerByMemberId(memberId);
@@ -85,8 +85,9 @@ public class TrainerMembershipController {
         trainerQrService.ensureTrainerQr(trainer);
 
         return RspTemplate.success(
-                Success.GET_TRAINER_MEMBERSHIP_SUCCESS,
-                TrainerMembershipQrInfoResponse.from(trainer, trainerMembershipService.getMyActiveMembership(memberId))
+                Success.GET_TRAINER_QR_SUCCESS,
+                TrainerMembershipQrInfoResponse.from(trainer)
+//                TrainerMembershipQrInfoResponse.from(trainer, trainerMembershipService.getMyActiveMembership(memberId))
         );
     }
 }

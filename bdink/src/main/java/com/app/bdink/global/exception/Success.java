@@ -62,6 +62,7 @@ public enum Success {
     GET_LEARNING_PROGRESS_SUCCESS(HttpStatus.OK,"학습 진행률 조회 성공"),
     GET_TRAINER_MEMBERSHIP_PLAN_SUCCESS(HttpStatus.OK,"트레이너 멤버십 플랜 조회 성공"),
     GET_TRAINER_MEMBERSHIP_SUCCESS(HttpStatus.OK,"트레이너 멤버십 조회 성공"),
+    GET_TRAINER_QR_SUCCESS(HttpStatus.OK,"트레이너 QR 조회 성공"),
     GET_REPORT_LIST_SUCCESS(HttpStatus.OK,"신고 목록 조회 성공"),
     SEARCH_EXERCISE_SUCCESS(HttpStatus.OK,"운동종목 검색 성공"),
 
