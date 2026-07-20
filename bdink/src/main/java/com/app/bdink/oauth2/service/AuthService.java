@@ -47,6 +47,29 @@ public class AuthService {
         return result;
     }
 
+    // AppleSignInService.getAppleId() 메서드도 이 코드에 그대로 재사용됐는데,
+    // 애플도 웹에서 쓰게 될 때 카카오처럼 코드/토큰 교환 방식이 다를 수 있어. 지금 애플 로그인은 아직 웹에서 구현 안 했으니 당장은 문제없지만,
+    // 나중에 애플 웹 로그인 붙일 때 이 부분도 다시 점검 필요하다는 것을 유의하세요.
+
+    // 웹 전용: 카카오는 인가코드 → 액세스 토큰 교환 과정이 필요함 cf) 웹은 카카오 로그인만 지원합니다. (26.7)
+    @Transactional
+    public LoginResult signUpOrSignInWeb(String socialType, String code, String redirectUri) {
+        LoginResult result = null;
+
+        if (SocialType.valueOf(socialType).name().equals("APPLE")) {
+            result = appleSignInService.getAppleId(code); // 애플은 기존과 동일하다고 가정 (필요시 확인)
+        } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
+            String accessToken = kakaoSignInService.getAccessToken(code, redirectUri);
+            result = kakaoSignInService.loginOrSignUp(accessToken);
+        }
+
+        if (result == null) {
+            throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
+        }
+
+        return result;
+    }
+
     @Transactional
     public void revoke(Principal principal, String socialType) {
         Long id = Long.parseLong(principal.getName());
