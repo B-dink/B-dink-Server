@@ -37,7 +37,7 @@ public class KakaoSignInService {
     private final MemberRepository memberRepository;
 
     // 인가 코드를 통해 액세스 토큰을 받아오는 메서드
-    public String getAccessToken(String code) {
+    public String getAccessToken(String code, String redirectUri) {
         KakaoTokenResDto kakaoTokenResDto = WebClient.create(KAUTH_TOKEN_URL_HOST)
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -45,6 +45,7 @@ public class KakaoSignInService {
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", clientId)
+                        .queryParam("redirect_uri", redirectUri)
                         .queryParam("code", code)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())

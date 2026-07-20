@@ -62,6 +62,23 @@ public class SocialAuthController {
         return RspTemplate.success(Success.SIGNUP_SUCCESS, commonOauthDto);
     }
 
+    @GetMapping("/web")
+    @Operation(method = "GET", description = "웹 전용 소셜 로그인. 카카오는 인가코드+redirectUri를 받아 서버에서 액세스 토큰으로 교환합니다.")
+    public RspTemplate<?> signInWeb(
+            @Parameter(description = "카카오는 인가코드, 애플은 아이덴티티 토큰", in = ParameterIn.QUERY) @RequestParam("code") String code,
+            @Parameter(description = "애플은 APPLE, 카카오는 KAKAO", in = ParameterIn.QUERY) @RequestParam("provider") String provider,
+            @Parameter(description = "프론트에서 사용한 redirect_uri", in = ParameterIn.QUERY) @RequestParam("redirectUri") String redirectUri
+    ) {
+        LoginResult result = authService.signUpOrSignInWeb(provider, code, redirectUri);
+        memberService.markLogin(result.member());
+        TokenDto tokenDto = tokenProvider.createToken(result.member());
+        CommonOauthDto commonOauthDto = new CommonOauthDto(tokenDto, result.member().getId());
+        if (result.isNewMember()) {
+            return RspTemplate.success(Success.LOGIN_ACCEPTED, commonOauthDto);
+        }
+        return RspTemplate.success(Success.SIGNUP_SUCCESS, commonOauthDto);
+    }
+
     @DeleteMapping("/revoke")
     @Operation(method = "DELETE", description = "소셜로그인 회원탈퇴를 진행합니다. authcode는 애플로그인인 경우만 필요.")
     public RspTemplate<?> revoke(@RequestParam String provider, Principal principal) {
