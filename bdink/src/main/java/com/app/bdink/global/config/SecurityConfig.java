@@ -77,7 +77,6 @@ public class SecurityConfig {
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of("*")); // 모든 도메인에서의 요청 허용
         configuration.setAllowedOrigins(List.of(
                 "http://127.0.0.1:3000",
                 "http://127.0.0.1:8080",
