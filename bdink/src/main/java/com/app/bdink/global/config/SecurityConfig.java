@@ -83,6 +83,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://www.bdink.co.kr"
         ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // ← 이 줄 추가
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 요청 허용
         configuration.setExposedHeaders(List.of("Access-Control-Allow-Credentials", "Authorization", "Set-Cookie")); // 특정 응답 헤더를 클라이언트가 접근할 수 있도록 노출
         configuration.setAllowCredentials(true); // 자격 증명(쿠기 등)을 포함한 요청 허용
