@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // 스프링의 기본 로그인 폼을 사용하지 않고, auth 등의 외부 인증 방식을 사용하기 위해 비활성화.
                 .logout(AbstractHttpConfigurer::disable) // 로그아웃 기능 비활성화
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/callback/**").permitAll() // 이 경로에 대해서는 모든 사용자가 접근할 수 있도록 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() // Swagger API 문서 허용
