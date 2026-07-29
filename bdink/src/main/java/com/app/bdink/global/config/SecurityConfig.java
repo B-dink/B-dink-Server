@@ -81,7 +81,8 @@ public class SecurityConfig {
                 "http://127.0.0.1:3000",
                 "http://127.0.0.1:8080",
                 "http://localhost:3000",
-                "https://www.bdink.co.kr"
+                "https://www.bdink.co.kr",
+                "https://bdink.co.kr"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // ← 이 줄 추가
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 요청 허용
