@@ -213,6 +213,10 @@ public enum Success {
     DELETE_WORKOUT_SUCCESS(HttpStatus.NO_CONTENT, "운동일지 정보 삭제 성공"),
     DELETE_ROUTINE_SUCCESS(HttpStatus.NO_CONTENT, "추천 운동루틴 삭제 성공"),
 
+    CREATE_COUPON_SUCCESS(HttpStatus.CREATED, "쿠폰 생성 성공"),
+    VALIDATE_COUPON_SUCCESS(HttpStatus.OK, "쿠폰 검증 성공"),
+    REDEEM_COUPON_SUCCESS(HttpStatus.OK, "쿠폰 사용 처리 성공"),
+
 
     ;
 

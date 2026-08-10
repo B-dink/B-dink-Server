@@ -114,8 +114,9 @@ public class ControllerExceptionAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<RspTemplate> handleException(final Exception error, final HttpServletRequest request){
+        log.error("Unhandled exception at {}: ", request.getRequestURI(), error); // ← 이 줄 추가
         return ResponseEntity.status(Error.INTERNAL_SERVER_ERROR.getErrorCode())
-                .body(RspTemplate.error(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage()));    
+                .body(RspTemplate.error(Error.INTERNAL_SERVER_ERROR, Error.INTERNAL_SERVER_ERROR.getMessage()));
     }
 
 }

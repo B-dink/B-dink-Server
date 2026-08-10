@@ -38,6 +38,7 @@ public enum Error {
     NOT_FOUND_CLASSROOM_DETAILPAGE(HttpStatus.NOT_FOUND, "강의실에 디테일 페이지가 없습니다."),
     NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "찾을 수 없는 챕터입니다."),
     NOT_FOUND_LECTURE(HttpStatus.NOT_FOUND, "찾을 수 없는 강의입니다."),
+    NOT_FOUND_COUPON(HttpStatus.NOT_FOUND, "찾을 수 없는 쿠폰입니다."),
     NOT_FOUND_MEDIA(HttpStatus.NOT_FOUND, "찾을 수 없는 미디어입니다."),
     NOT_FOUND_KOLLUSMEDIA(HttpStatus.NOT_FOUND, "찾을 수 없는 미디어입니다."),
     NOT_FOUND_KOLLUSMEDIALINK(HttpStatus.NOT_FOUND, "찾을 수 없는 시청기록 입니다."),
@@ -160,6 +161,9 @@ public enum Error {
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN,"리소스에 접근할 수 없는 유저입니다. 토큰을 확인해주세요."),
     NO_INSTRUCTOR(HttpStatus.FORBIDDEN, "강사정보가 없는 유저입니다."),
     INVALID_USER_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없는 유저입니다."),
+    NOT_APPLICABLE_COUPON(HttpStatus.FORBIDDEN, "해당 강의에는 사용할 수 없는 쿠폰입니다."),
+    EXCEED_COUPON_USAGE_LIMIT(HttpStatus.FORBIDDEN, "쿠폰 사용 가능 횟수를 초과했습니다."),
+    INVALID_COUPON_DISCOUNT_RATE(HttpStatus.FORBIDDEN, "할인율은 1~100 사이여야 합니다."),
     INVALID_SELF_TRAINER_QR(HttpStatus.FORBIDDEN, "트레이너는 본인의 QR은 사용할 수 없습니다."),
     REJECT_ACCOUNT_PAYMENT(HttpStatus.FORBIDDEN, "잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_PAYMENT(HttpStatus.FORBIDDEN, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
@@ -199,6 +203,7 @@ public enum Error {
      */
     VERSION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 버전입니다."),
     DUPLICATE_PURCHASE(HttpStatus.CONFLICT, "이미 처리된 구매입니다"),
+    DUPLICATE_COUPON_CODE(HttpStatus.CONFLICT, "이미 존재하는 쿠폰 코드입니다."),
 
     /**
      * 500 INTERNAL_SERVER_ERROR
