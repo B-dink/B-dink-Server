@@ -171,6 +171,14 @@ public class MemberService {
     }
 
     @Transactional
+    public Member completeWebSignUp(final Member member) {
+        if (member.getRole().equals(Role.SIGNUP_PROGRESS)) {
+            member.modifyingInSocialSignUp(member.getName(), member.getPictureUrl(), "");
+        }
+        return member;
+    }
+
+    @Transactional
     public void updateMarketing(final Member member, MemberMarketingDto memberMarketingDto){
         member.updateEventAgree(memberMarketingDto.isAgree());
     }
