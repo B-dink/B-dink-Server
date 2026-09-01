@@ -54,6 +54,10 @@ public class Member extends BaseTimeEntity {
     @Column(name = "status", nullable = false)
     private MemberStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform")
+    private Platform platform;
+
     @Column(name = "lastLoginAt")
     private LocalDateTime lastLoginAt;
 
@@ -67,7 +71,7 @@ public class Member extends BaseTimeEntity {
 
     @Builder
     public Member(String email, String password, String name, Role role, String phoneNumber, String pictureUrl,
-                  String appleId, Long kakaoId, SocialType socialType, boolean eventAgree) {
+                  String appleId, Long kakaoId, SocialType socialType, boolean eventAgree, Platform platform) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -79,6 +83,7 @@ public class Member extends BaseTimeEntity {
         this.kakaoId = kakaoId;
         this.socialType = socialType;
         this.eventAgree = eventAgree;
+        this.platform = platform;
         this.kollusClientUserId = socialType+"_"+UUID.randomUUID();
     }
 

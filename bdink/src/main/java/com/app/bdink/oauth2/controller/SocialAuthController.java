@@ -18,6 +18,7 @@ import com.app.bdink.oauth2.domain.RefreshToken;
 import com.app.bdink.oauth2.domain.TokenDto;
 import com.app.bdink.oauth2.service.AuthService;
 import com.app.bdink.qna.service.QuestionService;
+import com.app.bdink.member.entity.Platform;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -50,9 +51,10 @@ public class SocialAuthController {
     @Operation(method = "GET", description = "소셜 로그인(KAKAO,APPLE)을 진행해 회원가입 및 로그인을 진행합니다. 소셜 로그인은 자체 회원가입으로 넘어갑니다. 여기서 넘겨주는 토큰을 social-signup으로 넘겨주세요.")
     public RspTemplate<?> signIn(
             @Parameter(description = "애플은 아이덴티티 토큰, 카카오는 인가코드", in = ParameterIn.QUERY) @RequestParam("code") String socialAccessToken,
-            @Parameter(description = "애플은 APPLE, 카카오는 KAKAO", in = ParameterIn.QUERY) @RequestParam("provider") String provider
+            @Parameter(description = "애플은 APPLE, 카카오는 KAKAO", in = ParameterIn.QUERY) @RequestParam("provider") String provider,
+            @Parameter(description = "IOS 또는 ANDROID (앱 업데이트 전까지는 생략 가능)", in = ParameterIn.QUERY) @RequestParam(value = "platform", required = false, defaultValue = "UNKNOWN") String platform
     ) {
-        LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken);
+        LoginResult result = authService.signUpOrSignIn(provider, socialAccessToken, Platform.valueOf(platform));
         memberService.markLogin(result.member());
         TokenDto tokenDto = tokenProvider.createToken(result.member());
         CommonOauthDto commonOauthDto = new CommonOauthDto(tokenDto, result.member().getId());
@@ -108,10 +110,12 @@ public class SocialAuthController {
     public RspTemplate<?> signUpSocial(
             Principal principal,
             @Valid @RequestPart(value = "memberSocialRequestDto") MemberSocialRequestDto memberRequestDto,
-            @RequestPart(value = "profile") MultipartFile profileImage
+            @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
         Member member = memberService.findById(memberUtilService.getMemberId(principal));
-        String image = s3Service.uploadImageOrMedia("image/", profileImage);
+        String image = (profileImage != null && !profileImage.isEmpty())
+                ? s3Service.uploadImageOrMedia("image/", profileImage)
+                : member.getPictureUrl();
         member = memberService.socialJoin(member, memberRequestDto, image);
         CommonOauthDto commonOauthDto = new CommonOauthDto(tokenProvider.createToken(member), member.getId());
         return RspTemplate.success(Success.SIGNUP_SUCCESS, commonOauthDto);

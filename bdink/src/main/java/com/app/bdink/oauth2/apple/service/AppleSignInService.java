@@ -9,6 +9,7 @@ import com.app.bdink.oauth2.domain.SocialType;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.repository.MemberRepository;
+import com.app.bdink.member.entity.Platform;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,6 +80,7 @@ public class AppleSignInService {
                             .appleId(appleId)
                             .socialType(SocialType.APPLE)
                             .role(Role.SIGNUP_PROGRESS)
+                            .platform(Platform.IOS)
                             .build()));
             return LoginResult.from(member.get(), true);
         }
