@@ -67,7 +67,9 @@ public class AuthService {
             throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
         }
 
-        return result;
+        // 웹은 프로필세팅 화면이 없으므로, 로그인 시점에 카카오 정보로 즉시 가입 완료 처리
+        Member completedMember = memberService.completeWebSignUp(result.member());
+        return new LoginResult(completedMember, result.isNewMember());
     }
 
     @Transactional
