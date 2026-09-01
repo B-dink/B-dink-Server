@@ -11,6 +11,7 @@ import com.app.bdink.oauth2.kakao.service.KakaoSignInService;
 import com.app.bdink.global.token.TokenProvider;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.service.MemberService;
+import com.app.bdink.member.entity.Platform;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,13 @@ public class AuthService {
 
 
     @Transactional
-    public LoginResult signUpOrSignIn(String socialType, String socialAccessToken) {
+    public LoginResult signUpOrSignIn(String socialType, String socialAccessToken, Platform platform) {
         LoginResult result = null;
 
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
             result = appleSignInService.getAppleId(socialAccessToken);
         } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
-            //String accessToken = kakaoSignInService.getAccessToken(socialAccessToken);
-            result = kakaoSignInService.loginOrSignUp(socialAccessToken);
+            result = kakaoSignInService.loginOrSignUp(socialAccessToken, platform);
         }
 
         if (result == null) {
@@ -57,17 +57,16 @@ public class AuthService {
         LoginResult result = null;
 
         if (SocialType.valueOf(socialType).name().equals("APPLE")) {
-            result = appleSignInService.getAppleId(code); // 애플은 기존과 동일하다고 가정 (필요시 확인)
+            result = appleSignInService.getAppleId(code);
         } else if (SocialType.valueOf(socialType).name().equals("KAKAO")) {
             String accessToken = kakaoSignInService.getAccessToken(code, redirectUri);
-            result = kakaoSignInService.loginOrSignUp(accessToken);
+            result = kakaoSignInService.loginOrSignUp(accessToken, Platform.WEB);
         }
 
         if (result == null) {
             throw new CustomException(Error.BAD_REQUEST_VALIDATION, Error.BAD_REQUEST_VALIDATION.getMessage());
         }
 
-        // 웹은 프로필세팅 화면이 없으므로, 로그인 시점에 카카오 정보로 즉시 가입 완료 처리
         Member completedMember = memberService.completeWebSignUp(result.member());
         return new LoginResult(completedMember, result.isNewMember());
     }

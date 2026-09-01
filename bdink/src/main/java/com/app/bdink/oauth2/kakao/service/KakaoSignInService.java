@@ -9,6 +9,7 @@ import com.app.bdink.oauth2.kakao.info.KakaoUserInfo;
 import com.app.bdink.member.entity.Member;
 import com.app.bdink.member.entity.Role;
 import com.app.bdink.member.repository.MemberRepository;
+import com.app.bdink.member.entity.Platform;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +73,7 @@ public class KakaoSignInService {
     }
 
     @Transactional
-    public LoginResult loginOrSignUp(String kakaoAccessToken) {
+    public LoginResult loginOrSignUp(String kakaoAccessToken, Platform platform) {
         KakaoUserInfo userInfo = getUserInfo(kakaoAccessToken);
         log.info(userInfo.toString());
         Long kakaoId = userInfo.getId();
@@ -89,6 +90,7 @@ public class KakaoSignInService {
                             .socialType(SocialType.KAKAO)
                             .pictureUrl(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                             .role(Role.SIGNUP_PROGRESS)
+                            .platform(platform)
                             .build()));
             return new LoginResult(member.get(), true);
         }
